@@ -1,0 +1,43 @@
+{
+    "num_conditions": 15,
+    "num_samples": 80,
+    "num_samples_train": 64,
+    "num_samples_val": 16,
+    "condition_to_idx": {
+        "Actinic Keratosis": 0,
+        "Angioma": 1,
+        "Basal Cell Carcinoma": 2,
+        "Dermatitis": 3,
+        "Keloid": 4,
+        "Melanoma": 5,
+        "Melasma": 6,
+        "Nevus": 7,
+        "Psoriasis": 8,
+        "Seborrheic Keratosis": 9,
+        "Squamous Cell Carcinoma": 10,
+        "Tinea": 11,
+        "Urticaria": 12,
+        "Vitiligo": 13,
+        "Wart": 14
+    },
+    "idx_to_condition": {
+        "0": "Actinic Keratosis",
+        "1": "Angioma",
+        "2": "Basal Cell Carcinoma",
+        "3": "Dermatitis",
+        "4": "Keloid",
+        "5": "Melanoma",
+        "6": "Melasma",
+        "7": "Nevus",
+        "8": "Psoriasis",
+        "9": "Seborrheic Keratosis",
+        "10": "Squamous Cell Carcinoma",
+        "11": "Tinea",
+        "12": "Urticaria",
+        "13": "Vitiligo",
+        "14": "Wart"
+    },
+    "batch_size": 16,
+    "image_size": 224,
+    "created_at": "2026-04-19T17:11:05.403728"
+}

@@ -1,0 +1,2522 @@
+[
+    {
+        "image_id": "img_00107",
+        "image_path": "images/img_00107.jpg",
+        "question": "What causes dark patches?",
+        "answer": "Melasma caused by sun exposure, hormonal factors, and genetic predisposition. More common in darker skin types.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 29,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00146",
+        "image_path": "images/img_00146.jpg",
+        "question": "How is it removed?",
+        "answer": "Can be removed by cryotherapy, curettage, laser ablation, or surgical excision with minimal scarring.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 27,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00203",
+        "image_path": "images/img_00203.jpg",
+        "question": "How to treat?",
+        "answer": "Steroid injections, laser therapy, surgical excision, or pressure garments. Often requires combination approach.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 71,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00144",
+        "image_path": "images/img_00144.jpg",
+        "question": "Should I remove?",
+        "answer": "Removal only if cosmetically bothersome or frequently irritated by clothing. Purely optional decision.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 59,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00096",
+        "image_path": "images/img_00096.jpg",
+        "question": "Can AK become cancer?",
+        "answer": "Yes, 2-6% of actinic keratosis lesions progress to squamous cell carcinoma annually. Early treatment recommended.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 60,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00059",
+        "image_path": "images/img_00059.jpg",
+        "question": "What causes dermatitis?",
+        "answer": "Caused by allergic reaction to irritants, soaps, detergents, jewelry, plants, or genetic predisposition to inflammation.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 25,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00182",
+        "image_path": "images/img_00182.jpg",
+        "question": "Why bumps itchy?",
+        "answer": "Urticaria (hives) from allergic reaction causing raised itchy welts. Usually self-limited and manageable with antihistamines.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 73,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00019",
+        "image_path": "images/img_00019.jpg",
+        "question": "What is this pink bump?",
+        "answer": "Appears to be basal cell carcinoma, the most common skin cancer. Highly treatable when caught early with appropriate dermatological intervention.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 23,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00134",
+        "image_path": "images/img_00134.jpg",
+        "question": "Can vitiligo be treated?",
+        "answer": "No cure but treatments help. Options include topical steroids, phototherapy, surgical approaches, and cosmetic camouflage.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 44,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00172",
+        "image_path": "images/img_00172.jpg",
+        "question": "How to treat?",
+        "answer": "Topical antifungal creams for localized infection. Oral antifungals for extensive cases. Treatment typically lasts 2-4 weeks.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 29,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00050",
+        "image_path": "images/img_00050.jpg",
+        "question": "How to treat rash?",
+        "answer": "Avoid irritants, use gentle cleansers, apply fragrance-free moisturizer, and use topical corticosteroids as prescribed by your doctor.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 67,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00008",
+        "image_path": "images/img_00008.jpg",
+        "question": "What should I do?",
+        "answer": "Schedule urgent appointment with dermatologist. Early detection significantly improves treatment outcomes and survival rates.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 38,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00069",
+        "image_path": "images/img_00069.jpg",
+        "question": "How is psoriasis treated?",
+        "answer": "Treatment includes topical agents, phototherapy, and systemic medications depending on severity and extent of involvement.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 46,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00202",
+        "image_path": "images/img_00202.jpg",
+        "question": "How to treat?",
+        "answer": "Steroid injections, laser therapy, surgical excision, or pressure garments. Often requires combination approach.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 21,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00066",
+        "image_path": "images/img_00066.jpg",
+        "question": "How is psoriasis treated?",
+        "answer": "Treatment includes topical agents, phototherapy, and systemic medications depending on severity and extent of involvement.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 59,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00062",
+        "image_path": "images/img_00062.jpg",
+        "question": "What are silver scales?",
+        "answer": "Psoriatic plaques characterized by thick silvery-white scales on red inflamed base. Chronic autoimmune condition requiring ongoing management.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 40,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00150",
+        "image_path": "images/img_00150.jpg",
+        "question": "What is red spot?",
+        "answer": "Cherry angioma - benign vascular lesion composed of dilated blood vessels. Not dangerous, purely cosmetic concern.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 53,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00122",
+        "image_path": "images/img_00122.jpg",
+        "question": "Why is skin losing color?",
+        "answer": "Vitiligo is autoimmune depigmentation causing white patches as melanocytes are destroyed. Affects appearance but not health directly.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 49,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00141",
+        "image_path": "images/img_00141.jpg",
+        "question": "Should I remove?",
+        "answer": "Removal only if cosmetically bothersome or frequently irritated by clothing. Purely optional decision.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 42,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00140",
+        "image_path": "images/img_00140.jpg",
+        "question": "Should I remove?",
+        "answer": "Removal only if cosmetically bothersome or frequently irritated by clothing. Purely optional decision.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 73,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00005",
+        "image_path": "images/img_00005.jpg",
+        "question": "What should I do?",
+        "answer": "Schedule urgent appointment with dermatologist. Early detection significantly improves treatment outcomes and survival rates.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 68,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00040",
+        "image_path": "images/img_00040.jpg",
+        "question": "Should I remove it?",
+        "answer": "Removal is optional unless the mole changes in appearance or becomes irritated. Regular self-examination is important.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 22,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00100",
+        "image_path": "images/img_00100.jpg",
+        "question": "How to prevent?",
+        "answer": "Strict sun protection with SPF 30+ sunscreen daily, avoid peak sun hours 10am-4pm, wear protective clothing and hats.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 33,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00031",
+        "image_path": "images/img_00031.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "Appears to be a benign nevus with regular symmetric borders and uniform color. Monitor for any changes and have it evaluated if concerned.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 61,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00149",
+        "image_path": "images/img_00149.jpg",
+        "question": "How is it removed?",
+        "answer": "Can be removed by cryotherapy, curettage, laser ablation, or surgical excision with minimal scarring.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 70,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00198",
+        "image_path": "images/img_00198.jpg",
+        "question": "What is thick scar?",
+        "answer": "Keloid - abnormal scar tissue growth extending beyond original wound site. More common in individuals with genetic predisposition.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 44,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00087",
+        "image_path": "images/img_00087.jpg",
+        "question": "Are warts contagious?",
+        "answer": "Yes, HPV warts are contagious through direct skin contact. Avoid touching and spreading to other body areas.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 69,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00067",
+        "image_path": "images/img_00067.jpg",
+        "question": "How is psoriasis treated?",
+        "answer": "Treatment includes topical agents, phototherapy, and systemic medications depending on severity and extent of involvement.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 33,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00196",
+        "image_path": "images/img_00196.jpg",
+        "question": "What is thick scar?",
+        "answer": "Keloid - abnormal scar tissue growth extending beyond original wound site. More common in individuals with genetic predisposition.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 35,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00056",
+        "image_path": "images/img_00056.jpg",
+        "question": "What causes dermatitis?",
+        "answer": "Caused by allergic reaction to irritants, soaps, detergents, jewelry, plants, or genetic predisposition to inflammation.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 30,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00026",
+        "image_path": "images/img_00026.jpg",
+        "question": "How is it treated?",
+        "answer": "Treatment options include surgical excision, curettage, topical medications, or laser therapy depending on size and location.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 32,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00042",
+        "image_path": "images/img_00042.jpg",
+        "question": "Should I remove it?",
+        "answer": "Removal is optional unless the mole changes in appearance or becomes irritated. Regular self-examination is important.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 36,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00154",
+        "image_path": "images/img_00154.jpg",
+        "question": "What is red spot?",
+        "answer": "Cherry angioma - benign vascular lesion composed of dilated blood vessels. Not dangerous, purely cosmetic concern.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 74,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00027",
+        "image_path": "images/img_00027.jpg",
+        "question": "How is it treated?",
+        "answer": "Treatment options include surgical excision, curettage, topical medications, or laser therapy depending on size and location.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 64,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00078",
+        "image_path": "images/img_00078.jpg",
+        "question": "What is this hard bump?",
+        "answer": "Common wart caused by human papillomavirus (HPV) infection. Can be treated with topical medications, cryotherapy, or surgical removal.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 66,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00080",
+        "image_path": "images/img_00080.jpg",
+        "question": "How to treat wart?",
+        "answer": "Options include topical medications, freezing with liquid nitrogen, laser therapy, or surgical excision depending on size and location.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 45,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00024",
+        "image_path": "images/img_00024.jpg",
+        "question": "Is this serious?",
+        "answer": "BCC is treatable when diagnosed early. It rarely spreads to other parts of the body. Professional treatment is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 38,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00049",
+        "image_path": "images/img_00049.jpg",
+        "question": "Why is skin red and inflamed?",
+        "answer": "Contact or atopic dermatitis causing inflammation. Identify and avoid triggers, maintain good hygiene, use fragrance-free moisturizer.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 36,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00016",
+        "image_path": "images/img_00016.jpg",
+        "question": "What is this pink bump?",
+        "answer": "Appears to be basal cell carcinoma, the most common skin cancer. Highly treatable when caught early with appropriate dermatological intervention.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 26,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00156",
+        "image_path": "images/img_00156.jpg",
+        "question": "Should be removed?",
+        "answer": "Removal only for cosmetic reasons. No medical necessity as they are benign and pose no health risk.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 62,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00205",
+        "image_path": "images/img_00205.jpg",
+        "question": "Why do keloids form?",
+        "answer": "Abnormal healing response to skin injury. Genetic predisposition. More common in African, Hispanic, and Asian populations.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 20,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00121",
+        "image_path": "images/img_00121.jpg",
+        "question": "Why is skin losing color?",
+        "answer": "Vitiligo is autoimmune depigmentation causing white patches as melanocytes are destroyed. Affects appearance but not health directly.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 21,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00193",
+        "image_path": "images/img_00193.jpg",
+        "question": "How to treat?",
+        "answer": "Antihistamines, avoid known triggers, topical soothing agents. Seek medical care if severe or with anaphylaxis symptoms.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 45,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00112",
+        "image_path": "images/img_00112.jpg",
+        "question": "Can melasma be treated?",
+        "answer": "Yes, treatment options include strict sun protection, topical bleaching agents, laser therapy, or chemical peels.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 79,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00183",
+        "image_path": "images/img_00183.jpg",
+        "question": "Why bumps itchy?",
+        "answer": "Urticaria (hives) from allergic reaction causing raised itchy welts. Usually self-limited and manageable with antihistamines.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 44,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00175",
+        "image_path": "images/img_00175.jpg",
+        "question": "Is tinea contagious?",
+        "answer": "Yes, highly contagious through direct contact. Avoid sharing towels, nail tools, or other personal items.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 48,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00111",
+        "image_path": "images/img_00111.jpg",
+        "question": "Can melasma be treated?",
+        "answer": "Yes, treatment options include strict sun protection, topical bleaching agents, laser therapy, or chemical peels.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 54,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00119",
+        "image_path": "images/img_00119.jpg",
+        "question": "Will it come back?",
+        "answer": "Possible if sun exposure continues. Strict sun protection with SPF 50+ is essential for prevention of recurrence.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 59,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00171",
+        "image_path": "images/img_00171.jpg",
+        "question": "How to treat?",
+        "answer": "Topical antifungal creams for localized infection. Oral antifungals for extensive cases. Treatment typically lasts 2-4 weeks.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 43,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00070",
+        "image_path": "images/img_00070.jpg",
+        "question": "Is psoriasis permanent?",
+        "answer": "Yes, psoriasis is chronic but manageable. Remission possible with appropriate treatment and trigger avoidance.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 35,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00034",
+        "image_path": "images/img_00034.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "Appears to be a benign nevus with regular symmetric borders and uniform color. Monitor for any changes and have it evaluated if concerned.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 78,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00130",
+        "image_path": "images/img_00130.jpg",
+        "question": "Can vitiligo be treated?",
+        "answer": "No cure but treatments help. Options include topical steroids, phototherapy, surgical approaches, and cosmetic camouflage.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 22,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00028",
+        "image_path": "images/img_00028.jpg",
+        "question": "How is it treated?",
+        "answer": "Treatment options include surgical excision, curettage, topical medications, or laser therapy depending on size and location.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 43,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00165",
+        "image_path": "images/img_00165.jpg",
+        "question": "What is ring-shaped rash?",
+        "answer": "Tinea (ringworm) - fungal infection causing characteristic ring-shaped lesion. Contagious and requires antifungal treatment.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 43,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00148",
+        "image_path": "images/img_00148.jpg",
+        "question": "How is it removed?",
+        "answer": "Can be removed by cryotherapy, curettage, laser ablation, or surgical excision with minimal scarring.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 78,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00052",
+        "image_path": "images/img_00052.jpg",
+        "question": "How to treat rash?",
+        "answer": "Avoid irritants, use gentle cleansers, apply fragrance-free moisturizer, and use topical corticosteroids as prescribed by your doctor.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 48,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00168",
+        "image_path": "images/img_00168.jpg",
+        "question": "What is ring-shaped rash?",
+        "answer": "Tinea (ringworm) - fungal infection causing characteristic ring-shaped lesion. Contagious and requires antifungal treatment.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 55,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00209",
+        "image_path": "images/img_00209.jpg",
+        "question": "Why do keloids form?",
+        "answer": "Abnormal healing response to skin injury. Genetic predisposition. More common in African, Hispanic, and Asian populations.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 35,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00093",
+        "image_path": "images/img_00093.jpg",
+        "question": "What are rough spots?",
+        "answer": "Actinic keratosis - precancerous growths from sun exposure. Should be monitored and treated to prevent progression to skin cancer.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 21,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00054",
+        "image_path": "images/img_00054.jpg",
+        "question": "How to treat rash?",
+        "answer": "Avoid irritants, use gentle cleansers, apply fragrance-free moisturizer, and use topical corticosteroids as prescribed by your doctor.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 69,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00029",
+        "image_path": "images/img_00029.jpg",
+        "question": "How is it treated?",
+        "answer": "Treatment options include surgical excision, curettage, topical medications, or laser therapy depending on size and location.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 31,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00118",
+        "image_path": "images/img_00118.jpg",
+        "question": "Will it come back?",
+        "answer": "Possible if sun exposure continues. Strict sun protection with SPF 50+ is essential for prevention of recurrence.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 70,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00136",
+        "image_path": "images/img_00136.jpg",
+        "question": "What is brown growth?",
+        "answer": "Seborrheic keratosis - common benign skin growth more prevalent with age. Not cancerous and requires no medical treatment.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 28,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00036",
+        "image_path": "images/img_00036.jpg",
+        "question": "What type of mole?",
+        "answer": "This appears to be a common acquired nevus, likely compound type. Benign and does not require treatment unless cosmetically bothersome.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 23,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00083",
+        "image_path": "images/img_00083.jpg",
+        "question": "How to treat wart?",
+        "answer": "Options include topical medications, freezing with liquid nitrogen, laser therapy, or surgical excision depending on size and location.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 74,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00086",
+        "image_path": "images/img_00086.jpg",
+        "question": "Are warts contagious?",
+        "answer": "Yes, HPV warts are contagious through direct skin contact. Avoid touching and spreading to other body areas.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 22,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00207",
+        "image_path": "images/img_00207.jpg",
+        "question": "Why do keloids form?",
+        "answer": "Abnormal healing response to skin injury. Genetic predisposition. More common in African, Hispanic, and Asian populations.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 78,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00160",
+        "image_path": "images/img_00160.jpg",
+        "question": "How to remove?",
+        "answer": "Can be treated with laser, cryotherapy, or electrocautery if cosmetically concerning.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 60,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00192",
+        "image_path": "images/img_00192.jpg",
+        "question": "How to treat?",
+        "answer": "Antihistamines, avoid known triggers, topical soothing agents. Seek medical care if severe or with anaphylaxis symptoms.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 68,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00065",
+        "image_path": "images/img_00065.jpg",
+        "question": "How is psoriasis treated?",
+        "answer": "Treatment includes topical agents, phototherapy, and systemic medications depending on severity and extent of involvement.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 22,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00090",
+        "image_path": "images/img_00090.jpg",
+        "question": "What are rough spots?",
+        "answer": "Actinic keratosis - precancerous growths from sun exposure. Should be monitored and treated to prevent progression to skin cancer.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 60,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00106",
+        "image_path": "images/img_00106.jpg",
+        "question": "What causes dark patches?",
+        "answer": "Melasma caused by sun exposure, hormonal factors, and genetic predisposition. More common in darker skin types.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 24,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00176",
+        "image_path": "images/img_00176.jpg",
+        "question": "Is tinea contagious?",
+        "answer": "Yes, highly contagious through direct contact. Avoid sharing towels, nail tools, or other personal items.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 39,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00079",
+        "image_path": "images/img_00079.jpg",
+        "question": "What is this hard bump?",
+        "answer": "Common wart caused by human papillomavirus (HPV) infection. Can be treated with topical medications, cryotherapy, or surgical removal.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 32,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00195",
+        "image_path": "images/img_00195.jpg",
+        "question": "What is thick scar?",
+        "answer": "Keloid - abnormal scar tissue growth extending beyond original wound site. More common in individuals with genetic predisposition.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 69,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00132",
+        "image_path": "images/img_00132.jpg",
+        "question": "Can vitiligo be treated?",
+        "answer": "No cure but treatments help. Options include topical steroids, phototherapy, surgical approaches, and cosmetic camouflage.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 58,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00002",
+        "image_path": "images/img_00002.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning ABCDE features including irregular borders and varied coloration. Immediate dermatological evaluation is critical.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 31,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00032",
+        "image_path": "images/img_00032.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "Appears to be a benign nevus with regular symmetric borders and uniform color. Monitor for any changes and have it evaluated if concerned.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 42,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00117",
+        "image_path": "images/img_00117.jpg",
+        "question": "Will it come back?",
+        "answer": "Possible if sun exposure continues. Strict sun protection with SPF 50+ is essential for prevention of recurrence.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 26,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00060",
+        "image_path": "images/img_00060.jpg",
+        "question": "What are silver scales?",
+        "answer": "Psoriatic plaques characterized by thick silvery-white scales on red inflamed base. Chronic autoimmune condition requiring ongoing management.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 73,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00189",
+        "image_path": "images/img_00189.jpg",
+        "question": "What causes hives?",
+        "answer": "Triggered by allergens, infections, medications, stress, or in many cases the cause is unknown (idiopathic).",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 76,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00046",
+        "image_path": "images/img_00046.jpg",
+        "question": "Why is skin red and inflamed?",
+        "answer": "Contact or atopic dermatitis causing inflammation. Identify and avoid triggers, maintain good hygiene, use fragrance-free moisturizer.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 57,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00166",
+        "image_path": "images/img_00166.jpg",
+        "question": "What is ring-shaped rash?",
+        "answer": "Tinea (ringworm) - fungal infection causing characteristic ring-shaped lesion. Contagious and requires antifungal treatment.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 60,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00038",
+        "image_path": "images/img_00038.jpg",
+        "question": "What type of mole?",
+        "answer": "This appears to be a common acquired nevus, likely compound type. Benign and does not require treatment unless cosmetically bothersome.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 75,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00204",
+        "image_path": "images/img_00204.jpg",
+        "question": "How to treat?",
+        "answer": "Steroid injections, laser therapy, surgical excision, or pressure garments. Often requires combination approach.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 28,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00048",
+        "image_path": "images/img_00048.jpg",
+        "question": "Why is skin red and inflamed?",
+        "answer": "Contact or atopic dermatitis causing inflammation. Identify and avoid triggers, maintain good hygiene, use fragrance-free moisturizer.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 38,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00025",
+        "image_path": "images/img_00025.jpg",
+        "question": "How is it treated?",
+        "answer": "Treatment options include surgical excision, curettage, topical medications, or laser therapy depending on size and location.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 25,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00053",
+        "image_path": "images/img_00053.jpg",
+        "question": "How to treat rash?",
+        "answer": "Avoid irritants, use gentle cleansers, apply fragrance-free moisturizer, and use topical corticosteroids as prescribed by your doctor.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 41,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00051",
+        "image_path": "images/img_00051.jpg",
+        "question": "How to treat rash?",
+        "answer": "Avoid irritants, use gentle cleansers, apply fragrance-free moisturizer, and use topical corticosteroids as prescribed by your doctor.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 30,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00097",
+        "image_path": "images/img_00097.jpg",
+        "question": "Can AK become cancer?",
+        "answer": "Yes, 2-6% of actinic keratosis lesions progress to squamous cell carcinoma annually. Early treatment recommended.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 71,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00057",
+        "image_path": "images/img_00057.jpg",
+        "question": "What causes dermatitis?",
+        "answer": "Caused by allergic reaction to irritants, soaps, detergents, jewelry, plants, or genetic predisposition to inflammation.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 44,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00208",
+        "image_path": "images/img_00208.jpg",
+        "question": "Why do keloids form?",
+        "answer": "Abnormal healing response to skin injury. Genetic predisposition. More common in African, Hispanic, and Asian populations.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 76,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00009",
+        "image_path": "images/img_00009.jpg",
+        "question": "What should I do?",
+        "answer": "Schedule urgent appointment with dermatologist. Early detection significantly improves treatment outcomes and survival rates.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 77,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00088",
+        "image_path": "images/img_00088.jpg",
+        "question": "Are warts contagious?",
+        "answer": "Yes, HPV warts are contagious through direct skin contact. Avoid touching and spreading to other body areas.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 31,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00020",
+        "image_path": "images/img_00020.jpg",
+        "question": "Is this serious?",
+        "answer": "BCC is treatable when diagnosed early. It rarely spreads to other parts of the body. Professional treatment is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 48,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00055",
+        "image_path": "images/img_00055.jpg",
+        "question": "What causes dermatitis?",
+        "answer": "Caused by allergic reaction to irritants, soaps, detergents, jewelry, plants, or genetic predisposition to inflammation.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 39,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00200",
+        "image_path": "images/img_00200.jpg",
+        "question": "How to treat?",
+        "answer": "Steroid injections, laser therapy, surgical excision, or pressure garments. Often requires combination approach.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 66,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00064",
+        "image_path": "images/img_00064.jpg",
+        "question": "What are silver scales?",
+        "answer": "Psoriatic plaques characterized by thick silvery-white scales on red inflamed base. Chronic autoimmune condition requiring ongoing management.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 52,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00022",
+        "image_path": "images/img_00022.jpg",
+        "question": "Is this serious?",
+        "answer": "BCC is treatable when diagnosed early. It rarely spreads to other parts of the body. Professional treatment is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 72,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00126",
+        "image_path": "images/img_00126.jpg",
+        "question": "Is vitiligo hereditary?",
+        "answer": "Has genetic component. About 30% of cases have family history. Environmental triggers also play important role.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 54,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00077",
+        "image_path": "images/img_00077.jpg",
+        "question": "What is this hard bump?",
+        "answer": "Common wart caused by human papillomavirus (HPV) infection. Can be treated with topical medications, cryotherapy, or surgical removal.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 76,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00095",
+        "image_path": "images/img_00095.jpg",
+        "question": "Can AK become cancer?",
+        "answer": "Yes, 2-6% of actinic keratosis lesions progress to squamous cell carcinoma annually. Early treatment recommended.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 25,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00102",
+        "image_path": "images/img_00102.jpg",
+        "question": "How to prevent?",
+        "answer": "Strict sun protection with SPF 30+ sunscreen daily, avoid peak sun hours 10am-4pm, wear protective clothing and hats.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 45,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00098",
+        "image_path": "images/img_00098.jpg",
+        "question": "Can AK become cancer?",
+        "answer": "Yes, 2-6% of actinic keratosis lesions progress to squamous cell carcinoma annually. Early treatment recommended.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 79,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00075",
+        "image_path": "images/img_00075.jpg",
+        "question": "What is this hard bump?",
+        "answer": "Common wart caused by human papillomavirus (HPV) infection. Can be treated with topical medications, cryotherapy, or surgical removal.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 34,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00021",
+        "image_path": "images/img_00021.jpg",
+        "question": "Is this serious?",
+        "answer": "BCC is treatable when diagnosed early. It rarely spreads to other parts of the body. Professional treatment is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 63,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00188",
+        "image_path": "images/img_00188.jpg",
+        "question": "What causes hives?",
+        "answer": "Triggered by allergens, infections, medications, stress, or in many cases the cause is unknown (idiopathic).",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 47,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00120",
+        "image_path": "images/img_00120.jpg",
+        "question": "Why is skin losing color?",
+        "answer": "Vitiligo is autoimmune depigmentation causing white patches as melanocytes are destroyed. Affects appearance but not health directly.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 28,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00039",
+        "image_path": "images/img_00039.jpg",
+        "question": "What type of mole?",
+        "answer": "This appears to be a common acquired nevus, likely compound type. Benign and does not require treatment unless cosmetically bothersome.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 64,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00206",
+        "image_path": "images/img_00206.jpg",
+        "question": "Why do keloids form?",
+        "answer": "Abnormal healing response to skin injury. Genetic predisposition. More common in African, Hispanic, and Asian populations.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 51,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00061",
+        "image_path": "images/img_00061.jpg",
+        "question": "What are silver scales?",
+        "answer": "Psoriatic plaques characterized by thick silvery-white scales on red inflamed base. Chronic autoimmune condition requiring ongoing management.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 37,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00018",
+        "image_path": "images/img_00018.jpg",
+        "question": "What is this pink bump?",
+        "answer": "Appears to be basal cell carcinoma, the most common skin cancer. Highly treatable when caught early with appropriate dermatological intervention.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 76,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00127",
+        "image_path": "images/img_00127.jpg",
+        "question": "Is vitiligo hereditary?",
+        "answer": "Has genetic component. About 30% of cases have family history. Environmental triggers also play important role.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 23,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00163",
+        "image_path": "images/img_00163.jpg",
+        "question": "How to remove?",
+        "answer": "Can be treated with laser, cryotherapy, or electrocautery if cosmetically concerning.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 73,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00044",
+        "image_path": "images/img_00044.jpg",
+        "question": "Should I remove it?",
+        "answer": "Removal is optional unless the mole changes in appearance or becomes irritated. Regular self-examination is important.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 21,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00081",
+        "image_path": "images/img_00081.jpg",
+        "question": "How to treat wart?",
+        "answer": "Options include topical medications, freezing with liquid nitrogen, laser therapy, or surgical excision depending on size and location.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 44,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00011",
+        "image_path": "images/img_00011.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, melanoma is the most serious type of skin cancer. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 73,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00190",
+        "image_path": "images/img_00190.jpg",
+        "question": "How to treat?",
+        "answer": "Antihistamines, avoid known triggers, topical soothing agents. Seek medical care if severe or with anaphylaxis symptoms.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 66,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00072",
+        "image_path": "images/img_00072.jpg",
+        "question": "Is psoriasis permanent?",
+        "answer": "Yes, psoriasis is chronic but manageable. Remission possible with appropriate treatment and trigger avoidance.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 61,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00158",
+        "image_path": "images/img_00158.jpg",
+        "question": "Should be removed?",
+        "answer": "Removal only for cosmetic reasons. No medical necessity as they are benign and pose no health risk.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 31,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00108",
+        "image_path": "images/img_00108.jpg",
+        "question": "What causes dark patches?",
+        "answer": "Melasma caused by sun exposure, hormonal factors, and genetic predisposition. More common in darker skin types.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 60,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00013",
+        "image_path": "images/img_00013.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, melanoma is the most serious type of skin cancer. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 39,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00084",
+        "image_path": "images/img_00084.jpg",
+        "question": "How to treat wart?",
+        "answer": "Options include topical medications, freezing with liquid nitrogen, laser therapy, or surgical excision depending on size and location.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 54,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00128",
+        "image_path": "images/img_00128.jpg",
+        "question": "Is vitiligo hereditary?",
+        "answer": "Has genetic component. About 30% of cases have family history. Environmental triggers also play important role.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 24,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00023",
+        "image_path": "images/img_00023.jpg",
+        "question": "Is this serious?",
+        "answer": "BCC is treatable when diagnosed early. It rarely spreads to other parts of the body. Professional treatment is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 75,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00157",
+        "image_path": "images/img_00157.jpg",
+        "question": "Should be removed?",
+        "answer": "Removal only for cosmetic reasons. No medical necessity as they are benign and pose no health risk.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 28,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00145",
+        "image_path": "images/img_00145.jpg",
+        "question": "How is it removed?",
+        "answer": "Can be removed by cryotherapy, curettage, laser ablation, or surgical excision with minimal scarring.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 35,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00138",
+        "image_path": "images/img_00138.jpg",
+        "question": "What is brown growth?",
+        "answer": "Seborrheic keratosis - common benign skin growth more prevalent with age. Not cancerous and requires no medical treatment.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 33,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00153",
+        "image_path": "images/img_00153.jpg",
+        "question": "What is red spot?",
+        "answer": "Cherry angioma - benign vascular lesion composed of dilated blood vessels. Not dangerous, purely cosmetic concern.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 70,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00068",
+        "image_path": "images/img_00068.jpg",
+        "question": "How is psoriasis treated?",
+        "answer": "Treatment includes topical agents, phototherapy, and systemic medications depending on severity and extent of involvement.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 65,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00155",
+        "image_path": "images/img_00155.jpg",
+        "question": "Should be removed?",
+        "answer": "Removal only for cosmetic reasons. No medical necessity as they are benign and pose no health risk.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 21,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00169",
+        "image_path": "images/img_00169.jpg",
+        "question": "What is ring-shaped rash?",
+        "answer": "Tinea (ringworm) - fungal infection causing characteristic ring-shaped lesion. Contagious and requires antifungal treatment.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 78,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00179",
+        "image_path": "images/img_00179.jpg",
+        "question": "Is tinea contagious?",
+        "answer": "Yes, highly contagious through direct contact. Avoid sharing towels, nail tools, or other personal items.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 21,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00012",
+        "image_path": "images/img_00012.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, melanoma is the most serious type of skin cancer. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 46,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00115",
+        "image_path": "images/img_00115.jpg",
+        "question": "Will it come back?",
+        "answer": "Possible if sun exposure continues. Strict sun protection with SPF 50+ is essential for prevention of recurrence.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 50,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00041",
+        "image_path": "images/img_00041.jpg",
+        "question": "Should I remove it?",
+        "answer": "Removal is optional unless the mole changes in appearance or becomes irritated. Regular self-examination is important.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 55,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00151",
+        "image_path": "images/img_00151.jpg",
+        "question": "What is red spot?",
+        "answer": "Cherry angioma - benign vascular lesion composed of dilated blood vessels. Not dangerous, purely cosmetic concern.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 24,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00164",
+        "image_path": "images/img_00164.jpg",
+        "question": "How to remove?",
+        "answer": "Can be treated with laser, cryotherapy, or electrocautery if cosmetically concerning.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 73,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00161",
+        "image_path": "images/img_00161.jpg",
+        "question": "How to remove?",
+        "answer": "Can be treated with laser, cryotherapy, or electrocautery if cosmetically concerning.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 46,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00187",
+        "image_path": "images/img_00187.jpg",
+        "question": "What causes hives?",
+        "answer": "Triggered by allergens, infections, medications, stress, or in many cases the cause is unknown (idiopathic).",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 46,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00191",
+        "image_path": "images/img_00191.jpg",
+        "question": "How to treat?",
+        "answer": "Antihistamines, avoid known triggers, topical soothing agents. Seek medical care if severe or with anaphylaxis symptoms.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 48,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00110",
+        "image_path": "images/img_00110.jpg",
+        "question": "Can melasma be treated?",
+        "answer": "Yes, treatment options include strict sun protection, topical bleaching agents, laser therapy, or chemical peels.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 32,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00103",
+        "image_path": "images/img_00103.jpg",
+        "question": "How to prevent?",
+        "answer": "Strict sun protection with SPF 30+ sunscreen daily, avoid peak sun hours 10am-4pm, wear protective clothing and hats.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 66,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00143",
+        "image_path": "images/img_00143.jpg",
+        "question": "Should I remove?",
+        "answer": "Removal only if cosmetically bothersome or frequently irritated by clothing. Purely optional decision.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 45,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00201",
+        "image_path": "images/img_00201.jpg",
+        "question": "How to treat?",
+        "answer": "Steroid injections, laser therapy, surgical excision, or pressure garments. Often requires combination approach.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 32,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00082",
+        "image_path": "images/img_00082.jpg",
+        "question": "How to treat wart?",
+        "answer": "Options include topical medications, freezing with liquid nitrogen, laser therapy, or surgical excision depending on size and location.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 39,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00197",
+        "image_path": "images/img_00197.jpg",
+        "question": "What is thick scar?",
+        "answer": "Keloid - abnormal scar tissue growth extending beyond original wound site. More common in individuals with genetic predisposition.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 64,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00159",
+        "image_path": "images/img_00159.jpg",
+        "question": "Should be removed?",
+        "answer": "Removal only for cosmetic reasons. No medical necessity as they are benign and pose no health risk.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 77,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00194",
+        "image_path": "images/img_00194.jpg",
+        "question": "How to treat?",
+        "answer": "Antihistamines, avoid known triggers, topical soothing agents. Seek medical care if severe or with anaphylaxis symptoms.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 55,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00105",
+        "image_path": "images/img_00105.jpg",
+        "question": "What causes dark patches?",
+        "answer": "Melasma caused by sun exposure, hormonal factors, and genetic predisposition. More common in darker skin types.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 40,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00137",
+        "image_path": "images/img_00137.jpg",
+        "question": "What is brown growth?",
+        "answer": "Seborrheic keratosis - common benign skin growth more prevalent with age. Not cancerous and requires no medical treatment.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 51,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00089",
+        "image_path": "images/img_00089.jpg",
+        "question": "Are warts contagious?",
+        "answer": "Yes, HPV warts are contagious through direct skin contact. Avoid touching and spreading to other body areas.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 44,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00167",
+        "image_path": "images/img_00167.jpg",
+        "question": "What is ring-shaped rash?",
+        "answer": "Tinea (ringworm) - fungal infection causing characteristic ring-shaped lesion. Contagious and requires antifungal treatment.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 44,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00173",
+        "image_path": "images/img_00173.jpg",
+        "question": "How to treat?",
+        "answer": "Topical antifungal creams for localized infection. Oral antifungals for extensive cases. Treatment typically lasts 2-4 weeks.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 56,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00116",
+        "image_path": "images/img_00116.jpg",
+        "question": "Will it come back?",
+        "answer": "Possible if sun exposure continues. Strict sun protection with SPF 50+ is essential for prevention of recurrence.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 38,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00124",
+        "image_path": "images/img_00124.jpg",
+        "question": "Why is skin losing color?",
+        "answer": "Vitiligo is autoimmune depigmentation causing white patches as melanocytes are destroyed. Affects appearance but not health directly.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 73,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00104",
+        "image_path": "images/img_00104.jpg",
+        "question": "How to prevent?",
+        "answer": "Strict sun protection with SPF 30+ sunscreen daily, avoid peak sun hours 10am-4pm, wear protective clothing and hats.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 28,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00063",
+        "image_path": "images/img_00063.jpg",
+        "question": "What are silver scales?",
+        "answer": "Psoriatic plaques characterized by thick silvery-white scales on red inflamed base. Chronic autoimmune condition requiring ongoing management.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 58,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00037",
+        "image_path": "images/img_00037.jpg",
+        "question": "What type of mole?",
+        "answer": "This appears to be a common acquired nevus, likely compound type. Benign and does not require treatment unless cosmetically bothersome.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 60,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00185",
+        "image_path": "images/img_00185.jpg",
+        "question": "What causes hives?",
+        "answer": "Triggered by allergens, infections, medications, stress, or in many cases the cause is unknown (idiopathic).",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 63,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00199",
+        "image_path": "images/img_00199.jpg",
+        "question": "What is thick scar?",
+        "answer": "Keloid - abnormal scar tissue growth extending beyond original wound site. More common in individuals with genetic predisposition.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 74,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00010",
+        "image_path": "images/img_00010.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, melanoma is the most serious type of skin cancer. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 37,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00184",
+        "image_path": "images/img_00184.jpg",
+        "question": "Why bumps itchy?",
+        "answer": "Urticaria (hives) from allergic reaction causing raised itchy welts. Usually self-limited and manageable with antihistamines.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 63,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00006",
+        "image_path": "images/img_00006.jpg",
+        "question": "What should I do?",
+        "answer": "Schedule urgent appointment with dermatologist. Early detection significantly improves treatment outcomes and survival rates.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 21,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00139",
+        "image_path": "images/img_00139.jpg",
+        "question": "What is brown growth?",
+        "answer": "Seborrheic keratosis - common benign skin growth more prevalent with age. Not cancerous and requires no medical treatment.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 45,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00000",
+        "image_path": "images/img_00000.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning ABCDE features including irregular borders and varied coloration. Immediate dermatological evaluation is critical.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 68,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00178",
+        "image_path": "images/img_00178.jpg",
+        "question": "Is tinea contagious?",
+        "answer": "Yes, highly contagious through direct contact. Avoid sharing towels, nail tools, or other personal items.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 76,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00186",
+        "image_path": "images/img_00186.jpg",
+        "question": "What causes hives?",
+        "answer": "Triggered by allergens, infections, medications, stress, or in many cases the cause is unknown (idiopathic).",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 79,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00073",
+        "image_path": "images/img_00073.jpg",
+        "question": "Is psoriasis permanent?",
+        "answer": "Yes, psoriasis is chronic but manageable. Remission possible with appropriate treatment and trigger avoidance.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 55,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00125",
+        "image_path": "images/img_00125.jpg",
+        "question": "Is vitiligo hereditary?",
+        "answer": "Has genetic component. About 30% of cases have family history. Environmental triggers also play important role.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 31,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00003",
+        "image_path": "images/img_00003.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning ABCDE features including irregular borders and varied coloration. Immediate dermatological evaluation is critical.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 31,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00091",
+        "image_path": "images/img_00091.jpg",
+        "question": "What are rough spots?",
+        "answer": "Actinic keratosis - precancerous growths from sun exposure. Should be monitored and treated to prevent progression to skin cancer.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 51,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00174",
+        "image_path": "images/img_00174.jpg",
+        "question": "How to treat?",
+        "answer": "Topical antifungal creams for localized infection. Oral antifungals for extensive cases. Treatment typically lasts 2-4 weeks.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 69,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00058",
+        "image_path": "images/img_00058.jpg",
+        "question": "What causes dermatitis?",
+        "answer": "Caused by allergic reaction to irritants, soaps, detergents, jewelry, plants, or genetic predisposition to inflammation.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 26,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00071",
+        "image_path": "images/img_00071.jpg",
+        "question": "Is psoriasis permanent?",
+        "answer": "Yes, psoriasis is chronic but manageable. Remission possible with appropriate treatment and trigger avoidance.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 56,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00142",
+        "image_path": "images/img_00142.jpg",
+        "question": "Should I remove?",
+        "answer": "Removal only if cosmetically bothersome or frequently irritated by clothing. Purely optional decision.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 76,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00131",
+        "image_path": "images/img_00131.jpg",
+        "question": "Can vitiligo be treated?",
+        "answer": "No cure but treatments help. Options include topical steroids, phototherapy, surgical approaches, and cosmetic camouflage.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 69,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00114",
+        "image_path": "images/img_00114.jpg",
+        "question": "Can melasma be treated?",
+        "answer": "Yes, treatment options include strict sun protection, topical bleaching agents, laser therapy, or chemical peels.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 51,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00004",
+        "image_path": "images/img_00004.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning ABCDE features including irregular borders and varied coloration. Immediate dermatological evaluation is critical.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 68,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00017",
+        "image_path": "images/img_00017.jpg",
+        "question": "What is this pink bump?",
+        "answer": "Appears to be basal cell carcinoma, the most common skin cancer. Highly treatable when caught early with appropriate dermatological intervention.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 76,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00180",
+        "image_path": "images/img_00180.jpg",
+        "question": "Why bumps itchy?",
+        "answer": "Urticaria (hives) from allergic reaction causing raised itchy welts. Usually self-limited and manageable with antihistamines.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 75,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00047",
+        "image_path": "images/img_00047.jpg",
+        "question": "Why is skin red and inflamed?",
+        "answer": "Contact or atopic dermatitis causing inflammation. Identify and avoid triggers, maintain good hygiene, use fragrance-free moisturizer.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 39,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00074",
+        "image_path": "images/img_00074.jpg",
+        "question": "Is psoriasis permanent?",
+        "answer": "Yes, psoriasis is chronic but manageable. Remission possible with appropriate treatment and trigger avoidance.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 57,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00162",
+        "image_path": "images/img_00162.jpg",
+        "question": "How to remove?",
+        "answer": "Can be treated with laser, cryotherapy, or electrocautery if cosmetically concerning.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 68,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00035",
+        "image_path": "images/img_00035.jpg",
+        "question": "What type of mole?",
+        "answer": "This appears to be a common acquired nevus, likely compound type. Benign and does not require treatment unless cosmetically bothersome.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 37,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00133",
+        "image_path": "images/img_00133.jpg",
+        "question": "Can vitiligo be treated?",
+        "answer": "No cure but treatments help. Options include topical steroids, phototherapy, surgical approaches, and cosmetic camouflage.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 68,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00076",
+        "image_path": "images/img_00076.jpg",
+        "question": "What is this hard bump?",
+        "answer": "Common wart caused by human papillomavirus (HPV) infection. Can be treated with topical medications, cryotherapy, or surgical removal.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 27,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00177",
+        "image_path": "images/img_00177.jpg",
+        "question": "Is tinea contagious?",
+        "answer": "Yes, highly contagious through direct contact. Avoid sharing towels, nail tools, or other personal items.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 43,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00170",
+        "image_path": "images/img_00170.jpg",
+        "question": "How to treat?",
+        "answer": "Topical antifungal creams for localized infection. Oral antifungals for extensive cases. Treatment typically lasts 2-4 weeks.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 56,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00014",
+        "image_path": "images/img_00014.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, melanoma is the most serious type of skin cancer. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 49,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00001",
+        "image_path": "images/img_00001.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning ABCDE features including irregular borders and varied coloration. Immediate dermatological evaluation is critical.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 22,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00015",
+        "image_path": "images/img_00015.jpg",
+        "question": "What is this pink bump?",
+        "answer": "Appears to be basal cell carcinoma, the most common skin cancer. Highly treatable when caught early with appropriate dermatological intervention.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 22,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00043",
+        "image_path": "images/img_00043.jpg",
+        "question": "Should I remove it?",
+        "answer": "Removal is optional unless the mole changes in appearance or becomes irritated. Regular self-examination is important.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 43,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00030",
+        "image_path": "images/img_00030.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "Appears to be a benign nevus with regular symmetric borders and uniform color. Monitor for any changes and have it evaluated if concerned.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 36,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00099",
+        "image_path": "images/img_00099.jpg",
+        "question": "Can AK become cancer?",
+        "answer": "Yes, 2-6% of actinic keratosis lesions progress to squamous cell carcinoma annually. Early treatment recommended.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 34,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00152",
+        "image_path": "images/img_00152.jpg",
+        "question": "What is red spot?",
+        "answer": "Cherry angioma - benign vascular lesion composed of dilated blood vessels. Not dangerous, purely cosmetic concern.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 20,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00033",
+        "image_path": "images/img_00033.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "Appears to be a benign nevus with regular symmetric borders and uniform color. Monitor for any changes and have it evaluated if concerned.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 68,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00123",
+        "image_path": "images/img_00123.jpg",
+        "question": "Why is skin losing color?",
+        "answer": "Vitiligo is autoimmune depigmentation causing white patches as melanocytes are destroyed. Affects appearance but not health directly.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 67,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00092",
+        "image_path": "images/img_00092.jpg",
+        "question": "What are rough spots?",
+        "answer": "Actinic keratosis - precancerous growths from sun exposure. Should be monitored and treated to prevent progression to skin cancer.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 71,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00129",
+        "image_path": "images/img_00129.jpg",
+        "question": "Is vitiligo hereditary?",
+        "answer": "Has genetic component. About 30% of cases have family history. Environmental triggers also play important role.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 47,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00181",
+        "image_path": "images/img_00181.jpg",
+        "question": "Why bumps itchy?",
+        "answer": "Urticaria (hives) from allergic reaction causing raised itchy welts. Usually self-limited and manageable with antihistamines.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 32,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00101",
+        "image_path": "images/img_00101.jpg",
+        "question": "How to prevent?",
+        "answer": "Strict sun protection with SPF 30+ sunscreen daily, avoid peak sun hours 10am-4pm, wear protective clothing and hats.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 51,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00007",
+        "image_path": "images/img_00007.jpg",
+        "question": "What should I do?",
+        "answer": "Schedule urgent appointment with dermatologist. Early detection significantly improves treatment outcomes and survival rates.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 46,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00094",
+        "image_path": "images/img_00094.jpg",
+        "question": "What are rough spots?",
+        "answer": "Actinic keratosis - precancerous growths from sun exposure. Should be monitored and treated to prevent progression to skin cancer.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 37,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00085",
+        "image_path": "images/img_00085.jpg",
+        "question": "Are warts contagious?",
+        "answer": "Yes, HPV warts are contagious through direct skin contact. Avoid touching and spreading to other body areas.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 63,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00147",
+        "image_path": "images/img_00147.jpg",
+        "question": "How is it removed?",
+        "answer": "Can be removed by cryotherapy, curettage, laser ablation, or surgical excision with minimal scarring.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 71,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00045",
+        "image_path": "images/img_00045.jpg",
+        "question": "Why is skin red and inflamed?",
+        "answer": "Contact or atopic dermatitis causing inflammation. Identify and avoid triggers, maintain good hygiene, use fragrance-free moisturizer.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 67,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00113",
+        "image_path": "images/img_00113.jpg",
+        "question": "Can melasma be treated?",
+        "answer": "Yes, treatment options include strict sun protection, topical bleaching agents, laser therapy, or chemical peels.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 66,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00135",
+        "image_path": "images/img_00135.jpg",
+        "question": "What is brown growth?",
+        "answer": "Seborrheic keratosis - common benign skin growth more prevalent with age. Not cancerous and requires no medical treatment.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 61,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00109",
+        "image_path": "images/img_00109.jpg",
+        "question": "What causes dark patches?",
+        "answer": "Melasma caused by sun exposure, hormonal factors, and genetic predisposition. More common in darker skin types.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 52,
+            "gender": "M",
+            "location": "leg"
+        }
+    }
+]

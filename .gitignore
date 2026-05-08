@@ -1,0 +1,12 @@
+1_Data/
+3_Checkpoints/
+4_Models/
+5_Results/
+6_Test_Results/
+7_External_Test/
+8_Segmentation_Test/
+.venv/
+__pycache__/
+*.pth
+*.h5
+9_VQA/models/

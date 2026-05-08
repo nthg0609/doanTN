@@ -1,0 +1,962 @@
+[
+    {
+        "image_id": "img_00035",
+        "image_path": "images/img_00035.jpg",
+        "question": "What type of mole is this?",
+        "answer": "This is a common acquired nevus, likely a compound nevus based on the clinical appearance. It appears benign. Regular self-examination and professional evaluation during routine check-ups are recommended.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 64,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00040",
+        "image_path": "images/img_00040.jpg",
+        "question": "Why is my skin so red and inflamed?",
+        "answer": "This appears to be contact dermatitis or atopic dermatitis showing inflammation, erythema, and possible vesiculation. Identify and avoid trigger substances, maintain good skin hygiene, and use fragrance-free moisturizer regularly.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 35,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00051",
+        "image_path": "images/img_00051.jpg",
+        "question": "What is this hard bump?",
+        "answer": "This appears to be a common wart (verruca) caused by human papillomavirus (HPV) infection. It can be treated with topical medications, cryotherapy (freezing), laser therapy, or surgical removal depending on location and size.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 58,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00001",
+        "image_path": "images/img_00001.jpg",
+        "question": "What should I do about this spot?",
+        "answer": "Given the appearance with multiple concerning features, please schedule an urgent appointment with a dermatologist as soon as possible. Do not delay - early detection and treatment of melanoma is crucial for prognosis.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 78,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00022",
+        "image_path": "images/img_00022.jpg",
+        "question": "What is this scaly lesion?",
+        "answer": "This appears to be squamous cell carcinoma (SCC), characterized by rough, scaly appearance with possible ulceration. SCC can be locally invasive but is generally less likely to metastasize than melanoma. Treatment options include surgical removal.",
+        "condition": "Squamous Cell Carcinoma",
+        "metadata": {
+            "age": 20,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00059",
+        "image_path": "images/img_00059.jpg",
+        "question": "What is this red spot?",
+        "answer": "This appears to be a cherry angioma or hemangioma - a benign vascular lesion composed of dilated blood vessels. These are not dangerous and typically do not require treatment unless cosmetically bothersome or frequently traumatized.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 53,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00042",
+        "image_path": "images/img_00042.jpg",
+        "question": "Why is my skin so red and inflamed?",
+        "answer": "This appears to be contact dermatitis or atopic dermatitis showing inflammation, erythema, and possible vesiculation. Identify and avoid trigger substances, maintain good skin hygiene, and use fragrance-free moisturizer regularly.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 55,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00067",
+        "image_path": "images/img_00067.jpg",
+        "question": "What causes these dark patches?",
+        "answer": "This appears to be melasma, characterized by symmetric hyperpigmented patches usually on the face. More common in darker skin types. Triggered by sun exposure, hormonal factors. Treatment includes strict sun protection and may involve topical bleaching agents or laser therapy.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 34,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00003",
+        "image_path": "images/img_00003.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning features including irregular borders, varied coloration (brown, black, tan), and asymmetric appearance. These are classic ABCDE warning signs of melanoma. Immediate dermatological evaluation is strongly recommended. Early detection significantly improves treatment outcomes.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 54,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00076",
+        "image_path": "images/img_00076.jpg",
+        "question": "What is this thick raised scar?",
+        "answer": "This appears to be a keloid - abnormal scar tissue growth extending beyond original wound. More common in darker skin types. Can be treated with injections, laser, surgery, or pressure garments. Prone to recurrence.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 70,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00052",
+        "image_path": "images/img_00052.jpg",
+        "question": "What is this brown growth?",
+        "answer": "This is a seborrheic keratosis, a common benign skin growth that becomes more prevalent with age. It is not cancerous but can be removed for cosmetic reasons or if it becomes irritated.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 55,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00072",
+        "image_path": "images/img_00072.jpg",
+        "question": "Why are these bumps itchy?",
+        "answer": "These appear to be urticaria (hives) - raised, itchy welts caused by allergic reaction or other triggers. Usually self-limited and managed with antihistamines. Identify and avoid triggers. Seek medical attention if severe or persistent.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 24,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00050",
+        "image_path": "images/img_00050.jpg",
+        "question": "What is this hard bump?",
+        "answer": "This appears to be a common wart (verruca) caused by human papillomavirus (HPV) infection. It can be treated with topical medications, cryotherapy (freezing), laser therapy, or surgical removal depending on location and size.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 49,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00031",
+        "image_path": "images/img_00031.jpg",
+        "question": "What type of mole is this?",
+        "answer": "This is a common acquired nevus, likely a compound nevus based on the clinical appearance. It appears benign. Regular self-examination and professional evaluation during routine check-ups are recommended.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 39,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00029",
+        "image_path": "images/img_00029.jpg",
+        "question": "What type of mole is this?",
+        "answer": "This is a common acquired nevus, likely a compound nevus based on the clinical appearance. It appears benign. Regular self-examination and professional evaluation during routine check-ups are recommended.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 31,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00078",
+        "image_path": "images/img_00078.jpg",
+        "question": "What is this thick raised scar?",
+        "answer": "This appears to be a keloid - abnormal scar tissue growth extending beyond original wound. More common in darker skin types. Can be treated with injections, laser, surgery, or pressure garments. Prone to recurrence.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 32,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00000",
+        "image_path": "images/img_00000.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning features including irregular borders, varied coloration (brown, black, tan), and asymmetric appearance. These are classic ABCDE warning signs of melanoma. Immediate dermatological evaluation is strongly recommended. Early detection significantly improves treatment outcomes.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 66,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00032",
+        "image_path": "images/img_00032.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "This appears to be a benign nevus (mole) with regular, symmetric borders and uniform color distribution. It does not show concerning features. However, continue to monitor for any changes in size, shape, or color.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 75,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00006",
+        "image_path": "images/img_00006.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning features including irregular borders, varied coloration (brown, black, tan), and asymmetric appearance. These are classic ABCDE warning signs of melanoma. Immediate dermatological evaluation is strongly recommended. Early detection significantly improves treatment outcomes.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 69,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00043",
+        "image_path": "images/img_00043.jpg",
+        "question": "How do I treat this rash?",
+        "answer": "For dermatitis management: identify and avoid irritants, use gentle fragrance-free cleansers, apply moisturizer while skin is damp, and use topical corticosteroids as prescribed. Severe cases may require oral medications.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 67,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00024",
+        "image_path": "images/img_00024.jpg",
+        "question": "What are these rough spots?",
+        "answer": "These appear to be actinic keratosis lesions, precancerous growths caused by cumulative sun exposure. They present as rough, scaly patches. These should be monitored and treated to prevent progression to squamous cell carcinoma.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 75,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00007",
+        "image_path": "images/img_00007.jpg",
+        "question": "What should I do about this spot?",
+        "answer": "Given the appearance with multiple concerning features, please schedule an urgent appointment with a dermatologist as soon as possible. Do not delay - early detection and treatment of melanoma is crucial for prognosis.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 22,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00009",
+        "image_path": "images/img_00009.jpg",
+        "question": "Is this mole cancerous?",
+        "answer": "This lesion shows concerning features including irregular borders, varied coloration (brown, black, tan), and asymmetric appearance. These are classic ABCDE warning signs of melanoma. Immediate dermatological evaluation is strongly recommended. Early detection significantly improves treatment outcomes.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 65,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00057",
+        "image_path": "images/img_00057.jpg",
+        "question": "What is this red spot?",
+        "answer": "This appears to be a cherry angioma or hemangioma - a benign vascular lesion composed of dilated blood vessels. These are not dangerous and typically do not require treatment unless cosmetically bothersome or frequently traumatized.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 68,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00033",
+        "image_path": "images/img_00033.jpg",
+        "question": "What type of mole is this?",
+        "answer": "This is a common acquired nevus, likely a compound nevus based on the clinical appearance. It appears benign. Regular self-examination and professional evaluation during routine check-ups are recommended.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 75,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00037",
+        "image_path": "images/img_00037.jpg",
+        "question": "How do I treat this rash?",
+        "answer": "For dermatitis management: identify and avoid irritants, use gentle fragrance-free cleansers, apply moisturizer while skin is damp, and use topical corticosteroids as prescribed. Severe cases may require oral medications.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 42,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00062",
+        "image_path": "images/img_00062.jpg",
+        "question": "Why is my skin losing color?",
+        "answer": "This appears to be vitiligo, an autoimmune condition causing depigmentation and loss of melanocytes, resulting in white patches. While not medically dangerous, treatment options exist for cosmetic improvement including topical steroids, phototherapy, or depigmentation.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 60,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00045",
+        "image_path": "images/img_00045.jpg",
+        "question": "What are these silver scales?",
+        "answer": "These appear to be psoriatic plaques characterized by thick, silvery-white scales on erythematous base, with well-defined borders. Psoriasis is a chronic inflammatory condition requiring ongoing management and professional care.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 78,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00048",
+        "image_path": "images/img_00048.jpg",
+        "question": "What is this hard bump?",
+        "answer": "This appears to be a common wart (verruca) caused by human papillomavirus (HPV) infection. It can be treated with topical medications, cryotherapy (freezing), laser therapy, or surgical removal depending on location and size.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 43,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00071",
+        "image_path": "images/img_00071.jpg",
+        "question": "What is this ring-shaped rash?",
+        "answer": "This appears to be tinea (ringworm), a fungal infection causing a characteristic ring-shaped rash with raised borders. It is contagious and treatable with topical or oral antifungal medications depending on severity and type.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 57,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00066",
+        "image_path": "images/img_00066.jpg",
+        "question": "What causes these dark patches?",
+        "answer": "This appears to be melasma, characterized by symmetric hyperpigmented patches usually on the face. More common in darker skin types. Triggered by sun exposure, hormonal factors. Treatment includes strict sun protection and may involve topical bleaching agents or laser therapy.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 74,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00013",
+        "image_path": "images/img_00013.jpg",
+        "question": "Is this serious?",
+        "answer": "While basal cell carcinoma is the most common type of skin cancer, it is highly treatable when caught early. It rarely spreads to other parts of the body. Dermatological treatment and removal is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 53,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00021",
+        "image_path": "images/img_00021.jpg",
+        "question": "What is this scaly lesion?",
+        "answer": "This appears to be squamous cell carcinoma (SCC), characterized by rough, scaly appearance with possible ulceration. SCC can be locally invasive but is generally less likely to metastasize than melanoma. Treatment options include surgical removal.",
+        "condition": "Squamous Cell Carcinoma",
+        "metadata": {
+            "age": 38,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00008",
+        "image_path": "images/img_00008.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, this appears potentially dangerous based on morphologic features concerning for melanoma. Melanoma can spread to other parts of the body. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 33,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00074",
+        "image_path": "images/img_00074.jpg",
+        "question": "Why are these bumps itchy?",
+        "answer": "These appear to be urticaria (hives) - raised, itchy welts caused by allergic reaction or other triggers. Usually self-limited and managed with antihistamines. Identify and avoid triggers. Seek medical attention if severe or persistent.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 36,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00073",
+        "image_path": "images/img_00073.jpg",
+        "question": "Why are these bumps itchy?",
+        "answer": "These appear to be urticaria (hives) - raised, itchy welts caused by allergic reaction or other triggers. Usually self-limited and managed with antihistamines. Identify and avoid triggers. Seek medical attention if severe or persistent.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 27,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00005",
+        "image_path": "images/img_00005.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, this appears potentially dangerous based on morphologic features concerning for melanoma. Melanoma can spread to other parts of the body. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 60,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00054",
+        "image_path": "images/img_00054.jpg",
+        "question": "What is this brown growth?",
+        "answer": "This is a seborrheic keratosis, a common benign skin growth that becomes more prevalent with age. It is not cancerous but can be removed for cosmetic reasons or if it becomes irritated.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 55,
+            "gender": "F",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00012",
+        "image_path": "images/img_00012.jpg",
+        "question": "What is this pink bump?",
+        "answer": "This appears to be a basal cell carcinoma (BCC), the most common type of skin cancer. It typically presents as a firm, pink nodule or bump, sometimes with a pearly appearance. Treatment is usually successful with early intervention through excision or other modalities.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 56,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00075",
+        "image_path": "images/img_00075.jpg",
+        "question": "Why are these bumps itchy?",
+        "answer": "These appear to be urticaria (hives) - raised, itchy welts caused by allergic reaction or other triggers. Usually self-limited and managed with antihistamines. Identify and avoid triggers. Seek medical attention if severe or persistent.",
+        "condition": "Urticaria",
+        "metadata": {
+            "age": 33,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00016",
+        "image_path": "images/img_00016.jpg",
+        "question": "What is this pink bump?",
+        "answer": "This appears to be a basal cell carcinoma (BCC), the most common type of skin cancer. It typically presents as a firm, pink nodule or bump, sometimes with a pearly appearance. Treatment is usually successful with early intervention through excision or other modalities.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 47,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00004",
+        "image_path": "images/img_00004.jpg",
+        "question": "What should I do about this spot?",
+        "answer": "Given the appearance with multiple concerning features, please schedule an urgent appointment with a dermatologist as soon as possible. Do not delay - early detection and treatment of melanoma is crucial for prognosis.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 28,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00046",
+        "image_path": "images/img_00046.jpg",
+        "question": "What are these silver scales?",
+        "answer": "These appear to be psoriatic plaques characterized by thick, silvery-white scales on erythematous base, with well-defined borders. Psoriasis is a chronic inflammatory condition requiring ongoing management and professional care.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 27,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00064",
+        "image_path": "images/img_00064.jpg",
+        "question": "What causes these dark patches?",
+        "answer": "This appears to be melasma, characterized by symmetric hyperpigmented patches usually on the face. More common in darker skin types. Triggered by sun exposure, hormonal factors. Treatment includes strict sun protection and may involve topical bleaching agents or laser therapy.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 65,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00053",
+        "image_path": "images/img_00053.jpg",
+        "question": "What is this brown growth?",
+        "answer": "This is a seborrheic keratosis, a common benign skin growth that becomes more prevalent with age. It is not cancerous but can be removed for cosmetic reasons or if it becomes irritated.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 71,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00039",
+        "image_path": "images/img_00039.jpg",
+        "question": "How do I treat this rash?",
+        "answer": "For dermatitis management: identify and avoid irritants, use gentle fragrance-free cleansers, apply moisturizer while skin is damp, and use topical corticosteroids as prescribed. Severe cases may require oral medications.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 28,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00056",
+        "image_path": "images/img_00056.jpg",
+        "question": "What is this red spot?",
+        "answer": "This appears to be a cherry angioma or hemangioma - a benign vascular lesion composed of dilated blood vessels. These are not dangerous and typically do not require treatment unless cosmetically bothersome or frequently traumatized.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 55,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00049",
+        "image_path": "images/img_00049.jpg",
+        "question": "What is this hard bump?",
+        "answer": "This appears to be a common wart (verruca) caused by human papillomavirus (HPV) infection. It can be treated with topical medications, cryotherapy (freezing), laser therapy, or surgical removal depending on location and size.",
+        "condition": "Wart",
+        "metadata": {
+            "age": 37,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00011",
+        "image_path": "images/img_00011.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, this appears potentially dangerous based on morphologic features concerning for melanoma. Melanoma can spread to other parts of the body. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 38,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00017",
+        "image_path": "images/img_00017.jpg",
+        "question": "Is this serious?",
+        "answer": "While basal cell carcinoma is the most common type of skin cancer, it is highly treatable when caught early. It rarely spreads to other parts of the body. Dermatological treatment and removal is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 25,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00002",
+        "image_path": "images/img_00002.jpg",
+        "question": "Is it dangerous?",
+        "answer": "Yes, this appears potentially dangerous based on morphologic features concerning for melanoma. Melanoma can spread to other parts of the body. Professional evaluation and possible biopsy are needed immediately.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 32,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00020",
+        "image_path": "images/img_00020.jpg",
+        "question": "What is this scaly lesion?",
+        "answer": "This appears to be squamous cell carcinoma (SCC), characterized by rough, scaly appearance with possible ulceration. SCC can be locally invasive but is generally less likely to metastasize than melanoma. Treatment options include surgical removal.",
+        "condition": "Squamous Cell Carcinoma",
+        "metadata": {
+            "age": 51,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00026",
+        "image_path": "images/img_00026.jpg",
+        "question": "What are these rough spots?",
+        "answer": "These appear to be actinic keratosis lesions, precancerous growths caused by cumulative sun exposure. They present as rough, scaly patches. These should be monitored and treated to prevent progression to squamous cell carcinoma.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 65,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00065",
+        "image_path": "images/img_00065.jpg",
+        "question": "What causes these dark patches?",
+        "answer": "This appears to be melasma, characterized by symmetric hyperpigmented patches usually on the face. More common in darker skin types. Triggered by sun exposure, hormonal factors. Treatment includes strict sun protection and may involve topical bleaching agents or laser therapy.",
+        "condition": "Melasma",
+        "metadata": {
+            "age": 21,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00030",
+        "image_path": "images/img_00030.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "This appears to be a benign nevus (mole) with regular, symmetric borders and uniform color distribution. It does not show concerning features. However, continue to monitor for any changes in size, shape, or color.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 47,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00079",
+        "image_path": "images/img_00079.jpg",
+        "question": "What is this thick raised scar?",
+        "answer": "This appears to be a keloid - abnormal scar tissue growth extending beyond original wound. More common in darker skin types. Can be treated with injections, laser, surgery, or pressure garments. Prone to recurrence.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 70,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00014",
+        "image_path": "images/img_00014.jpg",
+        "question": "What is this pink bump?",
+        "answer": "This appears to be a basal cell carcinoma (BCC), the most common type of skin cancer. It typically presents as a firm, pink nodule or bump, sometimes with a pearly appearance. Treatment is usually successful with early intervention through excision or other modalities.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 32,
+            "gender": "F",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00077",
+        "image_path": "images/img_00077.jpg",
+        "question": "What is this thick raised scar?",
+        "answer": "This appears to be a keloid - abnormal scar tissue growth extending beyond original wound. More common in darker skin types. Can be treated with injections, laser, surgery, or pressure garments. Prone to recurrence.",
+        "condition": "Keloid",
+        "metadata": {
+            "age": 64,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00069",
+        "image_path": "images/img_00069.jpg",
+        "question": "What is this ring-shaped rash?",
+        "answer": "This appears to be tinea (ringworm), a fungal infection causing a characteristic ring-shaped rash with raised borders. It is contagious and treatable with topical or oral antifungal medications depending on severity and type.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 43,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00061",
+        "image_path": "images/img_00061.jpg",
+        "question": "Why is my skin losing color?",
+        "answer": "This appears to be vitiligo, an autoimmune condition causing depigmentation and loss of melanocytes, resulting in white patches. While not medically dangerous, treatment options exist for cosmetic improvement including topical steroids, phototherapy, or depigmentation.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 34,
+            "gender": "M",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00025",
+        "image_path": "images/img_00025.jpg",
+        "question": "What are these rough spots?",
+        "answer": "These appear to be actinic keratosis lesions, precancerous growths caused by cumulative sun exposure. They present as rough, scaly patches. These should be monitored and treated to prevent progression to squamous cell carcinoma.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 36,
+            "gender": "F",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00068",
+        "image_path": "images/img_00068.jpg",
+        "question": "What is this ring-shaped rash?",
+        "answer": "This appears to be tinea (ringworm), a fungal infection causing a characteristic ring-shaped rash with raised borders. It is contagious and treatable with topical or oral antifungal medications depending on severity and type.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 45,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00047",
+        "image_path": "images/img_00047.jpg",
+        "question": "What are these silver scales?",
+        "answer": "These appear to be psoriatic plaques characterized by thick, silvery-white scales on erythematous base, with well-defined borders. Psoriasis is a chronic inflammatory condition requiring ongoing management and professional care.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 35,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00055",
+        "image_path": "images/img_00055.jpg",
+        "question": "What is this brown growth?",
+        "answer": "This is a seborrheic keratosis, a common benign skin growth that becomes more prevalent with age. It is not cancerous but can be removed for cosmetic reasons or if it becomes irritated.",
+        "condition": "Seborrheic Keratosis",
+        "metadata": {
+            "age": 34,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00041",
+        "image_path": "images/img_00041.jpg",
+        "question": "How do I treat this rash?",
+        "answer": "For dermatitis management: identify and avoid irritants, use gentle fragrance-free cleansers, apply moisturizer while skin is damp, and use topical corticosteroids as prescribed. Severe cases may require oral medications.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 29,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00023",
+        "image_path": "images/img_00023.jpg",
+        "question": "What is this scaly lesion?",
+        "answer": "This appears to be squamous cell carcinoma (SCC), characterized by rough, scaly appearance with possible ulceration. SCC can be locally invasive but is generally less likely to metastasize than melanoma. Treatment options include surgical removal.",
+        "condition": "Squamous Cell Carcinoma",
+        "metadata": {
+            "age": 26,
+            "gender": "M",
+            "location": "chest"
+        }
+    },
+    {
+        "image_id": "img_00060",
+        "image_path": "images/img_00060.jpg",
+        "question": "Why is my skin losing color?",
+        "answer": "This appears to be vitiligo, an autoimmune condition causing depigmentation and loss of melanocytes, resulting in white patches. While not medically dangerous, treatment options exist for cosmetic improvement including topical steroids, phototherapy, or depigmentation.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 45,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00038",
+        "image_path": "images/img_00038.jpg",
+        "question": "Why is my skin so red and inflamed?",
+        "answer": "This appears to be contact dermatitis or atopic dermatitis showing inflammation, erythema, and possible vesiculation. Identify and avoid trigger substances, maintain good skin hygiene, and use fragrance-free moisturizer regularly.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 23,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00044",
+        "image_path": "images/img_00044.jpg",
+        "question": "What are these silver scales?",
+        "answer": "These appear to be psoriatic plaques characterized by thick, silvery-white scales on erythematous base, with well-defined borders. Psoriasis is a chronic inflammatory condition requiring ongoing management and professional care.",
+        "condition": "Psoriasis",
+        "metadata": {
+            "age": 33,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00015",
+        "image_path": "images/img_00015.jpg",
+        "question": "Is this serious?",
+        "answer": "While basal cell carcinoma is the most common type of skin cancer, it is highly treatable when caught early. It rarely spreads to other parts of the body. Dermatological treatment and removal is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 26,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00028",
+        "image_path": "images/img_00028.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "This appears to be a benign nevus (mole) with regular, symmetric borders and uniform color distribution. It does not show concerning features. However, continue to monitor for any changes in size, shape, or color.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 53,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00010",
+        "image_path": "images/img_00010.jpg",
+        "question": "What should I do about this spot?",
+        "answer": "Given the appearance with multiple concerning features, please schedule an urgent appointment with a dermatologist as soon as possible. Do not delay - early detection and treatment of melanoma is crucial for prognosis.",
+        "condition": "Melanoma",
+        "metadata": {
+            "age": 22,
+            "gender": "M",
+            "location": "arm"
+        }
+    },
+    {
+        "image_id": "img_00070",
+        "image_path": "images/img_00070.jpg",
+        "question": "What is this ring-shaped rash?",
+        "answer": "This appears to be tinea (ringworm), a fungal infection causing a characteristic ring-shaped rash with raised borders. It is contagious and treatable with topical or oral antifungal medications depending on severity and type.",
+        "condition": "Tinea",
+        "metadata": {
+            "age": 66,
+            "gender": "M",
+            "location": "back"
+        }
+    },
+    {
+        "image_id": "img_00063",
+        "image_path": "images/img_00063.jpg",
+        "question": "Why is my skin losing color?",
+        "answer": "This appears to be vitiligo, an autoimmune condition causing depigmentation and loss of melanocytes, resulting in white patches. While not medically dangerous, treatment options exist for cosmetic improvement including topical steroids, phototherapy, or depigmentation.",
+        "condition": "Vitiligo",
+        "metadata": {
+            "age": 41,
+            "gender": "F",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00058",
+        "image_path": "images/img_00058.jpg",
+        "question": "What is this red spot?",
+        "answer": "This appears to be a cherry angioma or hemangioma - a benign vascular lesion composed of dilated blood vessels. These are not dangerous and typically do not require treatment unless cosmetically bothersome or frequently traumatized.",
+        "condition": "Angioma",
+        "metadata": {
+            "age": 29,
+            "gender": "M",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00034",
+        "image_path": "images/img_00034.jpg",
+        "question": "Is this mole dangerous?",
+        "answer": "This appears to be a benign nevus (mole) with regular, symmetric borders and uniform color distribution. It does not show concerning features. However, continue to monitor for any changes in size, shape, or color.",
+        "condition": "Nevus",
+        "metadata": {
+            "age": 60,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00018",
+        "image_path": "images/img_00018.jpg",
+        "question": "What is this pink bump?",
+        "answer": "This appears to be a basal cell carcinoma (BCC), the most common type of skin cancer. It typically presents as a firm, pink nodule or bump, sometimes with a pearly appearance. Treatment is usually successful with early intervention through excision or other modalities.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 63,
+            "gender": "F",
+            "location": "neck"
+        }
+    },
+    {
+        "image_id": "img_00036",
+        "image_path": "images/img_00036.jpg",
+        "question": "Why is my skin so red and inflamed?",
+        "answer": "This appears to be contact dermatitis or atopic dermatitis showing inflammation, erythema, and possible vesiculation. Identify and avoid trigger substances, maintain good skin hygiene, and use fragrance-free moisturizer regularly.",
+        "condition": "Dermatitis",
+        "metadata": {
+            "age": 66,
+            "gender": "F",
+            "location": "leg"
+        }
+    },
+    {
+        "image_id": "img_00027",
+        "image_path": "images/img_00027.jpg",
+        "question": "What are these rough spots?",
+        "answer": "These appear to be actinic keratosis lesions, precancerous growths caused by cumulative sun exposure. They present as rough, scaly patches. These should be monitored and treated to prevent progression to squamous cell carcinoma.",
+        "condition": "Actinic Keratosis",
+        "metadata": {
+            "age": 41,
+            "gender": "M",
+            "location": "face"
+        }
+    },
+    {
+        "image_id": "img_00019",
+        "image_path": "images/img_00019.jpg",
+        "question": "Is this serious?",
+        "answer": "While basal cell carcinoma is the most common type of skin cancer, it is highly treatable when caught early. It rarely spreads to other parts of the body. Dermatological treatment and removal is recommended.",
+        "condition": "Basal Cell Carcinoma",
+        "metadata": {
+            "age": 37,
+            "gender": "M",
+            "location": "face"
+        }
+    }
+]
