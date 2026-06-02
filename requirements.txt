@@ -1,0 +1,15 @@
+numpy
+opencv-python
+Pillow
+torch
+torchvision
+segmentation-models-pytorch
+timm
+transformers
+scikit-learn
+tqdm
+streamlit
+matplotlib
+seaborn
+openai
+python-dotenv

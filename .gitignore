@@ -10,3 +10,5 @@ __pycache__/
 *.pth
 *.h5
 9_VQA/models/
+.env
+gcp-credentials.json

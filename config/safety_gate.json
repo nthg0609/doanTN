@@ -1,0 +1,7 @@
+{
+  "min_mask_area_px": 64,
+  "min_area_ratio": 0.001,
+  "max_area_ratio": 0.75,
+  "max_border_complexity": 8.0,
+  "min_class_confidence": 0.60
+}
