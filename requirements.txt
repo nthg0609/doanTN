@@ -13,3 +13,9 @@ matplotlib
 seaborn
 openai
 python-dotenv
+plotly
+kaleido
+google-cloud-firestore
+google-auth
+requests
+peft

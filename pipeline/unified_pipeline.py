@@ -275,6 +275,8 @@ class UnifiedDermatologyPipeline:
             return {
                 "area_ratio": 0.0,
                 "border_complexity": 0.0,
+                "asymmetry": 0.0,
+                "circularity": 0.0,
                 "lesion_area": lesion_area,
                 "image_area": img_area,
                 "low_confidence": True,
@@ -284,6 +286,8 @@ class UnifiedDermatologyPipeline:
             return {
                 "area_ratio": 0.0,
                 "border_complexity": 0.0,
+                "asymmetry": 0.0,
+                "circularity": 0.0,
                 "lesion_area": lesion_area,
                 "image_area": img_area,
                 "low_confidence": True,
@@ -292,9 +296,44 @@ class UnifiedDermatologyPipeline:
         perimeter = float(cv2.arcLength(largest, True))
         area_ratio = float(lesion_area) / float(img_area)
         border_complexity = perimeter / max(np.sqrt(float(lesion_area)), 1.0)
+
+        # --- Circularity (ABCD - C): 4π·Area / Perimeter² → 1.0 = perfect circle (NV lành tính) ---
+        circularity = (4.0 * np.pi * float(lesion_area)) / max(perimeter ** 2, 1e-6)
+        circularity = float(np.clip(circularity, 0.0, 1.0))
+
+        # --- Asymmetry (ABCD - A): Chia mask theo centroid (cả 2 trục ngang + dọc) ---
+        M = cv2.moments(largest)
+        if M.get("m00", 0) > 0:
+            cx = int(round(M["m10"] / M["m00"]))
+            cy = int(round(M["m01"] / M["m00"]))
+        else:
+            cx, cy = w // 2, h // 2
+
+        # Trục ngang (horizontal split tại cy)
+        top_half = mask[:cy, :]
+        bot_half = mask[cy:, :]
+        # Lật nửa dưới để so sánh với nửa trên (cùng kích thước)
+        max_rows = max(top_half.shape[0], bot_half.shape[0])
+        top_padded = np.pad(top_half, ((0, max_rows - top_half.shape[0]), (0, 0)))
+        bot_flipped = np.pad(np.flipud(bot_half), ((0, max_rows - bot_half.shape[0]), (0, 0)))
+        asym_h = float(np.sum(np.abs(top_padded.astype(np.int32) - bot_flipped.astype(np.int32))))
+
+        # Trục dọc (vertical split tại cx)
+        left_half = mask[:, :cx]
+        right_half = mask[:, cx:]
+        max_cols = max(left_half.shape[1], right_half.shape[1])
+        left_padded = np.pad(left_half, ((0, 0), (0, max_cols - left_half.shape[1])))
+        right_flipped = np.pad(np.fliplr(right_half), ((0, 0), (0, max_cols - right_half.shape[1])))
+        asym_v = float(np.sum(np.abs(left_padded.astype(np.int32) - right_flipped.astype(np.int32))))
+
+        # Normalize: Asymmetry score ∈ [0, 1] — 0 = hoàn toàn đối xứng, 1 = bất đối xứng tối đa
+        asymmetry = float(np.clip((asym_h + asym_v) / (2.0 * max(lesion_area, 1)), 0.0, 1.0))
+
         return {
             "area_ratio": float(area_ratio),
             "border_complexity": float(border_complexity),
+            "asymmetry": float(asymmetry),
+            "circularity": float(circularity),
             "lesion_area": lesion_area,
             "image_area": img_area,
             "low_confidence": False,

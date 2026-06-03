@@ -87,7 +87,7 @@ class ModelRegistry:
 
         model = smp.DeepLabV3Plus(
             encoder_name="resnet50",
-            encoder_weights="imagenet",
+            encoder_weights=None,
             in_channels=3,
             classes=1,
             activation=None,
@@ -175,7 +175,7 @@ class ModelRegistry:
                 return self.classifier(pooled)
 
         num_classes = len(idx_to_class) if idx_to_class else 7
-        model = EfficientNetWithAttention(num_classes=num_classes, pretrained=True)
+        model = EfficientNetWithAttention(num_classes=num_classes, pretrained=False)
         state = torch.load(str(ckpt_path), map_location=self.device)
         if isinstance(state, dict) and "model_state_dict" in state:
             state = state["model_state_dict"]
