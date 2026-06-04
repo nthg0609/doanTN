@@ -48,6 +48,12 @@ DIAGNOSIS_DICTIONARY: Dict[str, str] = {
     "VASC":  "Tổn thương mạch máu",
 }
 
+# Các lớp bệnh ác tính / tiền ác tính cần cảnh báo nếu xuất hiện trong Top-3
+MALIGNANT_CLASSES: list = ["MEL", "BCC", "AKIEC"]
+BENIGN_CLASSES:    list = ["BKL", "NV", "DF", "VASC"]
+# Ngưỡng xác suất hiển thị cảnh báo lâm sàng ngị ác tính
+MALIGNANT_ALERT_THRESHOLD: float = 0.15
+
 TRIAGE_REASON_VI: Dict[str, str] = {
     "empty_or_low_confidence_mask":  "Không phát hiện được vùng tổn thương rõ ràng trong ảnh",
     "area_ratio_out_of_bounds":      "Tỉ lệ diện tích tổn thương nằm ngoài ngưỡng hợp lệ",
@@ -71,6 +77,22 @@ def get_vietnamese_diagnosis(pred_label: str) -> str:
 # ==============================================================================
 # MODULE LOG HỆ THỐNG (Dev-only, ẩn hoàn toàn khỏi UI)
 # ==============================================================================
+class _NumpySafeEncoder(json.JSONEncoder):
+    """Custom JSON encoder để xử lý numpy scalar/array không thể serialize bình thường."""
+    def default(self, obj):
+        try:
+            import numpy as np
+            if isinstance(obj, (np.integer,)):
+                return int(obj)
+            if isinstance(obj, (np.floating,)):
+                return float(obj)
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+        except ImportError:
+            pass
+        return super().default(obj)
+
+
 def write_dev_log(data: Dict[str, Any], action_type: str) -> None:
     """Ghi gói JSON thô (bao gồm LLM Prompt & Response) vào file log cục bộ."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -80,7 +102,7 @@ def write_dev_log(data: Dict[str, Any], action_type: str) -> None:
         "payload": data,
     }
     with open(LOG_FILE_PATH, "a", encoding="utf-8") as f:
-        f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+        f.write(json.dumps(log_entry, ensure_ascii=False, cls=_NumpySafeEncoder) + "\n")
 
 
 # ==============================================================================
@@ -372,6 +394,109 @@ def generate_vqa_response(
     return raw_response
 
 
+def generate_vqa_response_stream(
+    question: str,
+    result: Dict[str, Any],
+    api_key: Optional[str],
+    history: Optional[List[Dict[str, str]]] = None,
+):
+    """
+    Luồng Fusion VQA chính (phiên bản Generator / Stream):
+      1. Safety Gate Check — Chặn LLM nếu status == triage
+      2. Build CV context dict
+      3. Build System Prompt với CV context nhúng cứng
+      4. Build message list: [system, *history_sans_last_user, user_question]
+      5. Gọi LLM API với stream=True
+      6. Yield từng chunk phản hồi
+      7. Ghi log đầy đủ System Prompt + User message + Raw Response sau khi hoàn tất
+    """
+    # ── BƯỚC 1: Safety Gate Check ─────────────────────────────────────────────
+    if result.get("status") == "triage":
+        triage_reason_raw = result.get("triage_reason", "unknown")
+        triage_reason_vi  = TRIAGE_REASON_VI.get(triage_reason_raw, triage_reason_raw)
+        fallback = (
+            f"🚨 **Safety Gate đã kích hoạt** — Hệ thống không thể đưa ra tư vấn vì:\n\n"
+            f"> _{triage_reason_vi}_\n\n"
+            "Vui lòng chụp lại ảnh tổn thương với ánh sáng tốt hơn, hoặc liên hệ trực tiếp "
+            "với bác sĩ da liễu để được thăm khám chính xác."
+        )
+        for char in fallback:
+            yield char
+        return
+
+    # ── BƯỚC 2: Build CV context ───────────────────────────────────────────────
+    cls_data = result.get("classification") or {}
+    cv_context = {
+        "prediction":    cls_data.get("prediction", "N/A"),
+        "confidence":    float(cls_data.get("confidence", 0.0)),
+        "probabilities": cls_data.get("probabilities", {}),
+        "metrics":       result.get("metrics", {}),
+    }
+
+    # ── BƯỚC 3: Build System Prompt ───────────────────────────────────────────
+    system_prompt = _build_fusion_system_prompt(cv_context)
+
+    # ── BƯỚC 4: Build message list ────────────────────────────────────────────
+    history = history or []
+    valid_history = [
+        {"role": msg["role"], "content": msg["content"]}
+        for msg in history
+        if msg.get("role") in ("user", "assistant") and msg.get("content")
+    ]
+    if valid_history and valid_history[-1]["role"] == "user":
+        valid_history = valid_history[:-1]
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        *valid_history,
+        {"role": "user",   "content": question},
+    ]
+
+    # ── BƯỚC 5: Gọi LLM với stream=True ───────────────────────────────────────
+    api_key = api_key or os.getenv("OPENAI_API_KEY")
+    if OpenAI is None or not api_key:
+        fallback = _fallback_response(question, result)
+        for char in fallback:
+            yield char
+        return
+
+    raw_response_list = []
+    try:
+        client = OpenAI(api_key=api_key)
+        resp = client.chat.completions.create(
+            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            temperature=0.2,
+            max_tokens=800,
+            messages=messages,
+            stream=True,
+        )
+        for chunk in resp:
+            if len(chunk.choices) > 0:
+                content = chunk.choices[0].delta.content
+                if content:
+                    raw_response_list.append(content)
+                    yield content
+    except Exception as exc:
+        write_dev_log({"error": str(exc), "question": question}, action_type="LLM_ERROR")
+        fallback = _fallback_response(question, result)
+        for char in fallback:
+            yield char
+        return
+
+    # ── BƯỚC 6: Ghi log đầy đủ ───────────────────────────────────────────────
+    raw_response = "".join(raw_response_list)
+    write_dev_log(
+        {
+            "system_prompt":  system_prompt,
+            "user_message":   question,
+            "chat_history_len": len(valid_history),
+            "raw_response":   raw_response,
+            "cv_context":     cv_context,
+        },
+        action_type="LLM_VQA_EXCHANGE",
+    )
+
+
 # ==============================================================================
 # MODULE VISUALIZATION
 # ==============================================================================
@@ -434,7 +559,7 @@ def render_probability_chart(probabilities: Dict[str, float], patient_name: str 
         height=320,
     )
 
-    st.plotly_chart(fig, width='stretch')
+    st.plotly_chart(fig, use_container_width=True)
 
     # ── Lưu PNG báo cáo ───────────────────────────────────────────────────────
     try:
@@ -521,7 +646,7 @@ def render_radar_chart(metrics: Dict[str, Any]) -> None:
         margin=dict(l=40, r=40, t=30, b=30),
         height=280,
     )
-    st.plotly_chart(fig, width='stretch')
+    st.plotly_chart(fig, use_container_width=True)
 
 
 # ==============================================================================
@@ -574,7 +699,7 @@ def render_doctor_dashboard() -> None:
             col_img, col_data = st.columns([1, 1.2])
             with col_img:
                 if image_url:
-                    st.image(image_url, caption=f"Ảnh tổn thương: {v_time}", width='stretch')
+                    st.image(image_url, caption=f"Ảnh tổn thương: {v_time}", use_container_width=True)
                 else:
                     st.warning("Không có tệp ảnh cho lần khám này.")
             with col_data:
@@ -659,6 +784,20 @@ def _inject_custom_css() -> None:
             font-size: 1rem;
             color: #feb2b2;
         }
+        /* ── Vô hiệu hóa hiệu ứng làm mờ khi Streamlit đang rerun/running ── */
+        div[data-testid="stAppViewContainer"] {
+            opacity: 1 !important;
+            filter: none !important;
+        }
+        [data-st-mode="running"] {
+            opacity: 1 !important;
+        }
+        div.element-container {
+            opacity: 1 !important;
+        }
+        .stApp.running, [data-st-mode="running"] * {
+            opacity: 1 !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -682,9 +821,7 @@ def main() -> None:
 
     st.title("🔬 Hệ thống Trợ lý Da liễu Đa phương thức & EHR Dashboard")
 
-    tab_diagnosis, tab_doctor = st.tabs(["🔬 Thực hiện Chẩn đoán VQA", "📂 Màn hình Xem lại của Bác sĩ"])
-
-    # ── Session State Init ────────────────────────────────────────────────────
+    # ── Session State Init (TRƯỚC st.tabs() để tránh race condition) ─────────
     for key, default in [
         ("messages", []),
         ("result", None),
@@ -698,46 +835,50 @@ def main() -> None:
         if key not in st.session_state:
             st.session_state[key] = default
 
+    def reset_patient_form():
+        st.session_state["form_patient_name"] = ""
+        st.session_state["form_patient_age"] = 25
+        st.session_state["form_patient_hometown"] = ""
+
+    # ── Sidebar (GLOBAL — không đặt trong context tab nào) ────────────────────
+    with st.sidebar:
+        st.header("📋 THÔNG TIN BỆNH NHÂN")
+        p_name     = st.text_input("Họ và tên bệnh nhân:", key="form_patient_name", placeholder="Nguyễn Văn A")
+        p_age      = st.number_input("Tuổi:", min_value=0, max_value=120, key="form_patient_age")
+        p_hometown = st.text_input("Quê quán / Địa chỉ:", key="form_patient_hometown", placeholder="Hà Nội")
+
+        allow_to_save = True
+        if p_name.strip():
+            is_old_patient = check_patient_exists(p_name)
+            if is_old_patient:
+                st.warning(f"⚠️ PHÁT HIỆN: Bệnh nhân '{p_name.upper()}' đã có hồ sơ lịch sử.")
+                confirm_update = st.radio(
+                    "Bác sĩ có muốn cập nhật thêm mốc khám mới không?",
+                    options=["Chưa chọn", "Có, ghi nhận thêm mốc khám mới", "Không, đây là bệnh nhân khác trùng tên"],
+                    index=0,
+                )
+                if confirm_update == "Có, ghi nhận thêm mốc khám mới":
+                    allow_to_save = True
+                    st.caption("🟢 Nút lưu đã được mở khoá.")
+                elif confirm_update == "Không, đây là bệnh nhân khác trùng tên":
+                    allow_to_save = False
+                    st.error("🛑 Vui lòng thêm Mã số định danh vào tên để tạo hồ sơ riêng.")
+                else:
+                    allow_to_save = False
+                    st.info("💡 Vui lòng tích chọn xác nhận để mở khoá nút Lưu.")
+            else:
+                st.success("✨ HỒ SƠ MỚI: Sẽ tạo tài khoản hồ sơ mới.")
+
+        st.button("🗑️ Reset Form", on_click=reset_patient_form)
+
+        st.markdown("---")
+        st.header("⚙️ CẤU HÌNH HỆ THỐNG")
+        min_conf = st.slider("Safety gate threshold (τ_c)", 0.30, 0.95, 0.60, 0.01)
+
+    tab_diagnosis, tab_doctor = st.tabs(["🔬 Thực hiện Chẩn đoán VQA", "📂 Màn hình Xem lại của Bác sĩ"])
+
     # ── TAB 1: CHẨN ĐOÁN VQA ─────────────────────────────────────────────────
     with tab_diagnosis:
-        with st.sidebar:
-            st.header("📋 THÔNG TIN BỆNH NHÂN")
-            p_name     = st.text_input("Họ và tên bệnh nhân:", key="form_patient_name", placeholder="Nguyễn Văn A")
-            p_age      = st.number_input("Tuổi:", min_value=0, max_value=120, key="form_patient_age")
-            p_hometown = st.text_input("Quê quán / Địa chỉ:", key="form_patient_hometown", placeholder="Hà Nội")
-
-            allow_to_save = True
-            if p_name.strip():
-                is_old_patient = check_patient_exists(p_name)
-                if is_old_patient:
-                    st.warning(f"⚠️ PHÁT HIỆN: Bệnh nhân '{p_name.upper()}' đã có hồ sơ lịch sử.")
-                    confirm_update = st.radio(
-                        "Bác sĩ có muốn cập nhật thêm mốc khám mới không?",
-                        options=["Chưa chọn", "Có, ghi nhận thêm mốc khám mới", "Không, đây là bệnh nhân khác trùng tên"],
-                        index=0,
-                    )
-                    if confirm_update == "Có, ghi nhận thêm mốc khám mới":
-                        allow_to_save = True
-                        st.caption("🟢 Nút lưu đã được mở khoá.")
-                    elif confirm_update == "Không, đây là bệnh nhân khác trùng tên":
-                        allow_to_save = False
-                        st.error("🛑 Vui lòng thêm Mã số định danh vào tên để tạo hồ sơ riêng.")
-                    else:
-                        allow_to_save = False
-                        st.info("💡 Vui lòng tích chọn xác nhận để mở khoá nút Lưu.")
-                else:
-                    st.success("✨ HỒ SƠ MỚI: Sẽ tạo tài khoản hồ sơ mới.")
-
-            if st.button("🗑️ Reset Form"):
-                st.session_state["form_patient_name"]    = ""
-                st.session_state["form_patient_age"]     = 25
-                st.session_state["form_patient_hometown"] = ""
-                st.rerun()
-
-            st.markdown("---")
-            st.header("⚙️ CẤU HÌNH HỆ THỐNG")
-            min_conf = st.slider("Safety gate threshold (τ_c)", 0.30, 0.95, 0.60, 0.01)
-            st.caption(f"LLM Model: `{os.getenv('OPENAI_MODEL', 'gpt-4o-mini')}`")
 
         # ── Upload & Image Reset ──────────────────────────────────────────────
         uploaded = st.file_uploader("📤 Tải ảnh tổn thương da lên:", type=["jpg", "jpeg", "png"])
@@ -756,7 +897,7 @@ def main() -> None:
 
             col1, col2 = st.columns(2)
             with col1:
-                st.image(image, caption="📷 Ảnh đầu vào", width='stretch')
+                st.image(image, caption="📷 Ảnh đầu vào", use_container_width=True)
 
             if st.button("🔍 Chạy Phân tích CV", type="primary"):
                 st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
@@ -777,7 +918,7 @@ def main() -> None:
                 mask_img = _mask_to_image(mask, img_rgb.shape[:2])
                 with col2:
                     if mask_img is not None:
-                        st.image(mask_img, caption="🎭 Mặt nạ phân vùng", clamp=True, channels="L", width='stretch')
+                        st.image(mask_img, caption="🎭 Mặt nạ phân vùng", clamp=True, channels="L", use_container_width=True)
 
                 metrics  = result.get("metrics", {})
                 cls      = result.get("classification") or {}
@@ -800,6 +941,38 @@ def main() -> None:
                     )
                 else:
                     st.success(f"✅ Phân tích thành công — Độ tin cậy: {conf_pct:.1f}% ≥ τ_c")
+
+                # ── P0-3: Clinical Risk Warning ──────────────────────────────────────────
+                # Hiển thị cảnh báo khi nhãn chính là lành tính nhưng có nhãn ác tính ≥ ngưỡng.
+                if status == "ok" and pred in BENIGN_CLASSES:
+                    probs_early = cls.get("probabilities", {})
+                    if probs_early:
+                        max_mal_key = max(MALIGNANT_CLASSES, key=lambda k: probs_early.get(k, 0.0))
+                        max_mal_val = probs_early.get(max_mal_key, 0.0)
+                        if max_mal_val >= MALIGNANT_ALERT_THRESHOLD:
+                            vi_mal = get_vietnamese_diagnosis(max_mal_key)
+                            st.markdown(
+                                f"""
+                                <div style='background:rgba(237,137,54,0.18);border:2px solid #dd6b20;
+                                            border-radius:10px;padding:14px 18px;margin:8px 0;'>
+                                  ⚠️ <b>Cảnh báo Lâm sàng</b> — Dự đoán chính là <b>{pred}</b> (lành tính),
+                                  nhưng mô hình phát hiện xác suất <b>{max_mal_key}</b>
+                                  (<i>{vi_mal}</i>) = <b>{max_mal_val:.1%}</b>.
+                                  <br>➡️ Đề nghị tham khảo bác sĩ da liễu để loại trừ khả năng ác tính.
+                                </div>
+                                """,
+                                unsafe_allow_html=True,
+                            )
+
+                # ── Badge loại ảnh (informational) ──────────────────────────────────
+                img_type_detected = result.get("preprocess", {}).get("image_type", "dermoscopy")
+                badge_color = "#63b3ed" if img_type_detected == "dermoscopy" else "#f6ad55"
+                badge_label = "🔬 Dermoscopy" if img_type_detected == "dermoscopy" else "📱 Ảnh điện thoại (TTA)"
+                st.caption(
+                    f"<span style='color:{badge_color};font-weight:bold;'>{badge_label}</span> — "
+                    "Hệ thống tự phát hiện loại ảnh để áp dụng ngưỡng phù hợp.",
+                    unsafe_allow_html=True,
+                )
 
                 # ── 4 Metric Cards ────────────────────────────────────────────
                 st.subheader("📊 Số liệu Phân tích Định lượng")
@@ -865,15 +1038,18 @@ def main() -> None:
                 with st.chat_message("user"):
                     st.markdown(prompt)
 
-                answer = generate_vqa_response(
-                    question=prompt,
-                    result=result,
-                    api_key=os.getenv("OPENAI_API_KEY"),
-                    history=st.session_state["messages"],
-                )
-                st.session_state["messages"].append({"role": "assistant", "content": answer})
                 with st.chat_message("assistant"):
-                    st.markdown(answer)
+                    stream_gen = generate_vqa_response_stream(
+                        question=prompt,
+                        result=result,
+                        api_key=os.getenv("OPENAI_API_KEY"),
+                        history=st.session_state["messages"],
+                    )
+                    answer = st.write_stream(stream_gen)
+                st.session_state["messages"].append({"role": "assistant", "content": answer})
+                # Không gọi st.rerun() — trang giữ nguyên sau khi stream xong.
+                # Streamlit sẽ tự rerun khi user submit câu hỏi tiếp theo qua chat_input,
+                # đảm bảo câu hỏi không bị "chớp" mất và chat_input luôn ở cuối trang.
 
             # ── Lưu EHR ──────────────────────────────────────────────────────
             if result:

@@ -52,7 +52,7 @@ graph TD
 7. **Kích hoạt quy tắc điều hướng y tế (Clinical Guardrails)**:
    - **Quy tắc giải thích bệnh**: Nếu là bệnh lành tính (BKL, NV, DF, VASC), khẳng định lành tính, không lo ung thư, chỉ ảnh hưởng thẩm mỹ hoặc kích ứng tại chỗ, nhưng cảnh báo không được chủ quan nhầm lẫn. Nếu là ác tính hoặc tiền ác tính (AKIEC, BCC, MEL), giải thích thận trọng, nhấn mạnh tầm quan trọng của việc đi khám bác sĩ để làm sinh thiết sớm.
    - **Medication Guardrail (Tuyệt đối cấm kê đơn)**: Nghiêm cấm đưa ra tên thuốc cụ thể (ví dụ: Amoxicillin, Tretinoin...), liều lượng hoặc thời gian dùng thuốc, kể cả trong các câu hỏi giả định.
-8. **Gọi LLM & Phản hồi**: OpenAI API (`gpt-4o-mini`) trả về kết quả đáp ứng đầy đủ các ràng buộc trên và hiển thị ra màn hình chat. Đồng thời, toàn bộ log trao đổi (System prompt, User query, LLM response) được ghi xuống file log cục bộ (`5_Results/system_logs.log`).
+8. **Gọi LLM & Phản hồi**: OpenAI API (`gpt-4o-mini`) được tích hợp cơ chế **Streaming Response** (`st.write_stream`) để hiển thị câu trả lời dần dần (giống như ChatGPT và Gemini). Sau khi phản hồi hoàn tất, hệ thống tự động gọi `st.rerun()` để đẩy ô đặt câu hỏi (`st.chat_input`) xuống dưới cùng của giao diện chat. Đồng thời, toàn bộ log trao đổi (System prompt, User query, LLM response) được ghi xuống file log cục bộ (`5_Results/system_logs.log`).
 
 ---
 

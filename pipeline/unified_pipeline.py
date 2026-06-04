@@ -1,6 +1,10 @@
 from __future__ import annotations
 from pathlib import Path
-"""Unified dermatology pipeline with a single inference contract."""
+"""Unified dermatology pipeline with a single inference contract.
+
+Nâng cấp P1-1: Adaptive Safety Gate — pass img_type vào SafetyGate.evaluate()
+Nâng cấp P1-2: TTA Segmentation — dùng multiscale inference cho ảnh điện thoại
+"""
 
 from dataclasses import dataclass, asdict
 from typing import Any, Dict, Optional
@@ -12,6 +16,17 @@ from PIL import Image
 
 from .model_registry import ModelRegistry
 from .safety_gate import SafetyGate, SafetyGateConfig
+
+try:
+    import sys
+    import os
+    _base = str(Path(__file__).resolve().parent.parent)
+    if _base not in sys.path:
+        sys.path.insert(0, _base)
+    from derma_inference_utils import multiscale_segment_from_rgb
+    _TTA_AVAILABLE = True
+except ImportError:
+    _TTA_AVAILABLE = False
 
 
 @dataclass
@@ -40,6 +55,7 @@ class UnifiedDermatologyPipeline:
         seg_threshold: float = 0.3,
         min_area_px: int = 64,
         mode: str = "classification",
+        use_tta: bool = True,  # P1-2: Kích hoạt TTA cho ảnh phone
     ):
         self.registry = ModelRegistry.get_instance(base_dir=base_dir, device=device)
         if safety_config_path:
@@ -52,6 +68,7 @@ class UnifiedDermatologyPipeline:
         self.seg_threshold = float(seg_threshold)
         self.min_area_px = int(min_area_px)
         self.mode = mode
+        self.use_tta = use_tta and _TTA_AVAILABLE  # P1-2: TTA chỉ hoạt động khi module có sẵn
         if load_models:
             self.registry.load_all()
 
@@ -68,7 +85,8 @@ class UnifiedDermatologyPipeline:
         img_type = self._detect_image_type(img_rgb, resolved)
 
         # Nhánh 1: segmentation, metrics, và mask hiển thị chỉ đọc ảnh gốc RGB.
-        seg_mask, seg_info = self._segment(img_rgb)
+        # P1-2: Truyền img_type để kích hoạt TTA cho ảnh phone.
+        seg_mask, seg_info = self._segment(img_rgb, image_type=img_type)
         metrics = self._get_lesion_metrics(seg_mask)
 
         # Nhánh 2: classification chạy ĐỘC LẬP trên chính ảnh gốc, không nhân mask.
@@ -78,7 +96,8 @@ class UnifiedDermatologyPipeline:
             cls_result = self._classify(img_rgb)
             cls_confidence = None if cls_result is None else cls_result.get("confidence")
 
-        gate = self.safety_gate.evaluate(metrics, cls_confidence)
+        # P1-1: Pass img_type vào Safety Gate để áp dụng ngưỡng động theo loại ảnh.
+        gate = self.safety_gate.evaluate(metrics, cls_confidence, image_type=img_type)
         if not gate.accept:
             report = self._safe_fallback_report(metrics, gate.reason)
             result = {
@@ -110,15 +129,44 @@ class UnifiedDermatologyPipeline:
             result["segmentation_mask"] = seg_mask
         return result
 
-    def _segment(self, img_rgb: np.ndarray) -> tuple[np.ndarray, Dict[str, Any]]:
+    def _segment(self, img_rgb: np.ndarray, image_type: str = "dermoscopy") -> tuple[np.ndarray, Dict[str, Any]]:
+        """Phân vùng tổn thương.
+
+        P1-2: Nếu use_tta=True và image_type='phone', dùng Multi-Scale TTA
+        (multiscale_segment_from_rgb) để tăng robustness trên ảnh điện thoại.
+        """
         seg_model = self.registry.get_segmentation_model()
         if seg_model is None:
             return np.zeros(img_rgb.shape[:2], dtype=np.uint8), {"method": "deeplab", "error": "model_unavailable"}
 
         cfg = self.registry.config
         mean = np.array(cfg.seg_norm.mean, dtype=np.float32)
-        std = np.array(cfg.seg_norm.std, dtype=np.float32)
+        std  = np.array(cfg.seg_norm.std,  dtype=np.float32)
 
+        # ── P1-2: TTA cho ảnh phone ─────────────────────────────────────────
+        if self.use_tta and image_type == "phone":
+            tta_mask, _prob_map, tta_info = multiscale_segment_from_rgb(
+                img_rgb,
+                model=seg_model,
+                device=self.registry.device,
+                scales=(1.0, 0.75, 0.5),
+                input_size=cfg.seg_input_size,
+                threshold=self.seg_threshold,
+                min_area_px=self.min_area_px,
+                mean=mean,
+                std=std,
+                morph_kernel=5,
+            )
+            tta_mask = self._postprocess_mask(tta_mask)
+            tta_info["method"] = "deeplab_tta"
+            if tta_mask.sum() == 0:
+                fallback_mask, fb_info = self._classical_fallback_mask(img_rgb)
+                if fb_info.get("accepted", False):
+                    tta_mask = fallback_mask
+                    tta_info.update({"method": "classical_fallback_after_tta", **fb_info})
+            return tta_mask, tta_info
+
+        # ── Standard single-pass segmentation ──────────────────────────────
         h, w = img_rgb.shape[:2]
         resized = cv2.resize(img_rgb, (cfg.seg_input_size, cfg.seg_input_size), interpolation=cv2.INTER_LINEAR)
         arr = resized.astype(np.float32) / 255.0
