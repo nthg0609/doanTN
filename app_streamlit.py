@@ -462,7 +462,7 @@ def generate_vqa_response_stream(
 
     raw_response_list = []
     try:
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=api_key, timeout=15.0)
         resp = client.chat.completions.create(
             model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             temperature=0.2,
@@ -559,7 +559,7 @@ def render_probability_chart(probabilities: Dict[str, float], patient_name: str 
         height=320,
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_column_width=True)
 
     # ── Lưu PNG báo cáo ───────────────────────────────────────────────────────
     try:
@@ -646,7 +646,7 @@ def render_radar_chart(metrics: Dict[str, Any]) -> None:
         margin=dict(l=40, r=40, t=30, b=30),
         height=280,
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_column_width=True)
 
 
 # ==============================================================================
@@ -699,7 +699,7 @@ def render_doctor_dashboard() -> None:
             col_img, col_data = st.columns([1, 1.2])
             with col_img:
                 if image_url:
-                    st.image(image_url, caption=f"Ảnh tổn thương: {v_time}", use_container_width=True)
+                    st.image(image_url, caption=f"Ảnh tổn thương: {v_time}", use_column_width=True)
                 else:
                     st.warning("Không có tệp ảnh cho lần khám này.")
             with col_data:
@@ -897,7 +897,7 @@ def main() -> None:
 
             col1, col2 = st.columns(2)
             with col1:
-                st.image(image, caption="📷 Ảnh đầu vào", use_container_width=True)
+                st.image(image, caption="📷 Ảnh đầu vào", use_column_width=True)
 
             if st.button("🔍 Chạy Phân tích CV", type="primary"):
                 st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
@@ -918,7 +918,7 @@ def main() -> None:
                 mask_img = _mask_to_image(mask, img_rgb.shape[:2])
                 with col2:
                     if mask_img is not None:
-                        st.image(mask_img, caption="🎭 Mặt nạ phân vùng", clamp=True, channels="L", use_container_width=True)
+                        st.image(mask_img, caption="🎭 Mặt nạ phân vùng", clamp=True, channels="L", use_column_width=True)
 
                 metrics  = result.get("metrics", {})
                 cls      = result.get("classification") or {}
@@ -1019,6 +1019,10 @@ def main() -> None:
             st.divider()
             st.subheader("💬 VQA Chat Space")
 
+            if st.session_state.get("partial_response"):
+                st.session_state["messages"].append({"role": "assistant", "content": st.session_state["partial_response"]})
+                st.session_state["partial_response"] = ""
+
             for msg in st.session_state["messages"]:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
@@ -1045,8 +1049,17 @@ def main() -> None:
                         api_key=os.getenv("OPENAI_API_KEY"),
                         history=st.session_state["messages"],
                     )
-                    answer = st.write_stream(stream_gen)
+                    
+                    def stream_and_save():
+                        partial_text = ""
+                        for chunk in stream_gen:
+                            partial_text += chunk
+                            st.session_state["partial_response"] = partial_text
+                            yield chunk
+                            
+                    answer = st.write_stream(stream_and_save())
                 st.session_state["messages"].append({"role": "assistant", "content": answer})
+                st.session_state["partial_response"] = ""
                 # Không gọi st.rerun() — trang giữ nguyên sau khi stream xong.
                 # Streamlit sẽ tự rerun khi user submit câu hỏi tiếp theo qua chat_input,
                 # đảm bảo câu hỏi không bị "chớp" mất và chat_input luôn ở cuối trang.

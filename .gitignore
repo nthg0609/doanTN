@@ -10,5 +10,7 @@ __pycache__/
 *.pth
 *.h5
 9_VQA/models/
+9_VQA/dermavqa_dataset_old/
+9_VQA/dermavqa_dataset/
 .env
 gcp-credentials.json

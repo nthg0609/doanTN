@@ -168,17 +168,27 @@ class DermaVQADataset(Dataset):
         item = self.data[idx]
         img_path = self._resolve_img_path(item)
 
-        if img_path and os.path.exists(img_path):
-            image = Image.open(img_path).convert("RGB")
-        else:
-            # Fallback tạo ảnh ngẫu nhiên nếu mất file
+        try:
+            if img_path and os.path.exists(img_path):
+                image = Image.open(img_path).convert("RGB")
+            else:
+                raise FileNotFoundError("Image not found")
+        except Exception as e:
+            # Fallback tạo ảnh ngẫu nhiên nếu mất file hoặc file bị hỏng
             synthetic = np.random.randint(100, 180, (self.image_size, self.image_size, 3), dtype=np.uint8)
             image = Image.fromarray(synthetic)
+
+        conv = item.get("conversations", [])
+        if conv:
+            conv_text = " ".join([f"<|{turn.get('role', '')}|>: {turn.get('content', '')}" for turn in conv])
+        else:
+            conv_text = ""
 
         return {
             "image": self.transform(image),
             "question": item.get("question", ""),
             "answer": item.get("answer", ""),
+            "conversations_text": conv_text,
         }
 
 # ==============================================================================
@@ -187,7 +197,7 @@ class DermaVQADataset(Dataset):
 
 def main():
     parser = argparse.ArgumentParser(description="Joint Fine-tuning VQA Model with LoRA")
-    parser.add_argument("--epochs", type=int, default=10, help="Number of training epochs")
+    parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size")
     parser.add_argument("--lr_vision", type=float, default=2e-5, help="Learning rate for CBAM Attention")
     parser.add_argument("--lr_llm", type=float, default=5e-5, help="Learning rate for LLM / Projection")
@@ -198,7 +208,7 @@ def main():
     print(f"Device selected: {device}")
 
     # Đọc dữ liệu
-    qa_path = os.path.join(DATASET_DIR, "QA_pairs.json")
+    qa_path = os.path.join(DATASET_DIR, "QA_pairs_augmented.json")
     if not os.path.exists(qa_path):
         print(f"[ERROR] QA Dataset not found at: {qa_path}")
         return 1
@@ -298,13 +308,18 @@ def main():
         loop = tqdm(train_loader, desc=f"Epoch {epoch+1}/{args.epochs} [Train]")
         for batch in loop:
             images = batch["image"].to(device)
-            prompts = [f"Question: {q} Answer: {a}{tokenizer.eos_token}" for q, a in zip(batch["question"], batch["answer"])]
+            prompts = []
+            for q, a, conv_text in zip(batch["question"], batch["answer"], batch["conversations_text"]):
+                if conv_text:
+                    prompts.append(conv_text.strip() + tokenizer.eos_token)
+                else:
+                    prompts.append(f"Question: {q} Answer: {a}{tokenizer.eos_token}")
             
             tokens = tokenizer(
                 prompts,
                 padding=True,
                 truncation=True,
-                max_length=96,
+                max_length=256,
                 return_tensors="pt"
             ).to(device)
             
@@ -331,12 +346,17 @@ def main():
         with torch.no_grad():
             for batch in val_loader:
                 images = batch["image"].to(device)
-                prompts = [f"Question: {q} Answer: {a}{tokenizer.eos_token}" for q, a in zip(batch["question"], batch["answer"])]
+                prompts = []
+                for q, a, conv_text in zip(batch["question"], batch["answer"], batch["conversations_text"]):
+                    if conv_text:
+                        prompts.append(conv_text.strip() + tokenizer.eos_token)
+                    else:
+                        prompts.append(f"Question: {q} Answer: {a}{tokenizer.eos_token}")
                 tokens = tokenizer(
                     prompts,
                     padding=True,
                     truncation=True,
-                    max_length=96,
+                    max_length=256,
                     return_tensors="pt"
                 ).to(device)
                 labels = tokens["input_ids"].clone()
