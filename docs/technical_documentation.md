@@ -1,452 +1,1155 @@
-# BÁO CÁO KIẾN TRÚC HỆ THỐNG VÀ PHÂN TÍCH THUẬT TOÁN
-## HỆ THỐNG TRỢ LÝ CHẨN ĐOÁN DA LIỄU ĐA PHƯƠNG THỨC TÍCH HỢP VQA & HỒ SƠ BỆNH ÁN ĐIỆN TỬ (EHR) ĐA MỐC THỜI GIAN
+# TÀI LIỆU KỸ THUẬT HỆ THỐNG CHẨN ĐOÁN DA LIỄU ĐA PHƯƠNG THỨC
+## Tích hợp Thị giác Máy tính, Hội thoại Y tế VQA và Hồ sơ Bệnh án Điện tử Đa mốc thời gian
+
 
 ---
 
-### TÓM TẮT HỆ THỐNG
-Hệ thống là một giải pháp y tế số (Digital Health Solution) tích hợp đa phương thức (Multimodal AI), kết hợp các mô hình Thị giác Máy tính chuyên sâu (Computer Vision) dùng cho phân đoạn và phân loại tổn thương da liễu với Mô hình Ngôn ngữ Lớn (Large Language Model - LLM) để thực hiện hội thoại y khoa VQA (Visual Question Answering). Hệ thống được thiết kế với cơ chế tự động đánh giá an toàn dữ liệu (Safety Gate), quản lý bệnh án điện tử đa mốc thời gian (Multi-visit EHR) trên nền tảng đám mây Google Cloud Firestore, và giao diện trực quan hỗ trợ bác sĩ lâm sàng đưa ra quyết định sàng lọc sơ bộ tối ưu.
+## MỤC LỤC
+
+1. [Kiến trúc Tổng quan Hệ thống](#1-kiến-trúc-tổng-quan-hệ-thống)
+2. [Phát hiện Loại Ảnh và Phân nhánh TTA](#2-phát-hiện-loại-ảnh-và-phân-nhánh-tta)
+3. [Nhánh Phân vùng Tổn thương — DeepLabV3+](#3-nhánh-phân-vùng-tổn-thương--deeplabv3)
+4. [Nhánh Phân loại Bệnh lý — EfficientNet-B1 + CBAM](#4-nhánh-phân-loại-bệnh-lý--efficientnet-b1--cbam)
+5. [Safety Gate — Cổng Lọc An toàn Y tế](#5-safety-gate--cổng-lọc-an-toàn-y-tế)
+6. [Kiến trúc Fusion Prompt và Hệ thống VQA](#6-kiến-trúc-fusion-prompt-và-hệ-thống-vqa)
+7. [Bộ Quy tắc An toàn Y đức (Medication Guardrail)](#7-bộ-quy-tắc-an-toàn-y-đức-medication-guardrail)
+8. [Mô hình VQA Ngoại tuyến — CPUMedicalVQAModel](#8-mô-hình-vqa-ngoại-tuyến--cpumedicalvqamodel)
+9. [Cơ sở Dữ liệu EHR Đa mốc thời gian — Cloud Firestore](#9-cơ-sở-dữ-liệu-ehr-đa-mốc-thời-gian--cloud-firestore)
+10. [Trích xuất Đặc trưng Hình học ABCD](#10-trích-xuất-đặc-trưng-hình-học-abcd)
+11. [Đặc tả Hàm Chủ chốt (API Reference)](#11-đặc-tả-hàm-chủ-chốt-api-reference)
+12. [Hệ thống Cấu hình và Giám sát](#12-hệ-thống-cấu-hình-và-giám-sát)
 
 ---
 
-## 1. KIẾN TRÚC TỔNG QUAN VÀ SƠ ĐỒ LUỒNG DỮ LIỆU (System Architecture & Dataflow)
+## 1. KIẾN TRÚC TỔNG QUAN HỆ THỐNG
 
-### 1.1 Khái quát mô hình tổng thể
-Hệ thống hoạt động dựa trên cơ chế đồng hành song song (Parallel Pipeline Contract) giữa hai nhánh chính:
-1. **Nhánh Trích xuất Đặc trưng Hình học & Phân đoạn (Segmentation Branch)**: Nhận ảnh gốc RGB, đi qua khối phân đoạn DeepLabV3+ (được tăng cường bằng kỹ thuật Test-Time Augmentation - TTA đối với ảnh chụp điện thoại) để sinh ra mặt nạ (binary mask) tổn thương da. Từ mặt nạ này, hệ thống tính toán các chỉ số hình học theo chuẩn ABCD lâm sàng.
-2. **Nhánh Phân loại Bệnh lý (Classification Branch)**: Hoạt động hoàn toàn độc lập trên ảnh gốc RGB thông qua mạng EfficientNet-B1 kết hợp khối chú ý CBAM (Convolutional Block Attention Module) để xuất ra phân phối xác suất trên 7 nhóm bệnh lý da liễu thuộc chuẩn ISIC.
+### 1.1 Triết lý Thiết kế
 
-Kết quả từ hai nhánh được tổng hợp để đưa qua **Safety Gate**. Nếu vượt qua bộ lọc an toàn, dữ liệu hình học và phân loại sẽ được nhúng cứng (hard-coded) vào vùng ngữ cảnh hệ thống (System Prompt Context) của LLM tạo nên kiến trúc **Fusion Prompt**. LLM (GPT-4o-mini ở chế độ trực tuyến hoặc CPUMedicalVQAModel ở chế độ ngoại tuyến) sau đó sẽ sinh câu trả lời dạng dòng (Streaming Response) để trả lời các câu hỏi lâm sàng của người dùng (VQA Chat) dưới sự kiểm soát nghiêm ngặt của bộ quy tắc an toàn y đức (Medication Guardrail). Toàn bộ hồ sơ lâm sàng có thể được đồng bộ lên **Cloud Firestore** thông qua một cổng kiểm duyệt trùng lặp hồ sơ thông minh (**Confirmation Gate**).
+Hệ thống được xây dựng theo nguyên tắc **"AI hỗ trợ — Bác sĩ quyết định"** (AI-Assisted Clinical Decision Support). Toàn bộ các tính năng AI chỉ có vai trò sàng lọc sơ bộ, không tự đưa ra chẩn đoán cuối cùng. Ba trụ cột kỹ thuật:
 
-### 1.2 Sơ đồ luồng dữ liệu (Dataflow ASCII Art)
+1. **Computer Vision (CV)**: Phân vùng và đo lường hình học tổn thương khách quan.
+2. **LLM + Fusion Prompt**: Giải thích và trả lời câu hỏi y tế dựa trên dữ liệu CV thực tế.
+3. **Safety Gate**: Bộ lọc an toàn ngăn chặn AI đưa ra kết quả khi đầu vào không đủ chất lượng.
 
-```text
-       [ Ảnh đầu vào (RGB Image) ]
-                   │
-                   ▼
-     [ Image Type Detection Module ]
-      - Phân tích khía cạnh hình học & độ phân giải ảnh
-      - Phân loại luồng xử lý: { 'dermoscopy', 'phone' }
-                   │
-         ┌─────────┴────────────────────────┐
-         ▼ (dermoscopy)                     ▼ (phone)
-   [ Standard Segmentation ]         [ Multi-scale TTA Segment ]
-   - Single pass ResNet50-DeepLab   - Scale factor: (1.0, 0.75, 0.5)
-         │                                  - Averaged Probability Map
-         └─────────┬────────────────────────┘
-                   │
-                   ▼
-       [ Post-Processing Mask ]
-       - Morphology Open & Close (Kernel 5x5)
-       - Component Connection Analysis (Keep Largest)
-       - [Classical Fallback Otsu] (nếu DeepLab không tạo được mask)
-                   │
-                   ├───► [ ABCD Geometric Feature Extraction ]
-                   │      - Asymmetry (A), Border Complexity (B),
-                   │        Circularity (C), Area Ratio (D)
-                   │
-                   │         [ Classification Branch ]
-                   │         - Independent Forward pass on Raw RGB
-                   │         - ImageNet normalization & Resize (224x224)
-                   │         - EfficientNet-B1 + CBAM Network
-                   │         - 7-class Probability Distribution
-                   │                 │
-                   └────────┬────────┘
-                            ▼
-                  [ Safety Gate Evaluation ]
-                  - Đầu vào: ABCD metrics, cls_confidence, image_type
-                  - Ngưỡng động: adaptive thresholds (dermoscopy vs phone)
-                            │
-         ┌──────────────────┴──────────────────┐
-         ▼ (Chấp nhận - Accept)                ▼ (Từ chối - Reject: Triage Mode)
-   [ Clinical Risk Warning check ]      [ Triage System Report Generated ]
-   - Check if malignant prob >= 0.15    - Ghi nhận lỗi (area_ratio/border/confidence)
-   - Render orange UI Warning banner    - Khoá hoàn toàn VQA Chat Input
-         │                              - Render red Safety Gate Alert banner
-         ▼                                     │
-   [ Prompt Fusion Engine ]                    ▼
-   - Embed CV context into System Prompt   [ Hidden Dev System Logging ]
-   - Inject Medication Guardrails          - Serialize JSON raw data via Custom Encoder
-         │                                 - Ghi xuống file logs cục bộ
-         ▼                                   (5_Results/system_logs.log)
-   [ LLM Chat Engine (OpenAI API) ]
-   - gpt-4o-mini stream output
-   - Live stream rendering to UI
-         │
-         ▼
-   [ Cloud Confirmation Gate ]
-   - Kiểm tra trùng lặp trên GCP Firestore
-   - st.radio lựa chọn phân nhánh cho Bác sĩ:
-     ├──► [ Đồng ý cập nhật ] ──► Firestore: Append to visits[] (Multi-visit EHR)
-     └──► [ Báo trùng tên ]   ──► Block Save / Yêu cầu đổi ID hồ sơ bệnh nhân
+### 1.2 Sơ đồ Kiến trúc Tổng quan (Mermaid)
+
+```mermaid
+graph TB
+    subgraph INPUT["📥 ĐẦU VÀO"]
+        A[("🖼️ Ảnh da<br/>(JPG/PNG)")]
+    end
+
+    subgraph DETECT["🔍 PHÁT HIỆN LOẠI ẢNH"]
+        B{{"Dò loại hình ảnh<br/>Tỷ lệ khung hình & Phân giải"}}
+        B_D["Ảnh nội soi da (dermoscopy)<br/>(tỷ lệ ≤2, kích thước tối đa ≤1200)"]
+        B_P["Ảnh điện thoại (phone)<br/>(tỷ lệ >2 hoặc kích thước tối đa >1200)"]
+    end
+
+    subgraph SEG["🎭 PHÂN VÙNG TỔN THƯƠNG"]
+        C1["Một lượt chuẩn (Standard Single-Pass)<br/>DeepLabV3+ ResNet50<br/>Đầu vào: 256×256"]
+        C2["Tăng cường đa tỷ lệ (Multi-Scale TTA)<br/>DeepLabV3+ ResNet50<br/>Tỷ lệ: 1.0 / 0.75 / 0.5"]
+        C3[["Hậu xử lý mặt nạ (Postprocess Mask)<br/>Toán học hình thái Đóng + Mở<br/>Thành phần liên thông lớn nhất"]]
+        C4{{"Mặt nạ trống?<br/>tổng = 0"}}
+        C5["Dự phòng (Fallback):<br/>Phân ngưỡng Otsu<br/>Thị giác máy tính cổ điển"]
+    end
+
+    subgraph METRICS["📐 ĐO LƯỜNG HÌNH HỌC ABCD"]
+        D["Tính toán chỉ số ABCD:<br/>• Tỷ lệ diện tích (Area Ratio)<br/>• Độ phức tạp biên (Border Complexity)<br/>• Điểm bất đối xứng (Asymmetry Score)<br/>• Độ tròn (Circularity)"]
+    end
+
+    subgraph CLS["🧬 PHÂN LOẠI BỆNH LÝ (ĐỘC LẬP)"]
+        E["EfficientNet-B1<br/>+ Khối chú ý CBAM<br/>Đầu vào: 224×224 RGB gốc<br/>→ Phân phối xác suất 7 lớp ISIC"]
+    end
+
+    subgraph GATE["🛡️ CỔNG LỌC AN TOÀN (SAFETY GATE)"]
+        F{{"Đánh giá 4 tiêu chí:<br/>1. Diện tích mặt nạ ≥ 64px<br/>2. Tỷ lệ diện tích ∈ [min, max]<br/>3. Độ phức tạp biên ≤ biên tối đa<br/>4. Độ tin cậy ≥ τ_c"}}
+        F_OK["✅ CHẤP NHẬN (ACCEPT)<br/>trạng thái = ok"]
+        F_FAIL["❌ TỪ CHỐI (REJECT)<br/>trạng thái = triage (phân loại lại)"]
+    end
+
+    subgraph WARN["⚠️ CẢNH BÁO LÂM SÀNG"]
+        G{{"Nhãn lành tính?<br/>VÀ xác suất ác tính lớn nhất ≥ 0.15?"}}
+        G_YES["Hiển thị<br/>Cảnh báo nguy cơ lâm sàng"]
+        G_NO["Không cảnh báo"]
+    end
+
+    subgraph VQA["💬 HỆ THỐNG HỘI THOẠI VQA"]
+        H1["_build_fusion_system_prompt()<br/>Nhúng ngữ cảnh CV → System Prompt"]
+        H2["OpenAI gpt-4o-mini<br/>luồng phát (stream = True)"]
+        H3["st.write_stream()<br/>Hiển thị từng token thời gian thực"]
+    end
+
+    subgraph TRIAGE["🚨 TRIAGE UI"]
+        I["Banner đỏ: Safety Gate kích hoạt<br/>Khung nhập chat bị khóa hoàn toàn"]
+    end
+
+    subgraph EHR["💾 LƯU HỒ SƠ BỆNH ÁN EHR"]
+        J["Tải lên ImgBB<br/>(Đường dẫn ảnh công khai)"]
+        K["Firestore: Thêm vào visits[]<br/>(Hồ sơ bệnh án đa mốc thời gian)"]
+    end
+
+    A --> B
+    B --> B_D --> C1
+    B --> B_P --> C2
+    C1 --> C3
+    C2 --> C3
+    C3 --> C4
+    C4 -- "Có" --> C5
+    C4 -- "Không" --> D
+    C5 --> D
+    A --> E
+    D --> F
+    E --> F
+    F -- "Pass" --> F_OK --> G
+    F -- "Fail" --> F_FAIL --> I
+    G -- "Có" --> G_YES
+    G -- "Không" --> G_NO
+    G_YES --> H1
+    G_NO --> H1
+    H1 --> H2 --> H3
+    F_OK --> J --> K
 ```
 
----
+### 1.3 Nguyên tắc Hai nhánh Song song (Parallel Pipeline Contract)
 
-## 2. CÁC CÔNG NGHỆ, MÔ HÌNH VÀ THƯ VIỆN LÕI (Core Technology Stack & Deep Learning Models)
+Điểm quan trọng nhất trong thiết kế: **Nhánh Phân vùng và Nhánh Phân loại chạy hoàn toàn độc lập nhau**, không có dữ liệu nào truyền từ nhánh này sang nhánh kia:
 
-### 2.1 Nhánh Phân vùng Tổn thương (DeepLabV3+ Segmentation)
-* **Kiến trúc mô hình**: DeepLabV3+ sử dụng bộ trích xuất đặc trưng (backbone) **ResNet-50** đã loại bỏ các lớp phân loại cuối cùng. Khối Atrous Spatial Pyramid Pooling (ASPP) được áp dụng tại bottleneck để thu thập đặc trưng đa tỷ lệ thông qua các tốc độ giãn nở (dilation rates) khác nhau, giúp bảo toàn thông tin biên của tổn thương.
-* **Thông số đầu vào/đầu ra**:
-  * Kích thước ảnh đầu vào: $256 \times 256$ pixel, chuẩn hóa kênh màu qua cấu hình:
-    $$\mu = [0.5, 0.5, 0.5], \quad \sigma = [0.25, 0.25, 0.25]$$
-  * Đầu ra: Bản đồ xác suất đơn kênh (single-channel probability map) kích thước ban đầu $256 \times 256$. Bản đồ này được nội suy song tuyến (Bilinear Interpolation) về kích thước ảnh gốc $H \times W$, sau đó nhị phân hóa bằng ngưỡng $\text{seg\_threshold} = 0.3$.
-* **Đánh giá chất lượng mô hình**: Phân đoạn tổn thương đạt chỉ số **Dice Coefficient = 0.9074** và **IoU (Intersection over Union) = 0.8394** trên tập dữ liệu kiểm thử chuẩn ISIC.
+```mermaid
+graph LR
+    IMG[("Ảnh RGB gốc")]
 
-### 2.2 Nhánh Phân loại Bệnh lý (EfficientNet-B1 + CBAM)
-* **Kiến trúc mạng**: Sử dụng mạng xương sống **EfficientNet-B1** làm bộ trích xuất đặc trưng (feature extractor) cơ sở, trích xuất đặc trưng tại lớp convolutional cuối cùng để thu được tensor đặc trưng kích thước $C \times H \times W$ (với $C = 1280$ kênh đặc trưng). Tensor này được đưa qua khối chú ý hỗn hợp **CBAM (Convolutional Block Attention Module)**.
-* **Khối chú ý CBAM**: Tăng cường đặc trưng theo cả hai chiều:
-  * **Channel Attention**: Sử dụng cả hai phép toán Adaptive Average Pooling và Adaptive Max Pooling song song trên tensor đặc trưng, đi qua một mạng MLP chia sẻ trọng số để tạo ra vector trọng số kênh, nhấn mạnh "cái gì" quan trọng.
-    $$M_c(F) = \sigma(\text{MLP}(\text{AvgPool}(F)) + \text{MLP}(\text{MaxPool}(F)))$$
-  * **Spatial Attention**: Thực hiện phép chiếu kênh trung bình và kênh cực đại dọc theo chiều sâu đặc trưng, nối chúng lại thành tensor $2 \times H \times W$, sau đó đi qua một lớp tích chập tích hợp bộ lọc kích thước $7 \times 7$ để tạo bản đồ chú ý không gian, định vị "ở đâu" quan trọng trên ảnh da.
-    $$M_s(F) = \sigma(f^{7\times 7}([\text{AvgPool}(F); \text{MaxPool}(F)]))$$
-  * Tensor đặc trưng sau cùng được nhân nhân bản với các bản đồ chú ý:
-    $$F' = F \otimes M_c(F), \quad F'' = F' \otimes M_s(F')$$
-  * Đặc trưng sau chú ý $F''$ được đưa qua lớp Global Average Pooling để tạo thành vector đặc trưng $1280$ chiều, qua lớp Dropout điều hòa tỷ lệ $0.3$ và cuối cùng kết nối với một lớp tuyến tính (Linear Layer) để phân loại sang 7 lớp bệnh lý.
-* **Chuẩn hóa dữ liệu**: Ảnh được nội suy song tuyến về kích thước $224 \times 224$ và chuẩn hóa theo chuẩn ảnh ImageNet:
-  $$\mu = [0.485, 0.456, 0.406], \quad \sigma = [0.229, 0.224, 0.225]$$
-* **Tập nhãn bệnh lý (7 lớp ISIC)**:
-  * `AKIEC` (Dày sừng quang hóa), `BCC` (Ung thư tế bào đáy), `BKL` (Tổn thương sừng hóa lành tính), `DF` (U xơ da), `MEL` (U hắc tố ác tính), `NV` (Nốt ruồi lành tính), `VASC` (Tổn thương mạch máu).
+    IMG -->|"Co kích thước 256×256<br/>Chuẩn hóa μ=[0.5,0.5,0.5]<br/>σ=[0.25,0.25,0.25]"| SEG["🎭 DeepLabV3+<br/>→ Mặt nạ nhị phân (Binary Mask)<br/>→ Chỉ số hình học ABCD"]
 
-### 2.3 Hỏi đáp Y tế Đa phương thức (VQA Model)
-Hệ thống hỗ trợ hai cơ chế VQA linh hoạt phụ thuộc vào điều kiện hạ tầng phần cứng:
+    IMG -->|"Co kích thước 224×224<br/>Chuẩn hóa ImageNet<br/>μ=[0.485,0.456,0.406]"| CLS["🧬 EfficientNet-B1 + CBAM<br/>→ Xác suất 7 lớp<br/>→ Nhãn dự đoán, Độ tin cậy"]
 
-#### A. Mô hình Trực tuyến (Online Production VQA)
-Sử dụng mô hình ngôn ngữ lớn thương mại **gpt-4o-mini** của OpenAI. Để khắc phục hiện tượng "ảo tưởng" (hallucination) của LLM và đảm bảo tính chính xác lâm sàng, hệ thống áp dụng kiến trúc **Fusion Prompt**:
-* **Không truyền ảnh trực tiếp vào LLM**: Thay vì truyền tệp ảnh thô vào API của GPT (gây tốn chi phí token và khó kiểm soát vùng tư vấn), hệ thống chuyển đổi ảnh sang dạng biểu diễn thông tin định lượng (Quantitative Representation).
-* **System Prompt nhúng cứng ngữ cảnh CV**: Toàn bộ kết quả chẩn đoán của mô hình phân loại (nhãn dự đoán, xác suất chi tiết 7 lớp) và các chỉ số hình học trích xuất từ mô hình phân đoạn (Area ratio, Border complexity, Asymmetry, Circularity) được mã hóa thành văn bản và tiêm trực tiếp vào **System Prompt** ở khu vực dành riêng `[CV_CONTEXT]`.
-* **Ưu điểm**: Giúp LLM chỉ hội thoại xung quanh dữ liệu thực tế do mô hình CV trích xuất, ngăn chặn việc suy diễn ra ngoài vùng tổn thương được chụp.
-
-#### B. Mô hình Ngoại tuyến (Offline VQA - CPUMedicalVQAModel)
-Đây là mô hình tự huấn luyện phục vụ chạy offline trên CPU mà không cần kết nối API ngoài. Cấu trúc mô hình bao gồm:
-* **Vision Backbone**: Sử dụng `EfficientNet-B1` kết hợp khối `CBAM` trích xuất đặc trưng từ ảnh đầu vào $3 \times 224 \times 224$ thành vector đặc trưng kích thước $1 \times 1280$. Khi huấn luyện VQA, toàn bộ các tham số của mạng EfficientNet-B1 gốc bị đóng băng (frozen), chỉ mở khóa các tham số trong khối chú ý CBAM để tinh chỉnh thông tin không gian vùng da.
-* **Projection Layer**: Khối MLP gồm 2 lớp tuyến tính có hàm kích hoạt GELU và Dropout ($0.3$) xen kẽ, đảm nhận vai trò ánh xạ vector đặc trưng ảnh từ không gian thị giác ($1280$ chiều) sang không gian biểu diễn ngôn ngữ ($768$ chiều) để tương thích với LLM:
-  $$\text{Projection}(v) = W_2(\text{Dropout}(\text{GELU}(W_1(v) + b_1))) + b_2$$
-  Vector thu được được định hình lại thành kích thước $1 \times 1 \times 768$, đóng vai trò như một "token hình ảnh" đặc biệt đại diện cho vùng tổn thương da.
-* **Language Branch (DistilGPT-2 + LoRA)**:
-  * Sử dụng kiến trúc transformer giải mã tự hồi quy (Causal Language Model) **DistilGPT-2** làm bộ sinh ngôn ngữ (đầu vào embedding kích thước $768$).
-  * Nhúng bộ chuyển đổi tham số hiệu quả **LoRA (Low-Rank Adaptation)** trực tiếp vào các ma trận chiếu khóa-giá trị-truy vấn của lớp tự chú ý (các module `c_attn`).
-  * Cấu hình tham số LoRA: Hạng $r = 8$, hệ số tỷ lệ $\alpha = 16$, tỷ lệ Dropout bằng $0.05$. Điều này giúp giảm thiểu 99% số lượng tham số cần cập nhật trong quá trình huấn luyện LLM.
-* **Cơ chế ghép nối chuỗi mã hóa (Forward Pass)**:
-  * Token ảnh chiếu ($1 \times 768$) được ghép nối trực tiếp vào phía trước các token embedding của chuỗi câu hỏi văn bản ($L \times 768$) tạo thành chuỗi embedding tổng hợp ($ (1 + L) \times 768 $):
-    $$E_{\text{total}} = [\mathbf{v}_{\text{projected}} \; ; \; \mathbf{e}_{t_1} \; ; \; \mathbf{e}_{t_2} \; ; \; \dots \; ; \; \mathbf{e}_{t_L}]$$
-  * Chuỗi embedding này được đưa vào mô hình DistilGPT-2 để sinh chuỗi câu trả lời tự hồi quy.
-
----
-
-## 3. LOGIC XỬ LÝ CHI TIẾT TRÊN PIPELINE VÀ GIAO DIỆN (Detailed Workflow & State Management)
-
-### 3.1 Khối Safety Gate & Triage Mode (Selective Prediction)
-Nhằm bảo đảm an toàn tính mạng trong y tế số, hệ thống sử dụng thuật toán **Selective Prediction** thông qua khối kiểm soát **Safety Gate**. Khi dữ liệu đầu vào không đảm bảo chất lượng lâm sàng hoặc mô hình AI có độ tự tin quá thấp, hệ thống sẽ tự động chuyển sang **Triage Mode** (chế độ phân loại khẩn cấp/từ chối chẩn đoán tự động).
-
-* **Đánh giá Ngưỡng Tin cậy Thích ứng (Adaptive Thresholds)**:
-  Hệ thống tự động nhận dạng ảnh chụp bằng thiết bị chuyên dụng (`dermoscopy`) hay ảnh chụp tự do bằng điện thoại cá nhân (`phone`) dựa trên tỷ lệ khung hình và độ phân giải biên để kích hoạt các ngưỡng đánh giá phù hợp:
-
-| Ngưỡng tham số | Chế độ `dermoscopy` | Chế độ `phone` (Adaptive) | Ý nghĩa lâm sàng |
-| :--- | :---: | :---: | :--- |
-| $\text{min\_mask\_area\_px}$ | $64\text{ px}$ | $64\text{ px}$ | Diện tích tổn thương tối thiểu để xử lý |
-| $\text{min\_area\_ratio}$ | $0.001$ | $0.0005$ | Loại bỏ ảnh da bình thường không có nốt ruồi |
-| $\text{max\_area\_ratio}$ | $0.75$ | $0.92$ | Loại bỏ ảnh chụp quá sát, mất biên tổn thương |
-| $\text{max\_border\_complexity}$ | $8.0$ | $14.0$ | Nới lỏng độ phức tạp bờ do nhiễu hậu cảnh |
-| $\text{min\_class\_confidence}$ ($\tau_c$) | $0.60$ | $0.60$ | Ngưỡng an toàn xác suất dự đoán nhãn |
-
-* **Cơ chế hoạt động**:
-  1. Nếu diện tích vùng tổn thương phân đoạn ($A_{\text{lesion}}$) nhỏ hơn $64$ pixel, hoặc chỉ số diện tích tỷ lệ nằm ngoài khoảng cho phép $\Rightarrow$ Từ chối chẩn đoán với lỗi `empty_or_low_confidence_mask` hoặc `area_ratio_out_of_bounds`.
-  2. Nếu độ phức tạp bờ tổn thương vượt quá ngưỡng tối đa cho phép $\Rightarrow$ Từ chối chẩn đoán với lỗi `border_complexity_out_of_bounds` do ảnh bị nhiễu lông, vảy da sừng làm mất cấu trúc đường biên thực.
-  3. Nếu xác suất dự đoán của nhãn phân loại lớn nhất thấp hơn ngưỡng an toàn $\tau_c$ (mặc định $0.60$) $\Rightarrow$ Từ chối chẩn đoán với lỗi `low_classification_confidence`.
-  4. **Triage Mode Active**: Khi Safety Gate trả về kết quả từ chối (`accept = False`), giao diện Streamlit lập tức hiển thị Banner cảnh báo màu đỏ báo lỗi kỹ thuật chi tiết. Đồng thời, ô nhập chat VQA (`st.chat_input`) bị **khóa hoàn toàn (disabled)** nhằm ngăn chặn tuyệt đối việc LLM đưa ra lời khuyên y khoa dựa trên các số liệu đầu vào thiếu tin cậy.
-
-### 3.2 Khối Cảnh báo Lâm sàng Nguy cơ Ác tính (Clinical Risk Warning)
-Trên thực tế, mô hình phân loại có thể dự đoán nhãn có xác suất cao nhất là một bệnh lành tính (như nốt ruồi lành tính `NV`), nhưng xác suất dành cho lớp ác tính (như u hắc tố ác tính `MEL`) vẫn ở mức đáng lo ngại. Do đó, hệ thống triển khai cơ chế phát hiện sớm nguy cơ ác tính tiềm ẩn:
-* **Logic toán học**: Định nghĩa tập hợp các lớp ác tính và tiền ác tính $\mathcal{M} = \{\text{MEL}, \text{BCC}, \text{AKIEC}\}$. Khi nhãn dự đoán chính của mô hình $y^* \notin \mathcal{M}$ (thuộc nhóm lành tính), hệ thống sẽ quét qua phân phối xác suất dự đoán $P$ để tìm giá trị lớn nhất trong nhóm nguy cơ cao:
-  $$P_{\text{max\_malignant}} = \max_{m \in \mathcal{M}} P(m)$$
-* **Ngưỡng cảnh báo**: Nếu $P_{\text{max\_malignant}} \ge 0.15$ (tức xác suất mắc bệnh ác tính tiềm ẩn đạt từ 15% trở lên), hệ thống sẽ tự động kích hoạt **Clinical Risk Warning Banner** trên giao diện với màu cam nổi bật:
-  > ⚠️ **Cảnh báo Lâm sàng** — Dự đoán chính là **BKL** (lành tính), nhưng mô hình phát hiện xác suất **MEL** (U hắc tố ác tính) = **18.5%** ($\ge 15.0\%$). Đề nghị tham khảo bác sĩ da liễu để tiến hành làm sinh thiết loại trừ.
-* Cơ chế này đóng vai trò như một màng lọc bảo vệ kép, tránh việc bỏ sót (False Negative) các ca bệnh nguy hiểm khi mô hình bị nhiễu phân loại.
-
-### 3.3 Khối Cổng Kiểm Duyệt Trùng Lặp (Confirmation Gate)
-Để bảo toàn tính toàn vẹn dữ liệu và tránh việc lưu đè dữ liệu vô tổ chức lên hệ thống bệnh án điện tử, hệ thống tích hợp khối logic kiểm soát trùng lặp:
-1. **Kiểm tra sự tồn tại**: Khi bác sĩ nhập thông tin tên bệnh nhân vào sidebar, hệ thống chuẩn hóa tên bệnh nhân thành mã định danh viết hoa không dấu và không khoảng trắng (ví dụ: "Nguyễn Văn A" $\rightarrow$ ID document `NGUYENVANA`). Hàm `check_patient_exists()` sẽ thực hiện một truy vấn đọc nhanh lên Firestore.
-2. **Kích hoạt cổng chặn**: Nếu hồ sơ bệnh nhân đã tồn tại, nút "Xác nhận & Lưu" bị khóa. Hệ thống hiển thị cảnh báo đỏ và kết xuất widget lựa chọn bắt buộc bác sĩ tương tác (`st.radio`):
-   * *Lựa chọn 1: "Có, ghi nhận thêm mốc khám mới"* $\Rightarrow$ Đặt trạng thái biến cho phép ghi dữ liệu `allow_to_save = True`. Hệ thống sẽ chuẩn bị đẩy thông tin ảnh khám mới nhất vào mảng dòng thời gian của bệnh nhân cũ.
-   * *Lựa chọn 2: "Không, đây là bệnh nhân khác trùng tên"* $\Rightarrow$ Đặt trạng thái `allow_to_save = False`. Bác sĩ bị chặn lưu hồ sơ và được yêu cầu thêm ký tự phân biệt (như mã căn cước công dân hoặc số thứ tự khám) vào tên để tạo lập một hồ sơ độc lập.
-   * *Mặc định: "Chưa chọn"* $\Rightarrow$ Khóa tính năng đồng bộ và hướng dẫn bác sĩ chọn xác nhận để tiếp tục.
-
-### 3.4 Kiến trúc Tiến triển Đa mốc thời gian (Multi-visit EHR Architecture)
-Hệ thống sử dụng cơ sở dữ liệu tài liệu NoSQL Google Cloud Firestore làm kho lưu trữ EHR. Cấu trúc dữ liệu được thiết kế theo dạng **Nested Array of Objects** (Mảng đối tượng lồng nhau) trong một tài liệu duy nhất đại diện cho một bệnh nhân:
-
-```json
-{
-  "patient_id": "NGUYENVANB",
-  "patient_info": {
-    "name": "Nguyễn Văn B",
-    "age": 42,
-    "hometown": "Đà Nẵng"
-  },
-  "created_at": "2026-06-01 09:30:15",
-  "updated_at": "2026-06-03 14:20:00",
-  "visits": [
-    {
-      "timestamp_id": "20260601_093015",
-      "created_at": "2026-06-01 09:30:15",
-      "image_url": "https://i.ibb.co/example1/image.png",
-      "ai_extracted_metrics": {
-        "status": "ok",
-        "prediction": "NV",
-        "confidence": 0.8845,
-        "area_ratio": 0.0245,
-        "border_complexity": 3.1205,
-        "asymmetry": 0.1240,
-        "circularity": 0.8920
-      },
-      "vqa_conversations": [
-        {"role": "user", "content": "Nốt ruồi này có nguy hiểm không?"},
-        {"role": "assistant", "content": "Dựa trên chỉ số phân tích, tổn thương của bạn được phân loại..."}
-      ]
-    },
-    {
-      "timestamp_id": "20260603_142000",
-      "created_at": "2026-06-03 14:20:00",
-      "image_url": "https://i.ibb.co/example2/image.png",
-      "ai_extracted_metrics": {
-        "status": "ok",
-        "prediction": "NV",
-        "confidence": 0.9120,
-        "area_ratio": 0.0380,
-        "border_complexity": 3.4560,
-        "asymmetry": 0.1510,
-        "circularity": 0.8540
-      },
-      "vqa_conversations": []
-    }
-  ]
-}
+    SEG --> GATE["🛡️ Cổng lọc an toàn (Safety Gate)"]
+    CLS --> GATE
+    GATE --> VQA["💬 Hội thoại Fusion VQA"]
 ```
-* **Cơ chế cập nhật**: Khi lưu thêm mốc khám mới, hệ thống tải dữ liệu hiện tại xuống, thêm bản ghi khám mới vào mảng `visits` bằng phương thức `.update()` của Firestore Document Reference thay vì ghi đè lại toàn bộ tài liệu, giúp tiết kiệm chi phí băng thông đường truyền đám mây.
-* **Giao diện Doctor Dashboard**: Hiển thị toàn bộ biên niên sử ảnh qua các thời kỳ dưới dạng cây thư mục thu gọn (`st.expander`). Bác sĩ có thể so sánh trực quan sự thay đổi kích thước (`area_ratio`), sự biến đổi đường viền, độ đối xứng và xem lại lịch sử hội thoại của từng lần khám trước đó để đánh giá tốc độ tiến triển của bệnh.
 
-### 3.5 Khối Reset Trạng thái Thông minh (Smart Reset)
-Streamlit chạy lại toàn bộ script từ đầu mỗi khi có bất kỳ tương tác UI nào. Để duy trì tính nhất quán của trạng thái phiên làm việc (Session State) mà không để xảy ra hiện tượng chồng chéo dữ liệu cũ-mới, hệ thống cài đặt cơ chế **Smart Reset**:
-* Khi phát hiện tệp tin tải lên có tên khác với tên tệp tin lưu trong phiên khám hiện tại:
-  $$\text{uploaded.name} \neq \text{st.session_state["last\_uploaded\_file\_name"]}$$
-* Hệ thống lập tức thực thi chuỗi lệnh dọn dẹp bộ nhớ đệm:
-  ```python
-  st.session_state["last_uploaded_file_name"] = uploaded.name
-  st.session_state["result"]                  = None
-  st.session_state["messages"]                = []
-  st.session_state["analysis_time"]           = None
-  st.session_state["saved_local_img_path"]    = None
-  ```
-* Việc dọn dẹp này đảm bảo khi bác sĩ đổi sang phân tích ca bệnh mới, màn hình phân tích CV cũ, biểu đồ Plotly, biểu đồ Radar và nội dung trò chuyện VQA của bệnh nhân cũ sẽ biến mất hoàn toàn, tránh tình trạng bác sĩ đọc nhầm kết quả chẩn đoán của ca khám trước.
+**Lý do thiết kế độc lập này rất quan trọng:**
+
+| Vấn đề | Giải thích |
+|---|---|
+| **Tại sao Phân loại KHÔNG dùng mask đã cắt?** | Cắt ảnh theo mask làm mất phần viền da xung quanh — thông tin cần thiết để phân biệt tổn thương sắc tố (melanoma) với nốt ruồi lành tính. Bác sĩ da liễu cũng nhìn toàn bộ vùng da, không chỉ nốt được phân vùng. |
+| **Tại sao Phân vùng KHÔNG dùng nhãn phân loại?** | Phân vùng là bài toán pixel-level (từng pixel là tổn thương hay không), độc lập về mặt kỹ thuật. Nếu kết hợp sẽ tạo circular dependency và giảm khả năng phát hiện lỗi của từng mô hình. |
 
 ---
 
-## 4. ĐẶC TẢ CÁC HÀM VÀ PHƯƠNG THỨC CHỦ CHỐT (Core Functions Specification)
+## 2. PHÁT HIỆN LOẠI ẢNH VÀ PHÂN NHÁNH TTA
 
-### 4.1 Hàm khởi chạy pipeline phân tích tổng hợp
-#### `UnifiedDermatologyPipeline.run(self, image_path: str, question: Optional[str] = None, return_mask: bool = False) -> Dict[str, Any]`
-* **Mục đích**: Nhận ảnh da từ đường dẫn cục bộ, điều phối thực thi song song hai nhánh phân đoạn và phân loại, áp dụng Safety Gate để đưa ra kết quả chẩn đoán lâm sàng cuối cùng.
-* **Đầu vào (Inputs)**:
-  * `image_path` (`str`): Đường dẫn tuyệt đối đến tệp ảnh đầu vào.
-  * `question` (`Optional[str]`): Câu hỏi VQA nếu có.
-  * `return_mask` (`bool`): Cờ cho phép trả về ma trận numpy chứa mặt nạ nhị phân hay không.
-* **Đầu ra (Outputs)**: Trả về một từ điển (`Dict[str, Any]`) có cấu trúc:
-  * `status`: Trạng thái kết quả (`"ok"` hoặc `"triage"`).
-  * `image_path`: Đường dẫn ảnh gốc đã giải quyết.
-  * `triage_reason`: Lý do bị Safety Gate chặn (`None` nếu status là ok).
-  * `preprocess`: Chứa thông tin tiền xử lý bệnh án (`image_type` là phone hay dermoscopy).
-  * `segmentation`: Chi tiết phương pháp phân đoạn (`deeplab` hoặc `deeplab_tta`).
-  * `metrics`: Từ điển chứa các chỉ số hình học ABCD.
-  * `classification`: Từ điển chứa dự đoán nhãn cao nhất, độ tin cậy và phân phối xác suất 7 lớp.
-  * `report`: Chuỗi văn bản báo cáo y khoa sơ bộ.
-  * `segmentation_mask` (Tùy chọn): Ma trận nhị phân `np.ndarray` kích thước ảnh gốc.
-
-### 4.2 Các hàm xử lý ảnh và trích xuất đặc trưng hình học
-#### `UnifiedDermatologyPipeline._segment(self, img_rgb: np.ndarray, image_type: str = "dermoscopy") -> tuple[np.ndarray, Dict[str, Any]]`
-* **Mục đích**: Thực hiện phân đoạn ảnh. Nếu `image_type == "phone"` và cờ `use_tta` được bật, hàm sẽ gọi bộ phân đoạn đa tỷ lệ TTA để triệt tiêu nhiễu môi trường, ngược lại sẽ phân đoạn đơn luồng chuẩn.
-* **Đầu vào (Inputs)**:
-  * `img_rgb` (`np.ndarray`): Ma trận ảnh đầu vào màu RGB dạng `uint8` có kích thước $H \times W \times 3$.
-  * `image_type` (`str`): Kiểu ảnh chụp (`"dermoscopy"` hoặc `"phone"`).
-* **Đầu ra (Outputs)**: Trả về `tuple` gồm:
-  * `mask` (`np.ndarray`): Mặt nạ nhị phân nhãn $0/1$ kích thước $H \times W$.
-  * `seg_info` (`Dict[str, Any]`): Từ điển lưu trữ phương pháp phân đoạn thực thi và các tham số kỹ thuật đi kèm.
-
-#### `UnifiedDermatologyPipeline._get_lesion_metrics(self, mask: np.ndarray) -> Dict[str, Any]`
-* **Mục đích**: Tính toán các chỉ số hình học ABCD từ mặt nạ phân đoạn nhị phân của tổn thương.
-* **Đầu vào (Inputs)**:
-  * `mask` (`np.ndarray`): Mặt nạ nhị phân vùng tổn thương.
-* **Đầu ra (Outputs)**: `Dict[str, Any]` chứa:
-  * `area_ratio` (`float`): Tỷ số diện tích tổn thương trên diện tích ảnh da.
-  * `border_complexity` (`float`): Chỉ số đo lường độ phức tạp của đường bao.
-  * `asymmetry` (`float`): Hệ số bất đối xứng của tổn thương $\in [0,1]$.
-  * `circularity` (`float`): Chỉ số đo độ tròn của tổn thương $\in [0,1]$.
-  * `lesion_area` (`int`): Diện tích tổn thương tính bằng số pixel.
-  * `image_area` (`int`): Tổng diện tích ảnh tính bằng số pixel.
-  * `low_confidence` (`bool`): Đánh giá nhanh xem diện tích có quá nhỏ để tính toán hay không.
-
-#### `UnifiedDermatologyPipeline._postprocess_mask(self, mask: np.ndarray) -> np.ndarray`
-* **Mục đích**: Loại bỏ nhiễu nhị phân bằng thuật toán hình thái học (Morphological Operations) và giữ lại thành phần liên thông có diện tích lớn nhất (Largest Connected Component).
-* **Đầu vào (Inputs)**: `mask` (`np.ndarray`) nhị phân thô chứa nhiễu.
-* **Đầu ra (Outputs)**: `np.ndarray` mặt nạ nhị phân đã được làm sạch biên và chỉ chứa một vùng tổn thương chính duy nhất.
-
-#### `UnifiedDermatologyPipeline._classical_fallback_mask(self, img_rgb: np.ndarray) -> tuple[np.ndarray, Dict[str, Any]]`
-* **Mục đích**: Thuật toán phân đoạn dự phòng cổ điển sử dụng ngưỡng Otsu kết hợp phân tích thành phần liên thông khi mô hình học sâu DeepLab không phát hiện được tổn thương trong ảnh.
-* **Đầu vào (Inputs)**: `img_rgb` (`np.ndarray`) ảnh đầu vào màu gốc.
-* **Đầu ra (Outputs)**: Trả về mặt nạ nhị phân dự phòng và thông tin kiểm duyệt hình học (tỷ lệ khung bao, độ nén, khoảng cách tới tâm ảnh) xem mặt nạ cổ điển này có đáng tin cậy để sử dụng tiếp hay không.
-
-### 4.3 Các hàm giao tiếp dịch vụ đám mây (Cloud API Services)
-#### `check_patient_exists(patient_name: str) -> bool`
-* **Mục đích**: Kiểm tra sự tồn tại của hồ sơ bệnh án bệnh nhân dựa trên tên hành chính của họ trên Firestore.
-* **Đầu vào (Inputs)**: Tên bệnh nhân đầy đủ (`patient_name` dạng `str`).
-* **Đầu ra (Outputs)**: Trả về `True` nếu document ID tương ứng đã tồn tại trong collection `medical_records`, ngược lại trả về `False`.
-
-#### `save_medical_record_to_gcp(patient_name: str, patient_info: Dict[str, Any], visit_data: Dict[str, Any]) -> bool`
-* **Mục đích**: Đồng bộ dữ liệu khám bệnh lên Cloud Firestore.
-* **Đầu vào (Inputs)**:
-  * `patient_name` (`str`): Họ tên bệnh nhân.
-  * `patient_info` (`Dict[str, Any]`): Thông tin hành chính bệnh nhân (tuổi, quê quán).
-  * `visit_data` (`Dict[str, Any]`): Từ điển lưu trữ thông tin chi tiết của mốc khám (đường dẫn ảnh đám mây ImgBB, kết quả CV, nhật ký VQA).
-* **Đầu ra (Outputs)**: Trả về `True` nếu thực hiện ghi/cập nhật thành công lên Firestore, ngược lại trả về `False`.
-
-### 4.4 Hàm sinh hội thoại y khoa đa phương thức
-#### `generate_vqa_response_stream(question: str, result: Dict[str, Any], api_key: Optional[str], history: Optional[List[Dict[str, str]]] = None)`
-* **Mục đích**: Triệu gọi mô hình ngôn ngữ lớn ở chế độ sinh dòng (Streaming Generator), tích hợp ngữ cảnh CV nhúng cứng, sinh câu trả lời từng ký tự cho giao diện VQA.
-* **Đầu vào (Inputs)**:
-  * `question` (`str`): Câu hỏi hiện tại của người dùng.
-  * `result` (`Dict[str, Any]`): Kết quả phân tích CV từ pipeline.
-  * `api_key` (`Optional[str]`): Khóa API OpenAI.
-  * `history` (`Optional[List[Dict[str, str]]]`): Danh sách lịch sử tin nhắn trong phiên trò chuyện.
-* **Đầu ra (Outputs)**: Trình tạo (`Generator` yielding `str`) sinh ra từng từ/cụm từ của phản hồi hỗ trợ lâm sàng cho đến khi kết thúc chuỗi tin nhắn.
-
----
-
-## 5. CÁC THÔNG SỐ CẤU HÌNH VÀ QUẢN LÝ HỆ THỐNG (Thresholds, Mappings & Monitoring)
-
-### 5.1 Bảng ánh xạ bệnh lý lâm sàng (`DIAGNOSIS_DICTIONARY`)
-Để phục vụ hiển thị trên giao diện người dùng tiếng Việt và hỗ trợ LLM nhận thức đúng thuật ngữ lâm sàng, hệ thống xây dựng bảng ánh xạ danh pháp y khoa chi tiết:
+### 2.1 Cơ chế Phát hiện Loại Ảnh (`_detect_image_type`)
 
 ```python
-DIAGNOSIS_DICTIONARY: Dict[str, str] = {
-    "AKIEC": "Dày sừng quang hóa / Tiền ung thư",
-    "BCC":   "Ung thư biểu mô tế bào đáy",
-    "BKL":   "Tổn thương sừng hóa lành tính",
-    "DF":    "U xơ da",
-    "MEL":   "U hắc tố ác tính (Melanoma)",
-    "NV":    "Nốt ruồi lành tính",
-    "VASC":  "Tổn thương mạch máu",
-}
+# Trích từ unified_pipeline.py
+def _detect_image_type(img_rgb, path=None) -> str:
+    h, w = img_rgb.shape[:2]
+    aspect = float(max(h, w)) / max(1.0, float(min(h, w)))  # Tỷ lệ cạnh dài/cạnh ngắn
+    filename = Path(path or "").name.lower()
+    
+    # Điều kiện nhận diện ảnh điện thoại:
+    if aspect > 2.0                      # Ảnh dọc/ngang rất lệch (portrait phone)
+       or filename.startswith("img")     # Tên file từ DCIM điện thoại Android
+       or filename.startswith("dcim")    # Thư mục camera điện thoại
+       or max(h, w) > 1200:             # Độ phân giải cao hơn ảnh dermoscopy chuẩn
+        return "phone"
+    return "dermoscopy"
 ```
 
-### 5.2 Các hằng số cấu hình CSS định hình giao diện UI
-Để tối ưu hóa giao diện Streamlit, tránh hiện tượng đè chữ, tràn dòng khi hiển thị trên các thiết bị màn hình khác nhau và loại bỏ hiệu ứng làm mờ giao diện (dimming effect) gây khó chịu cho bác sĩ khi mô hình đang chạy nền, hệ thống chèn trực tiếp mã CSS tùy chỉnh:
-
-```css
-/* Tránh tràn từ và đè chữ trong hộp thoại chat VQA */
-[data-testid="stChatMessageContent"] p,
-[data-testid="stChatMessageContent"] li {
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-/* Đặt giới hạn chiều cao cho khung hiển thị VQA Chat và thanh cuộn */
-[data-testid="stChatMessageContent"] {
-    max-height: 420px;
-    overflow-y: auto;
-}
-
-/* Chuẩn hóa kích thước font chữ hiển thị của các thẻ chỉ số định lượng */
-[data-testid="stMetricValue"] {
-    font-size: 1.1rem !important;
-}
-
-/* Vô hiệu hóa hiệu ứng làm mờ giao diện khi Streamlit chạy lại code */
-div[data-testid="stAppViewContainer"] {
-    opacity: 1 !important;
-    filter: none !important;
-}
-[data-st-mode="running"] {
-    opacity: 1 !important;
-}
-div.element-container {
-    opacity: 1 !important;
-}
-.stApp.running, [data-st-mode="running"] * {
-    opacity: 1 !important;
-}
+```mermaid
+flowchart TD
+    A["Ảnh đầu vào"] --> B["Tính tỷ lệ khung hình = max(H,W) / min(H,W)"]
+    B --> C{"Tỷ lệ khung hình > 2.0?"}
+    C -- "Có" --> PHONE["📱 Ảnh điện thoại ('phone')"]
+    C -- "Không" --> D{"Độ phân giải max(H,W) > 1200?"}
+    D -- "Có" --> PHONE
+    D -- "Không" --> E{"Tên file\nbắt đầu 'img'\nhoặc 'dcim'?"}
+    E -- "Có" --> PHONE
+    E -- "Không" --> DERM["🔬 Ảnh nội soi da ('dermoscopy')"]
 ```
 
-### 5.3 Cơ chế Ghi nhật ký ẩn phục vụ giám sát kỹ thuật (Dev-only System Logging)
-Hệ thống không hiển thị log kỹ thuật lên UI để tránh gây nhiễu cho bác sĩ. Thay vào đó, toàn bộ dữ liệu giao tiếp thô giữa người dùng, kết quả mô hình CV và chuỗi prompt gửi lên LLM được ghi tự động vào tệp tin nhật ký cục bộ `5_Results/system_logs.log` dưới dạng JSON thô.
+**Thông số trong sơ đồ:**
+- `aspect > 2.0`: Ảnh chụp dọc điện thoại thường có tỷ lệ 16:9 ≈ 1.78, nhưng ảnh da bằng điện thoại (chụp ngang hoặc cận cảnh) thường có cạnh dài gấp đôi cạnh ngắn.
+- `max(H,W) > 1200`: Dermoscopy chuẩn thường là 600×600 đến 1024×1024. Ảnh điện thoại thường 2000–4000px.
+- Tên file `IMG_XXXX.jpg` và `DCIM/...` là quy ước đặt tên tự động của hệ thống camera Android/iOS.
 
-* **Bộ mã hóa numpy an toàn (`_NumpySafeEncoder`)**:
-  Do các thư viện OpenCV và PyTorch trả kết quả về dạng kiểu dữ liệu numpy (ví dụ: `np.float32`, `np.int64`, ma trận `np.ndarray`), các kiểu dữ liệu này không thể được giải tuần tự hóa (serialize) trực tiếp bằng thư viện `json` tiêu chuẩn của Python. Hệ thống thiết kế lớp chuyển đổi dữ liệu tùy biến:
-  ```python
-  class _NumpySafeEncoder(json.JSONEncoder):
-      def default(self, obj):
-          if isinstance(obj, (np.integer,)):
-              return int(obj)
-          if isinstance(obj, (np.floating,)):
-              return float(obj)
-          if isinstance(obj, np.ndarray):
-              return obj.tolist()
-          return super().default(obj)
-  ```
-* **Hàm ghi log `write_dev_log(data: Dict[str, Any], action_type: str)`**:
-  Hàm tự động đóng gói dữ liệu cùng nhãn thời gian thực tế, chuyển hóa thành chuỗi văn bản JSON không đổi dấu và ghi tiếp nối (append) vào cuối tệp tin nhật ký:
-  ```python
-  log_entry = {
-      "action_time": timestamp,
-      "action_type": action_type,
-      "payload": data,
-  }
-  ```
+### 2.2 Tại sao Phân vùng cần TTA còn Phân loại thì không?
 
-### 5.4 Phân tích toán học hàm mất mát (Loss Function) của VQA Offline
-Trong quá trình Joint Fine-tuning mô hình offline `CPUMedicalVQAModel`, hệ thống sử dụng hàm mất mát hồi quy ngôn ngữ **Causal Language Modeling Loss**:
-* Định nghĩa chuỗi tokens đầu vào có chiều dài $T$. Tại mỗi bước thời gian $t$, mô hình nhận chuỗi các token trước đó $x_{<t}$ và dự đoán phân phối xác suất cho token tiếp theo $x_t$.
-* Hàm mất mát được tính bằng phép toán **Cross Entropy Loss** trên các token thuộc chuỗi câu trả lời (các token câu hỏi và token ảnh được gán nhãn $-100$ để bỏ qua trong quá trình tính gradient):
-  $$\mathcal{L}(\theta) = -\frac{1}{N} \sum_{i=1}^{N} \sum_{t \in \mathcal{A}} \log P(x_t^{(i)} \mid x_{<t}^{(i)}; \theta)$$
-  Trong đó $\mathcal{A}$ là tập chỉ số các token thuộc chuỗi câu trả lời (Answer tokens), $N$ là kích thước lô (batch size), và $\theta$ là tập hợp các tham số có thể huấn luyện (các trọng số LoRA của DistilGPT-2 và trọng số của các lớp Projection Layer cùng khối CBAM).
+Đây là câu hỏi kỹ thuật quan trọng. Câu trả lời nằm ở bản chất bài toán:
+
+**Bài toán Phân vùng (Segmentation)** — cực kỳ nhạy cảm với scale và vị trí:
+
+```mermaid
+graph LR
+    A["Ảnh điện thoại<br/>2000×1500px<br/>Tổn thương ở góc"] 
+    B["Co kích thước về 256×256<br/>Tổn thương bị thu nhỏ tương đối<br/>→ Tín hiệu yếu"]
+    C["DeepLabV3+ dự đoán<br/>→ Mặt nạ rất nhỏ hoặc rỗng<br/>→ Safety Gate từ chối!"]
+    A --> B --> C
+
+    D["Cùng ảnh, TTA Tỷ lệ 0.5:<br/>Cắt trung tâm 1000×750px<br/>Tổn thương phóng to tương đối"]
+    E["Co kích thước về 256×256<br/>Tổn thương chiếm nhiều điểm ảnh hơn"]
+    F["DeepLabV3+ dự đoán<br/>→ Mặt nạ rõ hơn nhiều"]
+    A --> D --> E --> F
+```
+
+**Bài toán Phân loại (Classification)** — mạnh mẽ hơn với thay đổi scale:
+
+Mạng EfficientNet-B1 đã được huấn luyện với **Data Augmentation** (RandomCrop, RandomFlip, RandomScale) trên tập ISIC. Nhờ đó, bộ tham số đã học được cách nhận dạng tổn thương ở nhiều kích thước khác nhau. Thêm vào đó, lớp **Global Average Pooling (GAP)** ở cuối mạng tự động gộp thông tin trên toàn bộ bản đồ đặc trưng, độc lập với vị trí không gian. Vì vậy, kết quả phân loại khá ổn định dù ảnh được resize.
+
+### 2.3 Kỹ thuật Test-Time Augmentation (TTA) trong Phân vùng
+
+TTA là kỹ thuật suy diễn (inference) nâng cao: thay vì đưa ảnh gốc vào mô hình một lần duy nhất, ta tạo ra nhiều phiên bản khác nhau của ảnh đầu vào, cho mô hình dự đoán trên từng phiên bản, rồi **tổng hợp (ensemble)** tất cả kết quả.
+
+**Cụ thể trong hệ thống này (Multi-Scale Center Crop TTA):**
+
+```mermaid
+graph TD
+    subgraph "Ảnh gốc H×W×3"
+        ORIG["📷 Ảnh gốc\n2000×1500px"]
+    end
+
+    subgraph "Tỷ lệ 1.0 — Toàn bộ ảnh"
+        S1["Cắt: toàn bộ (2000×1500)"]
+        S1A["Co kích thước → 256×256"]
+        S1B["DeepLabV3+ lan truyền xuôi"]
+        S1C["Bản đồ xác suất P₁: 2000×1500\n(nội suy phóng to về kích thước gốc)"]
+    end
+
+    subgraph "Tỷ lệ 0.75 — Cắt trung tâm 75%"
+        S2["Cắt: 1500×1125 trung tâm"]
+        S2A["Co kích thước → 256×256"]
+        S2B["DeepLabV3+ lan truyền xuôi"]
+        S2C["Bản đồ xác suất P₂: 1500×1125\n(chỉ cộng vào vùng cắt)"]
+    end
+
+    subgraph "Tỷ lệ 0.5 — Cắt trung tâm 50%"
+        S3["Cắt: 1000×750 trung tâm"]
+        S3A["Co kích thước → 256×256"]
+        S3B["DeepLabV3+ lan truyền xuôi"]
+        S3C["Bản đồ xác suất P₃: 1000×750\n(chỉ cộng vào vùng cắt)"]
+    end
+
+    subgraph "Tổng hợp"
+        AVG["Xác suất trung bình = (P₁ + P₂ + P₃) / count_map\nMỗi điểm ảnh được chuẩn hóa theo số lần quét dự đoán"]
+        BIN["Mặt nạ nhị phân: Xác suất trung bình ≥ 0.3"]
+        MORPH["Làm sạch bằng toán hình thái\nMở → Đóng → Thành phần liên thông lớn nhất"]
+    end
+
+    ORIG --> S1 --> S1A --> S1B --> S1C
+    ORIG --> S2 --> S2A --> S2B --> S2C
+    ORIG --> S3 --> S3A --> S3B --> S3C
+    S1C --> AVG
+    S2C --> AVG
+    S3C --> AVG
+    AVG --> BIN --> MORPH
+```
+
+**Vai trò của `count_map`:** Đây là ma trận đếm số lần mỗi pixel được dự đoán. Pixel ở trung tâm ảnh được cả 3 scale dự đoán (count=3), pixel ở rìa chỉ có scale 1.0 dự đoán (count=1). Phép chia chuẩn hóa đảm bảo không có sự thiên vị về vùng trung tâm:
+
+$$\text{avg\_prob}(y,x) = \frac{\sum_{s \in \text{scales}} P_s(y,x)}{\text{count\_map}(y,x)}$$
+
+**Tại sao threshold phân vùng = 0.3 thay vì 0.5?**
+
+Vì đây là TTA kết hợp nhiều scale — xác suất trung bình thường thấp hơn xác suất đơn lẻ (do các scale nhỏ hơn có tín hiệu yếu hơn). Ngưỡng 0.3 đảm bảo không bỏ sót vùng tổn thương khi tổng hợp.
 
 ---
 
-## 6. PHÂN TÍCH TOÁN HỌC TRÍCH XUẤT ĐẶC TRƯNG HÌNH HỌC (ABCD Metrics in Computer Vision)
+## 3. NHÁNH PHÂN VÙNG TỔN THƯƠNG — DeepLabV3+
 
-Để mô phỏng quy trình chẩn đoán lâm sàng ABCD truyền thống của bác sĩ da liễu, hệ thống thực hiện trích xuất 4 tham số hình học quan trọng từ mặt nạ tổn thương nhị phân $M(y, x) \in \{0, 1\}$:
+### 3.1 Kiến trúc DeepLabV3+ với ResNet50 Backbone
 
-### 6.1 Asymmetry (Hệ số bất đối xứng - A)
-* **Tính toán tâm khối (Centroid)**:
-  Sử dụng các moment hình học bậc 0 và bậc 1 của đường bao tổn thương lớn nhất $\mathcal{C}$ để tìm tọa độ trọng tâm $(c_x, c_y)$ của vùng tổn thương:
-  $$M_{00} = \sum_{y} \sum_{x} M(y, x)$$
-  $$M_{10} = \sum_{y} \sum_{x} x \cdot M(y, x), \quad M_{01} = \sum_{y} \sum_{x} y \cdot M(y, x)$$
-  $$c_x = \frac{M_{10}}{M_{00}}, \quad c_y = \frac{M_{01}}{M_{00}}$$
-* **Phép lật đối xứng và tính sai lệch**:
-  Hệ thống thực hiện cắt mặt nạ thành các phần dọc theo hai trục vuông góc đi qua trọng tâm $(c_x, c_y)$.
-  * **Trục ngang (Horizontal split)**: Chia mặt nạ thành nửa trên $M_{\text{top}}$ và nửa dưới $M_{\text{bottom}}$. Thực hiện lật dọc nửa dưới $M_{\text{bottom\_flipped}} = \text{FlipY}(M_{\text{bottom}})$ và căn đệm kích thước tương đồng. Tính sai số tuyệt đối về mặt diện tích:
-    $$\text{diff}_h = \sum_{y} \sum_{x} \left| M_{\text{top\_padded}}(y, x) - M_{\text{bottom\_flipped\_padded}}(y, x) \right|$$
-  * **Trục dọc (Vertical split)**: Chia mặt nạ thành nửa trái $M_{\text{left}}$ và nửa phải $M_{\text{right}}$. Thực hiện lật ngang nửa phải $M_{\text{right\_flipped}} = \text{FlipX}(M_{\text{right}})$. Tính sai số tuyệt đối:
-    $$\text{diff}_v = \sum_{y} \sum_{x} \left| M_{\text{left\_padded}}(y, x) - M_{\text{right\_flipped\_padded}}(y, x) \right|$$
-* **Chuẩn hóa điểm bất đối xứng**:
-  Điểm bất đối xứng tổng hợp được chuẩn hóa về khoảng $[0, 1]$ dựa trên diện tích vùng tổn thương thực tế:
-  $$\text{Asymmetry Score} = \min\left(1.0, \frac{\text{diff}_h + \text{diff}_v}{2 \cdot M_{00}}\right)$$
-  * *Ý nghĩa lâm sàng*: Điểm số bằng $0$ thể hiện tổn thương đối xứng hoàn hảo trên cả 2 trục (lành tính), điểm số tiến gần về $1.0$ thể hiện mức độ bất đối xứng cực kỳ cao (dấu hiệu melanoma).
+```mermaid
+graph LR
+    subgraph INPUT["Đầu vào"]
+        IN["Ảnh da 256×256×3<br/>Chuẩn hóa μ=[0.5,0.5,0.5]<br/>σ=[0.25,0.25,0.25]"]
+    end
 
-### 6.2 Border Complexity (Độ phức tạp biên tổn thương - B)
-* **Tính toán**:
-  Đo lường mức độ gồ ghề, răng cưa hoặc tua rua của đường viền tổn thương da. Chỉ số được tính dựa trên tỷ lệ giữa chu vi tổn thương ($P$) và căn bậc hai diện tích của nó ($A = M_{00}$):
-  $$\text{Border Complexity} = \frac{P}{\sqrt{A}}$$
-  Trong đó, chu vi $P$ là độ dài đường bao lớn nhất $\mathcal{C}$ tính bằng thuật toán xấp xỉ chuỗi điểm biên của OpenCV (`cv2.arcLength`).
-  * *Ý nghĩa lâm sàng*: Đối với một hình tròn hoàn hảo, tỷ lệ này đạt giá trị tối thiểu $\approx 2\sqrt{\pi} \approx 3.54$. Tổn thương lành tính thường có biên mịn màng nên chỉ số này dao động thấp từ $3.5 \rightarrow 5.0$. Các tổn thương ác tính phát triển mất kiểm soát ra xung quanh tạo các cạnh hình răng cưa phức tạp, khiến chỉ số này tăng vọt vượt lên $\ge 6.0$.
+    subgraph BACKBONE["ResNet-50 Bộ mã hóa (Đóng băng - Frozen)"]
+        R1["Tầng 1: Tích chập (Conv) 7×7, bước nhảy=2\n→ 128×128×64"]
+        R2["Tầng 2-4: Khối dư (Residual Blocks)\n→ 32×32×256 (Đặc trưng cấp thấp)"]
+        R3["Tầng 5-6: Tích chập giãn nở (Dilated Conv)\nTỷ lệ rate=[6,12,18]\n→ 32×32×2048 (Đặc trưng cấp cao)"]
+    end
 
-### 6.3 Circularity (Độ tròn tổn thương - C)
-* **Tính toán**:
-  Chỉ số độ tròn đánh giá mức độ tương đồng giữa hình dạng tổn thương với một hình tròn lý tưởng:
-  $$\text{Circularity} = \frac{4\pi \cdot A}{P^2}$$
-  Giá trị Circularity được giới hạn nghiêm ngặt trong đoạn $[0.0, 1.0]$.
-  * *Ý nghĩa lâm sàng*: Nốt ruồi lành tính thông thường (`NV`) hầu như có dạng tròn hoặc oval rất đều, chỉ số Circularity sẽ tiệm cận sát $1.0$. Ngược lại, các mảng ung thư tế bào đáy hoặc u hắc tố có dạng méo mó, kéo dài dị hình làm chỉ số Circularity rơi sâu xuống sát $0.0$.
+    subgraph ASPP["Khối ASPP"]
+        A1["Tích chập 1×1\n+ Gộp cực đại toàn cục"]
+        A2["Tích chập giãn nở rate=6"]
+        A3["Tích chập giãn nở rate=12"]
+        A4["Tích chập giãn nở rate=18"]
+        CAT["Ghép nối (Concat) → Tích chập 1×1\n→ 32×32×256"]
+    end
 
-### 6.4 Area Ratio (Tỉ lệ diện tích tổn thương - D)
-* **Tính toán**:
-  Tỉ số diện tích được dùng để ước lượng gián tiếp kích thước của tổn thương trên vùng da thu nhận được qua ống kính camera:
-  $$\text{Area Ratio} = \frac{M_{00}}{H \times W}$$
-  Với $H \times W$ là tổng số pixel của toàn bộ ảnh đầu vào.
-  * *Ý nghĩa lâm sàng*: Kết hợp cùng loại ảnh phát hiện để xác định xem tổn thương có kích thước quá lớn (dấu hiệu lan rộng nguy hiểm của các mảng sừng hóa BKL lớn hoặc Melanoma thời kỳ muộn) hoặc quá nhỏ dưới ngưỡng phân tích tin cậy của mô hình AI.
+    subgraph DECODER["Bộ giải mã (Được huấn luyện)"]
+        D1["Nội suy phóng to (Upsample) ×4\n→ 128×128×256"]
+        D2["Ghép đặc trưng cấp thấp\n256×128×128"]
+        D3["Tích chập 3×3 × 2\n→ 128×128×128"]
+        D4["Tích chập 1×1 → 1 kênh\n(Bản đồ logit)"]
+        D5["Nội suy phóng to về H×W gốc"]
+    end
+
+    subgraph OUT["Đầu ra"]
+        O1["Sigmoid → Xác suất [0,1]"]
+        O2{"≥ 0.3?"}
+        O3["Mặt nạ nhị phân\n(0 = da lành, 1 = tổn thương)"]
+    end
+
+    IN --> R1 --> R2 --> R3 --> A1
+    R3 --> A2
+    R3 --> A3
+    R3 --> A4
+    A1 --> CAT
+    A2 --> CAT
+    A3 --> CAT
+    A4 --> CAT
+    R2 --> D2
+    CAT --> D1 --> D2 --> D3 --> D4 --> D5 --> O1 --> O2
+    O2 -- "Có" --> O3
+```
+
+**Giải thích các thông số kỹ thuật:**
+- **Dilated Convolution (Tích chập giãn nở)**: Thay vì dùng kernel 3×3 liên tiếp, kernel được "giãn" ra với khoảng trống giữa các ô trọng số. Rate=6 nghĩa là giữa 2 ô có 5 ô trống. Cho phép thu thập thông tin trên vùng rộng hơn mà không cần downsampling.
+- **ASPP (Atrous Spatial Pyramid Pooling)**: Dùng 4 nhánh với rate tích chập khác nhau (1×1, 6, 12, 18) để nhìn tổn thương ở nhiều "quy mô" đồng thời — nhỏ (1×1) đến rất rộng (rate=18 = nhìn vùng rộng 37×37 pixel).
+- **Low-level features từ Layer2**: Các đặc trưng chi tiết (cạnh, màu sắc cục bộ) được giữ lại và nối vào decoder để giúp khôi phục đường biên tổn thương sắc nét.
+
+### 3.2 Hậu xử lý Mask (Post-processing)
+
+```mermaid
+graph LR
+    RAW["Mặt nạ nhị phân thô\n(Chứa nhiễu hạt, lỗ rỗng)"]
+    
+    OPEN["Phép toán MỞ hình thái\nCo (Erode) → Giãn (Dilate)\nNhân elip cỡ 5×5\n→ Xóa nhiễu hạt nhỏ"]
+    
+    CLOSE["Phép toán ĐÓNG hình thái\nGiãn (Dilate) → Co (Erode)\nNhân elip cỡ 5×5\n→ Lấp đầy các lỗ rỗng"]
+    
+    CC["Phân tích thành phần liên thông\nLiên thông 8 hướng"]
+    
+    BEST["Chọn thành phần lớn nhất\n(Loại bỏ nhiễu rời rạc)"]
+    
+    CLEAN["Mặt nạ sạch\n(Chỉ giữ 1 vùng tổn thương duy nhất)"]
+    
+    RAW --> OPEN --> CLOSE --> CC --> BEST --> CLEAN
+```
+
+### 3.3 Fallback Cổ điển Otsu (khi DeepLab thất bại)
+
+Khi mô hình Deep Learning không phát hiện được tổn thương (mask rỗng, sum=0), hệ thống kích hoạt phương pháp dự phòng Otsu Thresholding — một thuật toán cổ điển hoàn toàn không cần neural network:
+
+```mermaid
+graph TD
+    A["Ảnh RGB gốc"]
+    B["Chuyển sang ảnh xám (Grayscale)"]
+    C["Lọc trung vị MedianBlur (nhân 5)\nGiảm nhiễu hạt muối tiêu"]
+    D["Phân ngưỡng Otsu (Otsu Threshold)\nTự động tìm ngưỡng xám tối ưu\ntách vùng tiền cảnh/hậu cảnh"]
+    E["Toán hình thái học Mở + Đóng\n(Làm sạch mặt nạ)"]
+    F["Tìm các thành phần liên thông"]
+    G["Chọn thành phần lớn nhất"]
+    H{{"Kiểm tra tính hợp lệ:<br/>diện tích ≥ 64px<br/>0.25 ≤ tỷ lệ khung bao ≤ 4.0<br/>độ nén (solidity) ≥ 0.35<br/>khoảng cách tới tâm ≤ 0.7"}}
+    I["✅ Chấp nhận: Dùng mặt nạ dự phòng"]
+    J["❌ Từ chối: Trả về mặt nạ rỗng"]
+
+    A --> B --> C --> D --> E --> F --> G --> H
+    H -- "Thỏa mãn" --> I
+    H -- "Không thỏa" --> J
+```
+
+**Giải thích các ngưỡng kiểm tra hợp lệ của Fallback:**
+- `bbox_aspect 0.25–4.0`: Bounding box của tổn thương phải có dạng hợp lý (không quá dẹt hay quá cao). Ngưỡng 4.0 = cạnh dài gấp 4 cạnh ngắn.
+- `solidity ≥ 0.35`: Độ nén = (diện tích mask) / (diện tích convex hull). Giá trị thấp < 0.35 cho thấy hình dạng rất "rỗng" như đường viền hoặc lưới — không phải tổn thương thực.
+- `center_dist ≤ 0.7`: Tổn thương phải nằm trong 70% bán kính từ tâm ảnh. Nếu nằm ở góc xa nhất thường là vật thể nền (tóc, móng tay, quần áo).
+
+---
+
+## 4. NHÁNH PHÂN LOẠI BỆNH LÝ — EfficientNet-B1 + CBAM
+
+### 4.1 Tổng quan Kiến trúc Kết hợp
+
+```mermaid
+graph TB
+    IN["Ảnh RGB gốc\n224×224×3\nChuẩn hóa ImageNet\nμ=[0.485,0.456,0.406]\nσ=[0.229,0.224,0.225]"]
+
+    subgraph EFF["Khung xương EfficientNet-B1 (Đóng băng - Frozen)"]
+        E1["Lớp khởi đầu MBConv (Stem)\n→ 112×112×32"]
+        E2["Khối MBConv từ 1 đến 7\n(Mobile Inverted Bottleneck\nvới cơ chế Squeeze & Excitation)\n→ 7×7×1280"]
+        E3["Bản đồ đặc trưng F\n7×7×1280\n(Không qua gộp pooling cuối)"]
+    end
+
+    subgraph CBAM["Khối chú ý CBAM"]
+        CA["Chú ý theo kênh M_c(F)\nXác định CÁI GÌ quan trọng"]
+        SA["Chú ý không gian M_s(F')\nXác định Ở ĐÂU quan trọng"]
+        F_PRIME["F' = F × M_c(F)"]
+        F_DPRIME["F'' = F' × M_s(F')"]
+    end
+
+    subgraph HEAD["Đầu phân loại (Classification Head)"]
+        GAP["Gộp trung bình toàn cục (Global Avg Pool)\n7×7×1280 → 1280"]
+        DROP["Lớp Dropout(0.3)"]
+        LINEAR["Lớp tuyến tính Linear(1280 → 7)\n→ 7 lớp bệnh lý ISIC"]
+        SOFT["Hàm Softmax\n→ Xác suất p₀...p₆"]
+    end
+
+    IN --> E1 --> E2 --> E3
+    E3 --> CA --> F_PRIME --> SA --> F_DPRIME
+    F_DPRIME --> GAP --> DROP --> LINEAR --> SOFT
+```
+
+### 4.2 Cơ chế Channel Attention (M_c) — "Cái gì quan trọng?"
+
+Channel Attention xác định **kênh đặc trưng nào** (feature channel) mang thông tin hữu ích nhất cho việc phân loại bệnh lý da.
+
+```mermaid
+graph LR
+    F["Bản đồ đặc trưng F\n7×7×1280"]
+
+    subgraph "Nhánh gộp trung bình (AvgPool branch)"
+        AP["Gộp trung bình thích ứng AdaptiveAvgPool2d(1)\n→ 1×1×1280"]
+        FC1A["Lớp liên kết đầy đủ FC1: 1280 → 80\n(hệ số giảm kênh reduction=16)"]
+        RELU1["Hàm kích hoạt ReLU"]
+        FC2A["Lớp liên kết đầy đủ FC2: 80 → 1280"]
+    end
+
+    subgraph "Nhánh gộp cực đại (MaxPool branch)"
+        MP["Gộp cực đại thích ứng AdaptiveMaxPool2d(1)\n→ 1×1×1280"]
+        FC1B["Lớp liên kết đầy đủ FC1: 1280 → 80\n(Chia sẻ chung trọng số!)"]
+        RELU2["Hàm kích hoạt ReLU"]
+        FC2B["Lớp liên kết đầy đủ FC2: 80 → 1280"]
+    end
+
+    ADD["Cộng từng phần tử của hai nhánh\n(Element-wise add)"]
+    SIG["Hàm Sigmoid → M_c ∈ [0,1]\nVector trọng số 1×1×1280"]
+    MUL["F' = F × M_c\n(Broadcast nhân theo chiều kênh)"]
+
+    F --> AP --> FC1A --> RELU1 --> FC2A --> ADD
+    F --> MP --> FC1B --> RELU2 --> FC2B --> ADD
+    ADD --> SIG --> MUL
+    F --> MUL
+```
+
+**Điểm kỹ thuật quan trọng — Shared Weights FC:**
+Cả hai nhánh AvgPool và MaxPool đều dùng **chung một bộ tham số FC** (Fully Connected layers). Điều này giúp mô hình học được tín hiệu chú ý từ cả đặc trưng trung bình (xu hướng tổng thể) lẫn đặc trưng cực đại (vị trí tín hiệu mạnh nhất) mà chỉ cần nửa số tham số.
+
+$$M_c(F) = \sigma\Big(\text{MLP}\big(\text{AvgPool}(F)\big) + \text{MLP}\big(\text{MaxPool}(F)\big)\Big)$$
+
+**Ví dụ trực quan:** Khi phân loại melanoma, kênh đặc trưng về "màu sắc nâu-đen không đều" được gán trọng số cao → M_c tăng cường kênh đó → mô hình tập trung vào màu sắc dị thường.
+
+### 4.3 Cơ chế Spatial Attention (M_s) — "Ở đâu quan trọng?"
+
+Spatial Attention xác định **vùng không gian** (spatial location) nào trên bản đồ đặc trưng đáng được chú ý nhất.
+
+```mermaid
+graph LR
+    FP["Bản đồ đặc trưng sau chú ý kênh F'\n7×7×1280"]
+
+    subgraph "Nén thông tin kênh (Channel reduction)"
+        AP2["Tính trung bình theo chiều kênh\n→ 7×7×1"]
+        MP2["Tính cực đại theo chiều kênh\n→ 7×7×1"]
+        CAT["Ghép nối (Concat) → 7×7×2"]
+    end
+
+    CONV["Tích chập 2D Conv2d(2→1, nhân 7×7)\nđệm padding=3\n→ 7×7×1"]
+    SIG2["Hàm Sigmoid → M_s ∈ [0,1]\nBản đồ trọng số 7×7×1"]
+    MUL2["F'' = F' × M_s\n(Broadcast nhân theo không gian)"]
+
+    FP --> AP2 --> CAT
+    FP --> MP2 --> CAT
+    CAT --> CONV --> SIG2 --> MUL2
+    FP --> MUL2
+```
+
+$$M_s(F') = \sigma\Big(f^{7\times7}\big([\text{AvgPool}_C(F'); \text{MaxPool}_C(F')]\big)\Big)$$
+
+**Ví dụ trực quan:** Trên bản đồ 7×7 đặc trưng, ô tương ứng với vùng tổn thương trung tâm được gán trọng số M_s cao → mô hình "nhìn tập trung" vào đó thay vì bị phân tán bởi lông, hình xăm hay da lành xung quanh.
+
+### 4.4 Kết quả Phân loại
+
+Sau khi đi qua chuỗi EfficientNet-B1 → CBAM → GAP → Dropout → Linear, đầu ra là vector 7 chiều được đưa qua Softmax:
+
+| Nhãn | Tên lâm sàng Tiếng Việt | Ký tự | Loại |
+|---|---|---|---|
+| AKIEC | Dày sừng quang hóa / Tiền ung thư | ⚠️ | Tiền ác tính |
+| BCC | Ung thư biểu mô tế bào đáy | 🔴 | Ác tính |
+| BKL | Tổn thương sừng hóa lành tính | 🟢 | Lành tính |
+| DF | U xơ da | 🟢 | Lành tính |
+| MEL | U hắc tố ác tính (Melanoma) | 🔴 | Ác tính |
+| NV | Nốt ruồi lành tính | 🟢 | Lành tính |
+| VASC | Tổn thương mạch máu | 🟢 | Lành tính |
+
+**Độ chính xác mô hình:**
+- Tập ISIC test (in-distribution): **88.65%**
+- Tập ảnh điện thoại thực tế (OOD): **50.38%** — đây là lý do cần Safety Gate và TTA.
+
+---
+
+## 5. SAFETY GATE — CỔNG LỌC AN TOÀN Y TẾ
+
+### 5.1 Khái niệm Selective Prediction
+
+Safety Gate là hiện thực hóa của khái niệm **Selective Prediction** (Dự đoán có chọn lọc) trong học máy y tế: thay vì *luôn* đưa ra kết quả (dù đầu vào tệ), mô hình có quyền *từ chối* trả lời khi không đủ tin cậy, chuyển sang Triage Mode (Chế độ phân loại khẩn).
+
+Điều này đặc biệt quan trọng trong y tế: **một câu trả lời sai còn nguy hiểm hơn không trả lời gì**.
+
+### 5.2 Sơ đồ Logic 4 bước Safety Gate
+
+```mermaid
+flowchart TD
+    START(["Bắt đầu đánh giá Cổng lọc an toàn (Safety Gate)\n(các chỉ số, độ tin cậy phân loại, loại ảnh)"])
+
+    B1{"Bước 1:\nMặt nạ không tin cậy (low_confidence = True)?\nHOẶC diện tích tổn thương < 64px?"}
+    E1["❌ TỪ CHỐI (REJECT)\nLý do: empty_or_low_confidence_mask\nMặt nạ rỗng hoặc thiếu điểm ảnh tổn thương"]
+
+    B2{"Bước 2 (Thích ứng):\nTỷ lệ diện tích < Ngưỡng dưới thích ứng?\nHOẶC Tỷ lệ diện tích > Ngưỡng trên thích ứng?"}
+    E2["❌ TỪ CHỐI (REJECT)\nLý do: area_ratio_out_of_bounds\nTổn thương quá nhỏ hoặc chiếm quá lớn trong ảnh"]
+
+    B3{"Bước 3 (Thích ứng):\nĐộ phức tạp biên > Biên tối đa thích ứng?"}
+    E3["❌ TỪ CHỐI (REJECT)\nLý do: border_complexity_out_of_bounds\nĐường viền quá phức tạp hoặc nhiễu"]
+
+    B4{"Bước 4:\nĐộ tin cậy phân loại chưa xác định?\nHOẶC độ tin cậy < Ngưỡng an toàn τ_c?"}
+    E4["❌ TỪ CHỐI (REJECT)\nLý do: low_classification_confidence\nĐộ tin cậy phân loại nhỏ hơn ngưỡng an toàn τ_c"]
+
+    OK(["✅ CHẤP NHẬN (ACCEPT)\ntrạng thái = ok\nChi tiết: {độ tin cậy, tỷ lệ diện tích, loại ảnh}"])
+
+    START --> B1
+    B1 -- "Có" --> E1
+    B1 -- "Không" --> B2
+    B2 -- "Có" --> E2
+    B2 -- "Không" --> B3
+    B3 -- "Có" --> E3
+    B3 -- "Không" --> B4
+    B4 -- "Có" --> E4
+    B4 -- "Không" --> OK
+```
+
+### 5.3 Ngưỡng Thích ứng (Adaptive Thresholds) theo Loại Ảnh
+
+Điểm sáng tạo nhất của Safety Gate: **ngưỡng thay đổi tự động** tùy theo loại ảnh được phát hiện. Ảnh điện thoại có nhiều biến động hơn (background phức tạp, zoom không chuẩn) nên cần ngưỡng nới lỏng hơn:
+
+```mermaid
+graph LR
+    subgraph "🔬 Ảnh nội soi da (Dermoscopy - Ngưỡng chặt)"
+        D1["Tỷ lệ diện tích tối thiểu min_area_ratio: 0.001\n→ Chiếm ít nhất 0.1% diện tích ảnh"]
+        D2["Tỷ lệ diện tích tối đa max_area_ratio: 0.75\n→ Vùng tổn thương chiếm không quá 75% ảnh"]
+        D3["Độ phức tạp biên tối đa max_border_complexity: 8.0\n→ Đường viền tương đối mịn"]
+    end
+
+    subgraph "📱 Ảnh điện thoại (Phone - Ngưỡng nới lỏng)"
+        P1["Tỷ lệ diện tích tối thiểu min_area_ratio: 0.0005\n→ Tổn thương có kích thước nhỏ hơn vẫn được duyệt"]
+        P2["Tỷ lệ diện tích tối đa max_area_ratio: 0.92\n→ Cho phép ảnh chụp cận cảnh rất gần"]
+        P3["Độ phức tạp biên tối đa max_border_complexity: 14.0\n→ Chấp nhận ảnh có nhiễu sợi lông hoặc vảy da"]
+    end
+
+    COMMON["Cả hai loại dùng chung:\nDiện tích mặt nạ tối thiểu = 64px\nĐộ tin cậy phân loại tối thiểu τ_c = 0.60"]
+```
+
+**Lý do kỹ thuật cho từng ngưỡng:**
+
+| Ngưỡng | Dermoscopy | Phone | Lý do khác nhau |
+|---|---|---|---|
+| min_area_ratio | 0.001 | 0.0005 | Ảnh phone chụp xa hơn, tổn thương chiếm ít % hơn |
+| max_area_ratio | 0.75 | 0.92 | Phone chụp cận cảnh, tổn thương có thể chiếm gần hết khung hình |
+| max_border | 8.0 | 14.0 | Ảnh phone có lông, da ráp, ánh sáng không đều làm biên phức tạp hơn |
+| τ_c | 0.60 | 0.60 | Yêu cầu tin cậy phân loại giống nhau — không nới lỏng về mặt lâm sàng |
+
+### 5.4 Cảnh báo Lâm sàng Kép (Clinical Risk Warning)
+
+Ngay cả khi Safety Gate chấp nhận (`status = ok`), hệ thống thực hiện thêm kiểm tra thứ hai:
+
+```mermaid
+flowchart TD
+    A{{"Nhãn dự đoán chính\nthuộc nhóm lành tính?\n(BKL, NV, DF, VASC)"}}
+    A -- "Không (Đã thuộc nhóm ác tính)" --> Z["Không cần cảnh báo kép\n(LLM sẽ tự đưa ra khuyến cáo)"]
+    A -- "Có (Lành tính)" --> B["Tính xác suất ác tính tối đa:\nmax_mal = max(P_MEL, P_BCC, P_AKIEC)"]
+    B --> C{{"max_mal ≥ 0.15?<br/>(15%)"}}
+    C -- "Không" --> Z2["Bình thường\nKhông cần hiển thị cảnh báo"]
+    C -- "Có" --> WARN["⚠️ Hiển thị banner cảnh báo nguy cơ lâm sàng\n(Màu cam nổi bật)\nGhi rõ tên bệnh ác tính tiềm ẩn và xác suất cụ thể\n→ Đề xuất bác sĩ xem xét sinh thiết thêm"]
+```
+
+**Tại sao ngưỡng 15%?** Đây là ngưỡng lâm sàng được lựa chọn cẩn thận:
+- Nếu đặt quá thấp (5%): Cảnh báo liên tục, bác sĩ mất tin tưởng (wolf-crying effect).
+- Nếu đặt quá cao (30%): Bỏ sót các ca nghi ngờ thực sự nguy hiểm.
+- 15% là ngưỡng tham chiếu phù hợp trong bối cảnh sàng lọc sơ bộ — *tỷ lệ ác tính trong dân số tại các phòng khám da liễu ngoại trú thường nằm trong khoảng 10–20%*.
+
+---
+
+## 6. KIẾN TRÚC FUSION PROMPT VÀ HỆ THỐNG VQA
+
+### 6.1 Vấn đề với LLM thuần túy trong Y tế
+
+Nếu chỉ hỏi LLM "ảnh này là bệnh gì?" mà không có ngữ cảnh, LLM sẽ:
+1. **Hallucinate** (ảo giác) — tự bịa số liệu xác suất và tên bệnh.
+2. **Không có căn cứ khách quan** — phân tích ảnh qua API vision rất tốn token và khó kiểm soát vùng tư vấn.
+3. **Mâu thuẫn giữa các câu trả lời** — mỗi lần hỏi một kết quả khác.
+
+### 6.2 Kiến trúc Fusion Prompt — Giải pháp
+
+**Ý tưởng cốt lõi**: Thay vì truyền ảnh vào LLM, hãy *dịch* kết quả CV sang ngôn ngữ tự nhiên và nhúng vào System Prompt như sự kiện đã được xác minh.
+
+```mermaid
+graph TB
+    subgraph CV["Kết quả từ Thị giác máy tính (Computer Vision)"]
+        R1["Nhãn dự đoán: BKL (96.6%)"]
+        R2["Bảng xác suất: BKL=0.966,\nNV=0.018, MEL=0.008..."]
+        R3["Chỉ số ABCD: tỷ lệ diện tích=0.024,\nđộ phức tạp biên=3.12, bất đối xứng=0.12,\nđộ tròn=0.89"]
+    end
+
+    subgraph BUILDER["_build_fusion_system_prompt()"]
+        SP["System Prompt\n3 vùng thông tin cố định:"]
+        
+        subgraph "Vùng 1: Vai trò [IDENTITY]"
+            I1["Thiết lập vai trò AI trợ lý y khoa\n→ Giới hạn phạm vi tư vấn"]
+        end
+
+        subgraph "Vùng 2: Ngữ cảnh [CV_CONTEXT]"
+            I2["Nhúng trực tiếp số liệu từ CV:\n• Nhãn dự đoán + Tên Tiếng Việt\n• Độ tin cậy phân loại\n• Phân phối đầy đủ 7 xác suất\n• Các chỉ số đo đạc hình học ABCD"]
+        end
+
+        subgraph "Vùng 3: Bộ quy tắc [GUARDRAIL_RULES]"
+            I3["Quy tắc hành vi được phép/cấm\nQuy tắc hướng dẫn tiến triển bệnh lý\nBộ quy tắc lọc đơn thuốc (Medication Guardrail)\nĐịnh dạng phản hồi đầu ra"]
+        end
+    end
+
+    subgraph MESSAGES["Chuỗi tin nhắn (Message Chain) gửi lên OpenAI"]
+        M1["[system] → Fusion System Prompt (đã điền context)"]
+        M2["[user] Lần 1: Câu hỏi đầu tiên của người dùng"]
+        M3["[assistant] Câu trả lời 1 của trợ lý"]
+        M4["[user] Lần 2: Câu hỏi tiếp theo"]
+        DOTS["... (Lịch sử hội thoại đầy đủ)"]
+        MN["[user] Câu hỏi hiện tại"]
+    end
+
+    subgraph STREAM["Dòng phản hồi từ GPT-4o-mini"]
+        S1["luồng phát stream=True → Sinh ra từng mảnh từ (chunk)"]
+        S2["st.write_stream() → Hiển thị dạng gõ chữ thời gian thực"]
+        S3["Ghép hoàn chỉnh câu trả lời → Ghi nhật ký vào tệp log"]
+    end
+
+    R1 --> BUILDER
+    R2 --> BUILDER
+    R3 --> BUILDER
+    BUILDER --> MESSAGES
+    MESSAGES --> STREAM
+```
+
+### 6.3 Cấu trúc thực tế của System Prompt (đã đơn giản hóa)
+
+```
+[IDENTITY]
+Bạn là Trợ lý Da liễu AI — hệ thống hỗ trợ sàng lọc y tế.
+Bạn tư vấn dựa HOÀN TOÀN trên dữ liệu CV dưới đây.
+
+[CV_CONTEXT — DỮ LIỆU CHẮC CHẮN TỪ MÔ HÌNH CV]
+Kết quả phân loại EfficientNet-B1 + CBAM:
+  • Nhãn dự đoán cao nhất: BKL → Tổn thương sừng hóa lành tính
+  • Độ tin cậy: 0.9660 (96.6%)
+
+Phân phối xác suất đầy đủ 7 nhãn:
+  • BKL: 0.9660    • NV: 0.0180    • MEL: 0.0080
+  • DF: 0.0040     • BCC: 0.0020   • AKIEC: 0.0010   • VASC: 0.0010
+
+Chỉ số hình học (DeepLabV3+):
+  • Area ratio: 0.0241   [0=nhỏ, 1=chiếm toàn bộ ảnh]
+  • Border complexity: 3.1205  [3.5=tròn đều, >6=gai góc]
+  • Asymmetry: 0.1204   [0=đối xứng, 1=bất đối xứng]
+  • Circularity: 0.8920  [0=méo, 1=tròn đều]
+
+[GUARDRAIL_RULES]
+ĐƯỢC PHÉP: Giải thích bệnh sinh, hướng dẫn chăm sóc, nhóm thuốc tổng quát...
+TUYỆT ĐỐI CẤM: Tên biệt dược, liều lượng, thời gian dùng thuốc...
+```
+
+**Điều này giải quyết vấn đề hallucination như thế nào?** Vì LLM được cung cấp sẵn các con số cụ thể (96.6%, 0.0241...) trong System Prompt với chỉ dẫn *"tư vấn dựa HOÀN TOÀN trên dữ liệu CV được cung cấp"*, mô hình ngôn ngữ không cần tự "đoán" số liệu mà chỉ cần giải thích và mở rộng từ chúng.
+
+---
+
+## 7. BỘ QUY TẮC AN TOÀN Y ĐỨC (MEDICATION GUARDRAIL)
+
+### 7.1 Cấu trúc 3 lớp Quy tắc
+
+```mermaid
+mindmap
+  root((BỘ QUY TẮC AN TOÀN<br/>GUARDRAIL))
+    PERMITTED["✅ ĐƯỢC PHÉP"]
+      P1["Giải thích bệnh sinh,<br/>triệu chứng lâm sàng"]
+      P2["Hướng dẫn chăm sóc da<br/>không dùng thuốc"]
+      P3["Phân nhóm thuốc tổng quát<br/>(nhóm kháng nấm, corticosteroid...)"]
+      P4["Giải thích các chỉ số ABCD"]
+      P5["Luôn khuyên đến gặp bác sĩ"]
+    CLINICAL["📋 QUY TẮC LÂM SÀNG<br/>(Theo nhãn dự đoán)"]
+      C1["Nhãn LÀNH TÍNH (BKL, NV...):\nKhẳng định lành tính,<br/>chỉ ảnh hưởng thẩm mỹ,<br/>nhấn mạnh nguy cơ nhầm lẫn"]
+      C2["Nhãn ÁC TÍNH (MEL, BCC, AKIEC):\nGiải thích thận trọng,<br/>không gây hoảng loạn,<br/>nhấn mạnh khám bác sĩ"]
+    FORBIDDEN["🚫 TUYỆT ĐỐI CẤM"]
+      F1["Tên biệt dược cụ thể<br/>(Amoxicillin, Tretinoin...)"]
+      F2["Liều lượng\n(mg, ml, %, IU...)"]
+      F3["Thời gian dùng thuốc<br/>(7 ngày, 2 tuần...)"]
+      F4["Đề xuất thuốc dù hỏi<br/>dạng 'ví dụ', 'giả sử'"]
+      F5["Xác nhận/phủ nhận thuốc<br/>người dùng tự đề xuất"]
+```
+
+### 7.2 Hệ thống này có AN TOÀN thật không?
+
+Đây là câu hỏi quan trọng nhất cần trả lời thành thật:
+
+```mermaid
+graph TD
+    subgraph "✅ Điểm MẠNH của hệ thống"
+        S1["Tránh ảo giác số liệu (hallucination):<br/>LLM không tự bịa số vì đã có ngữ cảnh CV cố định"]
+        S2["Không kê đơn thuốc cụ thể:<br/>Bộ quy tắc cấm kê tên biệt dược và liều lượng"]
+        S3["Nhất quán với kết quả CV:<br/>Mọi câu trả lời đều gắn chặt (anchored) với kết quả mô hình"]
+        S4["Luôn khuyên đến khám bác sĩ:<br/>Quy tắc bắt buộc ở cuối mỗi câu trả lời"]
+        S5["Safety Gate ngăn chặn sớm:<br/>Không cho LLM tư vấn nếu ảnh không đạt chuẩn chất lượng"]
+    end
+
+    subgraph "⚠️ Điểm YẾU / HẠN CHẾ"
+        W1["Mô hình CV có sai số:<br/>Độ chính xác OOD 50.38% → Có thể nhận dạng sai bệnh<br/>→ Dẫn đến LLM giải thích sai"]
+        W2["Quy tắc lọc thuốc có thể bị vượt qua (bypass):<br/>Người dùng có thể dùng kỹ thuật prompt injection<br/>để lách qua bộ quy tắc an toàn"]
+        W3["Thiếu cơ chế kiểm duyệt nội dung độc lập:<br/>Không có mô hình AI thứ hai kiểm tra câu trả lời của GPT-4o-mini"]
+        W4["Phụ thuộc vào dịch vụ bên thứ ba (OpenAI):<br/>Mọi sự thay đổi về hành vi của GPT-4o-mini<br/>đều có thể ảnh hưởng đến hiệu quả bộ lọc"]
+    end
+
+    subgraph "🔴 KẾT LUẬN"
+        CONCL["Hệ thống AN TOÀN ĐỦ DÙNG cho sàng lọc sơ bộ.<br/>KHÔNG AN TOÀN nếu dùng làm công cụ chẩn đoán độc lập.<br/>Phải luôn có bác sĩ da liễu kiểm tra lại kết quả cuối cùng."]
+    end
+```
+
+**Điều cần nhớ:** Hệ thống được thiết kế làm **công cụ hỗ trợ sàng lọc** (screening support tool), không phải hệ thống chẩn đoán tự động (autonomous diagnosis). Độ chính xác ~88% trên ISIC test là tốt cho nghiên cứu, nhưng trong triển khai lâm sàng thực tế, cần ít nhất 95%+ với xác nhận trên dữ liệu địa phương.
+
+---
+
+## 8. MÔ HÌNH VQA NGOẠI TUYẾN — CPUMedicalVQAModel
+
+### 8.1 Kiến trúc Tổng hợp Đa phương thức
+
+```mermaid
+graph LR
+    subgraph "Đầu vào"
+        IMG["Ảnh 224×224×3"]
+        TXT["Câu hỏi văn bản dạng:\n'Câu hỏi: X Trả lời: '"]
+    end
+
+    subgraph "Nhánh Thị giác (Vision Branch)"
+        EB["EfficientNet-B1\n(Trọng số đóng băng - Frozen weights)"]
+        CBAM2["Khối chú ý CBAM\n(Có thể huấn luyện - Trainable)"]
+        GAP2["Gộp trung bình toàn cục (GlobalAvgPool)\n→ Vector đặc trưng 1280 chiều"]
+        PROJ["Tầng chiếu đặc trưng (Projection Layer)\nMLP: 1280→768→768\n(Hàm kích hoạt GELU + Dropout)"]
+        VT["Từ tố ảnh (Visual Token)\n1×768"]
+    end
+
+    subgraph "Nhánh Ngôn ngữ (Language Branch)"
+        TOK["Bộ phân tách từ (Tokenizer)\n(DistilGPT-2)"]
+        WTE["Tầng nhúng từ (wte Embedding)\nL × 768"]
+        LORA["Mô hình DistilGPT-2\n+ Bộ thích ứng LoRA Adapter\n(Hạng r=8, α=16)"]
+    end
+
+    subgraph "Ghép nối đa phương thức"
+        CONCAT["Ghép nối (Concat):\n[Từ tố ảnh (VT) ; Lớp nhúng chữ (TXT)]\n→ Ma trận (1+L) × 768"]
+        MASK["Mặt nạ chú ý ghép (Attention Mask):\n[1_ảnh ; mặt_nạ_chữ]"]
+        LM["Truyền xuôi qua Mô hình ngôn ngữ\nNhãn đích (Labels): [-100, t₁, t₂, ... tL]"]
+        LOSS["Hàm mất mát Entropy chéo (Cross-Entropy Loss)\nChỉ tính toán trên các từ tố câu trả lời (Answer tokens)"]
+    end
+
+    IMG --> EB --> CBAM2 --> GAP2 --> PROJ --> VT
+    TXT --> TOK --> WTE
+    VT --> CONCAT
+    WTE --> CONCAT
+    CONCAT --> LM
+    MASK --> LM
+    LM --> LOSS
+```
+
+### 8.2 Cơ chế LoRA (Low-Rank Adaptation)
+
+LoRA là kỹ thuật tinh chỉnh tham số hiệu quả: thay vì cập nhật toàn bộ ma trận trọng số $W$ (hàng triệu tham số), LoRA chèn thêm hai ma trận hạng thấp $A$ và $B$ nhỏ hơn nhiều:
+
+```mermaid
+graph LR
+    X["Đầu vào x\n768 chiều"]
+    
+    subgraph "Trọng số gốc (❄️ Đóng băng - Frozen)"
+        W["W₀: 768×768\n= 589,824 tham số\n❄️ KHÔNG CẬP NHẬT"]
+    end
+
+    subgraph "Bộ thích ứng LoRA Adapter (🔥 Có thể huấn luyện - Trainable)"
+        A["Ma trận A: 768×8\n= 6,144 tham số"]
+        B["Ma trận B: 8×768\n= 6,144 tham số"]
+        NOTE["Hạng r=8 → 12,288 tham số\nso với 589,824 gốc\n→ Tiết kiệm 98% bộ nhớ!"]
+    end
+
+    ADD["Cộng đầu ra:\nh = W₀x + (B·A)x · (α/r)\n= W₀x + ΔWx"]
+    Y["Đầu ra h\n768 chiều"]
+
+    X --> W --> ADD
+    X --> A --> B --> ADD
+    ADD --> Y
+```
+
+**Giải thích toán học:**
+- $W_0$: Ma trận trọng số gốc của lớp Attention trong DistilGPT-2 (đóng băng — không cập nhật).
+- $\Delta W = BA$: Ma trận thay đổi được phân tích theo hạng thấp $r=8$.
+- $\alpha/r = 16/8 = 2$: Hệ số tỷ lệ giúp ổn định gradient khi huấn luyện.
+- **Target modules `c_attn`**: Module tích chập 1D trong GPT-2 đảm nhiệm vai trò chiếu Q, K, V trong self-attention — được LoRA can thiệp để điều chỉnh "cách GPT-2 chú ý" theo hướng y tế da liễu.
+
+### 8.3 Hàm Mất mát Huấn luyện
+
+```mermaid
+graph LR
+    subgraph "Chuỗi từ tố đầu vào (L tokens)"
+        T0["[VIS]\nTừ tố ảnh (Visual Token)\nnhãn (label)=-100"]
+        T1["Câu hỏi:\ntừ tố 1\nnhãn (label)=-100"]
+        T2["...\nnhãn (label)=-100"]
+        T3["Đáp án:\nnhãn (label)=-100"]
+        T4["Từ trả lời\n1\nnhãn=id_1"]
+        T5["Từ trả lời\n2\nnhãn=id_2"]
+        TN["[EOS] (Kết thúc câu)\nnhãn=id_eos"]
+    end
+
+    LOSS["Hàm mất mát Entropy chéo (Cross-Entropy Loss)\nChỉ tính toán trên các vị trí có nhãn ≠ -100\n(tức là phần Từ trả lời - Answer)"]
+
+    T0 --> LOSS
+    T1 --> LOSS
+    T2 --> LOSS
+    T3 --> LOSS
+    T4 --> LOSS
+    T5 --> LOSS
+    TN --> LOSS
+```
+
+$$\mathcal{L}(\theta) = -\frac{1}{|\mathcal{A}|} \sum_{t \in \mathcal{A}} \log P(x_t \mid x_{<t}; \theta)$$
+
+- $\mathcal{A}$: Tập chỉ số của các token thuộc phần *Answer* (câu trả lời).
+- $\theta$: Tập tham số có thể huấn luyện — Bao gồm: LoRA matrices $A, B$; Projection Layer $W_1, b_1, W_2, b_2$; CBAM attention weights.
+- **Gradient Clipping**: `clip_grad_norm_(max_norm=1.0)` — ngăn gradient bùng nổ khi mạng đa nhánh có learning rate khác nhau.
+
+---
+
+## 9. CƠ SỞ DỮ LIỆU EHR ĐA MỐC THỜI GIAN — CLOUD FIRESTORE
+
+### 9.1 Cấu trúc Dữ liệu NoSQL (Nested Array of Objects)
+
+```mermaid
+erDiagram
+    MEDICAL_RECORDS {
+        string patient_id PK "Mã định danh không dấu VD: NGUYENVANA"
+        object patient_info "Thông tin cá nhân (Tên, tuổi, địa chỉ)"
+        string created_at "Thời điểm khởi tạo hồ sơ bệnh án"
+        string updated_at "Thời điểm cập nhật hồ sơ gần nhất"
+        array visits "Mảng danh sách các mốc khám (visits - dạng lồng nhau)"
+    }
+
+    VISIT_OBJECT {
+        string timestamp_id "Mã mốc thời gian định dạng YYYYmmdd_HHMMSS"
+        string created_at "Thời điểm diễn ra buổi khám bệnh"
+        string image_url "Đường dẫn liên kết hình ảnh ImgBB lưu trữ vĩnh viễn"
+        object ai_extracted_metrics "Các chỉ số đo lường trích xuất bằng AI"
+        array vqa_conversations "Lịch sử cuộc trò chuyện hội thoại y tế VQA"
+    }
+
+    AI_METRICS {
+        string status "Trạng thái Cổng lọc: ok hoặc triage"
+        string prediction "Nhãn bệnh lý da liễu dự đoán"
+        float confidence "Mức độ tin cậy phân loại"
+        float area_ratio "Chỉ số ABCD: D (Tỷ lệ diện tích)"
+        float border_complexity "Chỉ số ABCD: B (Độ phức tạp đường biên)"
+        float asymmetry "Chỉ số ABCD: A (Độ bất đối xứng)"
+        float circularity "Chỉ số ABCD: C (Độ tròn trịa)"
+    }
+
+    MEDICAL_RECORDS ||--o{ VISIT_OBJECT : "chứa mảng visits[]"
+    VISIT_OBJECT ||--|| AI_METRICS : "chứa ai_extracted_metrics"
+```
+
+### 9.2 Quy trình Cổng Kiểm Duyệt Trùng Lặp (Confirmation Gate)
+
+```mermaid
+sequenceDiagram
+    participant Doctor as "👨‍⚕️ Bác sĩ điều trị"
+    participant UI as "🖥️ Giao diện Streamlit UI"
+    participant FS as "☁️ Cơ sở dữ liệu Firestore"
+    participant ImgBB as "🖼️ Máy chủ hình ảnh ImgBB CDN"
+
+    Doctor->>UI: Nhập thông tin tên bệnh nhân
+    UI->>FS: check_patient_exists("NGUYENVANA") (Kiểm tra xem bệnh nhân đã tồn tại chưa)
+    FS-->>UI: tồn tại = True (Đã có bệnh án của bệnh nhân này)
+
+    UI->>Doctor: ⚠️ Hiển thị cảnh báo trùng tên + tùy chọn st.radio
+    Doctor->>UI: Lựa chọn "Có, ghi thêm mốc khám mới"
+    UI->>UI: cho_phép_lưu = True (Đã cấp quyền lưu đè mốc mới)
+
+    Doctor->>UI: Bấm chọn "Xác nhận & Lưu hồ sơ"
+    UI->>ImgBB: upload_image_to_imgbb(tmp_path) (Tải ảnh bệnh án lên CDN)
+    ImgBB-->>UI: đường_dẫn_ảnh (public_url)
+
+    UI->>FS: doc.get() → Trích xuất mảng visits[] hiện tại
+    UI->>FS: doc.update({visits: [...dữ liệu cũ, mốc khám mới]})
+    FS-->>UI: Thành công (Success)
+
+    UI->>Doctor: 🎉 Thông báo đồng bộ dữ liệu thành công!
+    UI->>UI: Xóa tệp ảnh tạm thời (tmp) trên máy cục bộ
+```
+
+### 9.3 Tại sao dùng Nested Array thay vì Sub-collection?
+
+| Phương án | Nested Array (Hiện tại) | Sub-collection |
+|---|---|---|
+| **Cấu trúc** | Tất cả lịch sử trong 1 document | Mỗi lần khám = 1 document riêng |
+| **Đọc tất cả lịch sử** | 1 query, 1 document | N queries hoặc 1 collectionGroup query |
+| **Giới hạn** | Max 1MB/document | Không giới hạn |
+| **Phù hợp khi** | Bệnh nhân ≤ 50–100 lần khám | Hàng nghìn lần khám |
+| **Lý do chọn** | Hệ thống prototype/nghiên cứu; đơn giản | Cần cho production scale |
+
+---
+
+## 10. TRÍCH XUẤT ĐẶC TRƯNG HÌNH HỌC ABCD
+
+Chuẩn ABCD lâm sàng là quy tắc vàng trong sàng lọc u hắc tố da (melanoma) mà bác sĩ da liễu dùng khi quan sát tổn thương bằng mắt thường hay dermoscope. Hệ thống số hóa 4 tiêu chí này:
+
+```mermaid
+graph LR
+    MASK["Mặt nạ nhị phân (Binary Mask)\nvùng tổn thương da"]
+
+    MASK --> A["🔶 A — Asymmetry\n(Độ bất đối xứng)"]
+    MASK --> B["🔷 B — Border\n(Độ phức tạp đường viền)"]
+    MASK --> C["🔸 C — Circularity\n(Độ tròn - Thay thế màu sắc Color)"]
+    MASK --> D["🔹 D — Area Ratio\n(Tỷ lệ diện tích - Thay thế đường kính Diameter)"]
+
+    A --> A1["Điểm số ∈ [0,1]\n0 = Đối xứng hoàn hảo\n1 = Bất đối xứng tối đa"]
+    B --> B1["Điểm số ≥ 3.54\n3.54 = hình tròn tròn đều\n>6.0 = bờ gai góc, nguy hiểm"]
+    C --> C1["Điểm số ∈ [0,1]\n0 = Méo mó phức tạp\n1 = Tròn đều như hình tròn chuẩn"]
+    D --> D1["Điểm số ∈ [0,1]\n~ Tỷ lệ phần trăm diện tích tổn thương trên ảnh"]
+```
+
+### 10.1 Asymmetry — Chỉ số Bất đối xứng (A)
+
+**Bước 1: Xác định trọng tâm (Centroid) qua Image Moments**
+
+$$M_{pq} = \sum_x \sum_y x^p \cdot y^q \cdot M(y,x)$$
+
+$$c_x = \frac{M_{10}}{M_{00}}, \quad c_y = \frac{M_{01}}{M_{00}}$$
+
+- $M_{00}$ = tổng số pixel tổn thương (diện tích).
+- $M_{10}, M_{01}$ = moment bậc 1 theo chiều ngang và dọc.
+- $c_x, c_y$ = tọa độ trọng tâm của vùng tổn thương.
+
+**Bước 2: Chia và so sánh 2 trục**
+
+```mermaid
+graph TD
+    subgraph "Chia theo trục NGANG (Cắt tại tọa độ cy)"
+        TH1["Nửa trên: mask[:cy, :]"]
+        TH2["Nửa dưới: mask[cy:, :]"]
+        TH3["Lật dọc nửa dưới:\nLậtY (FlipY) của mask[cy:, :]"]
+        TH4["Đệm thêm pixel về cùng chiều cao\nsau đó so sánh từng điểm ảnh"]
+        TH5["sai_khác_ngang (diff_h) = Σ|trên - dưới_đã_lật|"]
+    end
+
+    subgraph "Chia theo trục DỌC (Cắt tại tọa độ cx)"
+        TV1["Nửa trái: mask[:, :cx]"]
+        TV2["Nửa phải: mask[:, cx:]"]
+        TV3["Lật ngang nửa phải:\nLậtX (FlipX) của mask[:, cx:]"]
+        TV4["Đệm thêm pixel về cùng chiều rộng\nsau đó so sánh từng điểm ảnh"]
+        TV5["sai_khác_dọc (diff_v) = Σ|trái - phải_đã_lật|"]
+    end
+
+    SCORE["Độ bất đối xứng (Asymmetry) = giới_hạn((diff_h + diff_v) / (2 × M₀₀), từ 0 đến 1)"]
+    TH5 --> SCORE
+    TV5 --> SCORE
+```
+
+**Ví dụ:** Một nốt ruồi NV hình tròn đều → diff_h ≈ diff_v ≈ 0 → Asymmetry ≈ 0. Một melanoma hình dạng bất quy tắc → diff rất lớn → Asymmetry tiến gần 1.
+
+### 10.2 Border Complexity — Độ phức tạp biên (B)
+
+$$\text{Border Complexity} = \frac{P}{\sqrt{A}} = \frac{\text{Chu vi tổn thương}}{\sqrt{\text{Diện tích tổn thương}}}$$
+
+- $P$: Độ dài chu vi đường bao lớn nhất (tính bằng `cv2.arcLength`).
+- $A = M_{00}$: Diện tích vùng tổn thương (pixel).
+
+**Thang tham chiếu:**
+- Hình tròn lý tưởng: $\frac{2\pi r}{\sqrt{\pi r^2}} = 2\sqrt{\pi} \approx 3.54$
+- NV lành tính (hình oval): 3.5 – 5.0
+- BKL (dạng mảng): 5.0 – 7.0
+- MEL/BCC (bờ răng cưa): > 7.0 – 12.0
+
+### 10.3 Circularity — Độ tròn (C)
+
+$$\text{Circularity} = \frac{4\pi \cdot A}{P^2}$$
+
+Đây là nghịch đảo có chuẩn hóa của Border Complexity:
+- Hình tròn lý tưởng: $\frac{4\pi \cdot \pi r^2}{(2\pi r)^2} = 1.0$
+- NV: 0.8 – 1.0
+- BKL: 0.5 – 0.8
+- MEL: 0.2 – 0.5
+- Các dạng tổn thương sao/hoa: < 0.2
+
+### 10.4 Area Ratio — Tỷ lệ diện tích (D)
+
+$$\text{Area Ratio} = \frac{M_{00}}{H \times W}$$
+
+Tỷ số giữa số pixel tổn thương và tổng số pixel ảnh:
+- **< 0.001**: Tổn thương quá nhỏ, Safety Gate từ chối (thiếu dữ liệu).
+- **0.001 – 0.03**: Tổn thương nhỏ, chụp từ xa.
+- **0.03 – 0.10**: Tổn thương vừa, chụp chuẩn.
+- **> 0.75**: Tổn thương chiếm gần hết ảnh — có thể chụp quá cận hoặc là bệnh lan rộng, Safety Gate từ chối.
+
+---
+
+## 11. ĐẶC TẢ HÀM CHỦ CHỐT (API REFERENCE)
+
+### 11.1 `UnifiedDermatologyPipeline.run()`
+
+```
+Chữ ký: run(image_path: str, question: Optional[str] = None, return_mask: bool = False) → Dict[str, Any]
+
+Mục đích:
+  Hàm entry-point chính của toàn bộ pipeline. Điều phối toàn bộ
+  quy trình từ tải ảnh → phát hiện loại ảnh → phân vùng → phân
+  loại → safety gate → tạo báo cáo.
+
+Tham số:
+  image_path  : Đường dẫn tuyệt đối tới file ảnh (JPEG/PNG).
+  question    : Câu hỏi VQA (hiện tại chưa xử lý trong pipeline, dành cho future).
+  return_mask : True = đính kèm numpy array mask vào output dictionary.
+
+Giá trị trả về (Dict):
+  status           : "ok" | "triage"
+  image_path       : Đường dẫn ảnh đã giải quyết (resolved).
+  triage_reason    : Lý do từ chối (None nếu ok).
+  preprocess       : {"image_type": "dermoscopy"|"phone", "preset": "raw_rgb"}
+  segmentation     : {"method": "deeplab"|"deeplab_tta"|"classical_fallback", ...}
+  metrics          : {"area_ratio", "border_complexity", "asymmetry", "circularity",
+                      "lesion_area", "image_area", "low_confidence"}
+  classification   : {"prediction", "confidence", "probabilities": {7 classes}}
+  report           : Chuỗi báo cáo y khoa sơ bộ.
+  segmentation_mask: np.ndarray H×W uint8 (chỉ có khi return_mask=True)
+
+Luồng lỗi:
+  Nếu không đọc được ảnh → trả ngay {"status": "triage", "triage_reason": "image_load_failed"}
+```
+
+### 11.2 `SafetyGate.evaluate()`
+
+```
+Chữ ký: evaluate(metrics: Dict, cls_confidence: Optional[float], image_type: str) → SafetyGateResult
+
+Tham số:
+  metrics        : Dict từ _get_lesion_metrics() chứa ABCD values.
+  cls_confidence : Giá trị confidence [0,1] từ classification. None nếu model không tải được.
+  image_type     : "dermoscopy" | "phone" → quyết định bộ ngưỡng adaptive.
+
+Giá trị trả về (SafetyGateResult — frozen dataclass):
+  accept  : bool   — True = chấp nhận, False = từ chối.
+  reason  : str    — Mã lý do (mapping sang tiếng Việt qua TRIAGE_REASON_VI).
+  details : Dict   — Các giá trị cụ thể giúp debug (eff_min, eff_max, image_type...).
+```
+
+### 11.3 `_build_fusion_system_prompt()`
+
+```
+Chữ ký: _build_fusion_system_prompt(cv_context: Dict) → str
+
+Tham số:
+  cv_context: {
+    "prediction"    : str,           # Nhãn dự đoán (VD: "BKL")
+    "confidence"    : float,         # Độ tin cậy [0,1]
+    "probabilities" : Dict[str,float], # Phân phối 7 lớp
+    "metrics"       : Dict[str,float]  # ABCD metrics
+  }
+
+Giá trị trả về:
+  str — System prompt hoàn chỉnh gồm 3 vùng [IDENTITY][CV_CONTEXT][GUARDRAIL_RULES].
+  Độ dài trung bình: ~1200–1500 ký tự (tương đương ~350–400 token GPT).
+```
+
+### 11.4 `multiscale_segment_from_rgb()` (TTA)
+
+```
+Chữ ký: multiscale_segment_from_rgb(
+    image_rgb, model, device,
+    scales=(1.0, 0.75, 0.5),
+    input_size=224,
+    threshold=0.5,
+    min_area_px=64,
+    mean=None, std=None,
+    morph_kernel=5
+) → tuple[np.ndarray, np.ndarray, Dict]
+
+Tham số:
+  image_rgb  : HxWx3 uint8 array — ảnh RGB gốc.
+  model      : PyTorch model (DeepLabV3+) đã load weights.
+  device     : torch.device — CPU/GPU.
+  scales     : Tuple các hệ số zoom — (1.0, 0.75, 0.5).
+  input_size : Kích thước resize trước khi đưa vào model (256 cho DeepLab).
+  threshold  : Ngưỡng nhị phân hóa xác suất trung bình (0.3).
+  min_area_px: Diện tích tối thiểu (pixel) của mỗi connected component (64).
+  morph_kernel: Kích thước kernel morphology (5x5 ellipse).
+
+Giá trị trả về:
+  final_mask : HxW uint8 array — binary mask đã làm sạch.
+  prob_map   : HxW float32 array — bản đồ xác suất trung bình.
+  seg_info   : Dict với method, threshold, scales, lesion_found...
+```
+
+---
+
+## 12. HỆ THỐNG CẤU HÌNH VÀ GIÁM SÁT
+
+### 12.1 Biểu đồ Toàn bộ Tham số Hệ thống
+
+```mermaid
+mindmap
+  root((Cấu hình\nHệ thống))
+    SEG["🎭 Nhánh Phân vùng"]
+      SEG1["Kích thước đầu vào = 256px"]
+      SEG2["Ngưỡng phân vùng = 0.3"]
+      SEG3["Diện tích tối thiểu = 64px"]
+      SEG4["Tỷ lệ thu phóng TTA = 1.0, 0.75, 0.5"]
+      SEG5["Nhân toán hình thái học = 5×5 elip"]
+      SEG6["Chuẩn hóa phân vùng: μ=0.5, σ=0.25"]
+    CLS["🧬 Nhánh Phân loại"]
+      CLS1["Kích thước đầu vào = 224px"]
+      CLS2["Chuẩn hóa phân loại: ImageNet μ/σ"]
+      CLS3["Tỷ lệ loại bỏ (Dropout) = 0.3"]
+      CLS4["Hệ số giảm kênh CBAM = 16"]
+    GATE["🛡️ Cổng lọc an toàn (Safety Gate)"]
+      GATE1["τ_c = 0.60 (Thanh trượt 0.30–0.95)"]
+      GATE2["Diện tích tối thiểu = 64px"]
+      GATE3["Nội soi da (Derm): diện tích [0.001, 0.75]"]
+      GATE4["Ảnh điện thoại (Phone): diện tích [0.0005, 0.92]"]
+      GATE5["Nội soi da (Derm): biên tối đa = 8.0"]
+      GATE6["Ảnh điện thoại (Phone): biên tối đa = 14.0"]
+      GATE7["Ngưỡng cảnh báo ác tính = 0.15"]
+    LLM["💬 Mô hình LLM VQA"]
+      LLM1["Tên mô hình = gpt-4o-mini"]
+      LLM2["Nhiệt độ (temperature) = 0.2"]
+      LLM3["Từ tố tối đa (max_tokens) = 800"]
+      LLM4["Luồng phát (stream) = True"]
+    VQA_OFFLINE["🖥️ VQA Ngoại tuyến"]
+      O1["LoRA hạng r = 8, α = 16"]
+      O2["Dropout LoRA = 0.05"]
+      O3["Tốc độ học thị giác (lr_vision) = 2e-5"]
+      O4["Tốc độ học mô hình ngôn ngữ (lr_llm) = 5e-5"]
+      O5["Cắt độ dốc (grad_clip) = 1.0"]
+      O6["Độ dài tối đa = 96 từ tố"]
+```
+
+### 12.2 Cơ chế Logging Kỹ thuật Ẩn
+
+```mermaid
+sequenceDiagram
+    participant APP as "Ứng dụng Streamlit"
+    participant ENC as "_NumpySafeEncoder (Bộ mã hóa numpy)"
+    participant LOG as "Nhật ký hệ thống system_logs.log"
+
+    APP->>APP: Nhận mảnh cuối (last chunk) từ luồng phát GPT
+    APP->>ENC: json.dumps(log_entry, cls=_NumpySafeEncoder)
+    Note over ENC: Xử lý chuyển đổi kiểu dữ liệu numpy:<br/>np.int64 → kiểu int chuẩn<br/>np.float32 → kiểu float chuẩn<br/>np.ndarray → kiểu list danh sách
+    ENC-->>APP: Chuỗi JSON hợp lệ
+    APP->>LOG: Ghi thêm dòng JSON mới (append newline JSON)
+
+    Note over LOG: Cấu trúc nhật ký chi tiết trên mỗi dòng:<br/>{<br/>  "action_time": "Thời gian hoạt động",<br/>  "action_type": "Loại hành động",<br/>  "payload": {<br/>    "system_prompt": "...",<br/>    "user_message": "...",<br/>    "chat_history_len": 2,<br/>    "raw_response": "...",<br/>    "cv_context": {...}<br/>  }<br/>}
+```
+
+**Các loại action_type được ghi log:**
+- `LLM_VQA_EXCHANGE`: Mỗi lượt hội thoại thành công (bao gồm full system prompt + raw response).
+- `LLM_ERROR`: Lỗi kết nối hoặc timeout OpenAI API.
+- `SAVE_OR_UPDATE_RECORD`: Mỗi lần lưu/cập nhật hồ sơ Firestore.
+
+---
+
+*Tài liệu kỹ thuật này phản ánh chính xác kiến trúc và thuật toán của hệ thống tính đến phiên bản hiện tại (tháng 6/2026). Mọi thông số trong tài liệu đều được trích xuất trực tiếp từ mã nguồn và đã qua kiểm tra bởi bộ unit test tự động (35/35 PASS).*
