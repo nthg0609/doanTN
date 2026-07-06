@@ -1,0 +1,33 @@
+1461           RESUME                   0
+
+1464           LOAD_FAST_BORROW         5 (kwargs)
+               LOAD_ATTR                1 (pop + NULL|self)
+               LOAD_CONST               1 ('new_x')
+               LOAD_CONST               2 (None)
+               CALL                     2
+               POP_TOP
+
+1465           LOAD_FAST_BORROW         5 (kwargs)
+               LOAD_ATTR                1 (pop + NULL|self)
+               LOAD_CONST               3 ('new_y')
+               LOAD_CONST               2 (None)
+               CALL                     2
+               POP_TOP
+
+1466           LOAD_FAST_BORROW         0 (pdf)
+               LOAD_ATTR                2 (cell)
+               PUSH_NULL
+               LOAD_FAST_BORROW_LOAD_FAST_BORROW 18 (w, h)
+               LOAD_GLOBAL              5 (_safe + NULL)
+               LOAD_FAST_BORROW         3 (txt)
+               CALL                     1
+               BUILD_TUPLE              3
+               LOAD_CONST               4 ('ln')
+               LOAD_FAST_BORROW         4 (ln)
+               BUILD_MAP                1
+               LOAD_FAST_BORROW         5 (kwargs)
+               DICT_MERGE               1
+               CALL_FUNCTION_EX
+               POP_TOP
+               LOAD_CONST               2 (None)
+               RETURN_VALUE

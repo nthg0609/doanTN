@@ -1,0 +1,5 @@
+152           RESUME                   0
+              LOAD_FAST_BORROW         0 (x)
+              LOAD_CONST               0 ('area')
+              BINARY_OP               26 ([])
+              RETURN_VALUE

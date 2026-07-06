@@ -1,0 +1,134 @@
+290           RESUME                   0
+
+295           LOAD_FAST                1 (mask)
+              POP_JUMP_IF_NONE        20 (to L1)
+              LOAD_FAST                1 (mask)
+              LOAD_ATTR                1 (sum + NULL|self)
+              CALL                     0
+              LOAD_CONST               1 (0)
+              COMPARE_OP              88 (bool(==))
+              POP_JUMP_IF_FALSE        2 (to L2)
+
+296   L1:     BUILD_LIST               0
+              RETURN_VALUE
+
+299   L2:     LOAD_FAST                1 (mask)
+              LOAD_ATTR                2 (ndim)
+              LOAD_CONST               2 (2)
+              COMPARE_OP             119 (bool(!=))
+              POP_JUMP_IF_FALSE       42 (to L3)
+
+300           LOAD_FAST                1 (mask)
+              LOAD_CONST               0 (None)
+              LOAD_CONST               0 (None)
+              BUILD_SLICE              2
+              LOAD_CONST               0 (None)
+              LOAD_CONST               0 (None)
+              BUILD_SLICE              2
+              LOAD_CONST               1 (0)
+              BUILD_TUPLE              3
+              BINARY_SUBSCR
+              LOAD_ATTR                5 (astype + NULL|self)
+              LOAD_GLOBAL              6 (np)
+              LOAD_ATTR                8 (uint8)
+              CALL                     1
+              STORE_FAST               2 (mask_gray)
+              JUMP_FORWARD            85 (to L4)
+
+302   L3:     LOAD_FAST                1 (mask)
+              LOAD_ATTR                5 (astype + NULL|self)
+              LOAD_GLOBAL              6 (np)
+              LOAD_ATTR                8 (uint8)
+              CALL                     1
+              STORE_FAST               2 (mask_gray)
+
+304           LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               12 (findContours)
+              PUSH_NULL
+              LOAD_FAST                2 (mask_gray)
+              LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               14 (RETR_EXTERNAL)
+              LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               16 (CHAIN_APPROX_SIMPLE)
+              CALL                     3
+              UNPACK_SEQUENCE          2
+              STORE_FAST_STORE_FAST   52 (contours, _)
+
+306   L4:     BUILD_LIST               0
+              STORE_FAST               5 (lesions)
+
+307           LOAD_CONST               3 (1)
+              STORE_FAST               6 (idx)
+
+309           LOAD_FAST_CHECK          3 (contours)
+              GET_ITER
+      L5:     FOR_ITER                87 (to L7)
+              STORE_FAST               7 (ctr)
+
+310           LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               18 (contourArea)
+              PUSH_NULL
+              LOAD_FAST                7 (ctr)
+              CALL                     1
+              STORE_FAST               8 (area)
+
+311           LOAD_FAST                8 (area)
+              LOAD_CONST               4 (150)
+              COMPARE_OP             188 (bool(>=))
+              POP_JUMP_IF_TRUE         2 (to L6)
+              JUMP_BACKWARD           33 (to L5)
+
+312   L6:     LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               20 (boundingRect)
+              PUSH_NULL
+              LOAD_FAST                7 (ctr)
+              CALL                     1
+              UNPACK_SEQUENCE          4
+              STORE_FAST_STORE_FAST  154 (x, y)
+              STORE_FAST_STORE_FAST  188 (w, h)
+
+313           LOAD_FAST                5 (lesions)
+              LOAD_ATTR               23 (append + NULL|self)
+
+314           LOAD_FAST                6 (idx)
+
+315           LOAD_FAST_LOAD_FAST    154 (x, y)
+              LOAD_FAST_LOAD_FAST    188 (w, h)
+              BUILD_TUPLE              4
+
+316           LOAD_FAST                7 (ctr)
+
+317           LOAD_FAST                8 (area)
+
+313           LOAD_CONST               5 (('id', 'bbox', 'contour', 'area'))
+              BUILD_CONST_KEY_MAP      4
+              CALL                     1
+              POP_TOP
+
+319           LOAD_FAST                6 (idx)
+              LOAD_CONST               3 (1)
+              BINARY_OP               13 (+=)
+              STORE_FAST               6 (idx)
+              JUMP_BACKWARD           89 (to L5)
+
+309   L7:     END_FOR
+              POP_TOP
+
+322           LOAD_GLOBAL             25 (sorted + NULL)
+              LOAD_FAST                5 (lesions)
+              LOAD_CONST               6 (<code object <lambda> at 0x000001813F041290, file "D:\DoAn_DaLieu\app_streamlit.py", line 322>)
+              MAKE_FUNCTION
+              LOAD_CONST               7 (True)
+              LOAD_CONST               8 (('key', 'reverse'))
+              CALL_KW                  3
+              STORE_FAST               5 (lesions)
+
+323           LOAD_FAST                5 (lesions)
+              RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x000001813F041290, file "D:\DoAn_DaLieu\app_streamlit.py", line 322>:
+322           RESUME                   0
+              LOAD_FAST                0 (x)
+              LOAD_CONST               1 ('area')
+              BINARY_SUBSCR
+              RETURN_VALUE

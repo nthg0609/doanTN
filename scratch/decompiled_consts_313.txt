@@ -1,0 +1,2521 @@
+
+=========================================
+Code object: <module>
+=========================================
+Names: ['streamlit', 'st', 'PIL', 'Image', 'set_page_config', 'os', 'environ', '_HEADER_INFO', 'json', 'io', 'tempfile', 'base64', 'requests', 'typing', 'Any', 'Dict', 'List', 'Optional', 'datetime', 'pathlib', 'Path', 'cv2', 'numpy', 'np', 'dotenv', 'load_dotenv', 'plotly.graph_objects', 'graph_objects', 'go', 'google.cloud.firestore', 'cloud', 'firestore', 'gcp_firestore', 'google.oauth2', 'service_account', 'fpdf', 'FPDF', 'openai', 'OpenAI', 'Exception', 'IMGBB_API_KEY', 'LOG_FILE_PATH', 'parent', 'mkdir', 'CHART_SAVE_DIR', 'DIAGNOSIS_DICTIONARY', 'str', '__annotations__', 'CLINICAL_KB', 'MALIGNANT_CLASSES', 'list', 'BENIGN_CLASSES', 'MALIGNANT_ALERT_THRESHOLD', 'float', 'TRIAGE_REASON_VI', 'BODY_LOCATIONS', 'VIETNAM_PROVINCES', 'MEDICAL_DISCLAIMER', 'get_vietnamese_diagnosis', 'cleanup_temp_file', 'ndarray', 'detect_multiple_lesions', 'draw_lesions_overlay', 'tuple', 'int', 'crop_lesion', 'cache_resource', 'get_whisper_pipeline', 'transcribe_audio', 'process_dicom_file', 'JSONEncoder', '_NumpySafeEncoder', 'write_dev_log', 'upload_image_to_imgbb', 'bool', 'check_patient_exists', 'check_patient_exists_by_id', 'find_patients_by_name', 'save_medical_record_to_gcp', 'fetch_all_medical_records', 'get_pipeline', 'get_rag_engine', '_mask_to_image', '_build_fusion_system_prompt', '_fallback_response', 'generate_vqa_response', 'generate_quality_advice', 'load_custom_vqa_model', 'translate_text', 'generate_vqa_response_stream', 'render_probability_chart', 'render_radar_chart', 'MedicalPDF', '_safe', '_cell', '_multi_cell', 'bytes', 'generate_pdf_report', 'render_evolution_chart', 'render_doctor_dashboard', 're', 'pandas', 'pd', 'strip_emojis', 'glass_alert', 'DIAGNOSIS_DICTIONARY_EN', 'TRANSLATIONS', '_inject_custom_css', 'main', '__name__']
+
+Const 0 (int): 0
+Const 1 (NoneType): None
+Const 2 (tuple): ('Image',)
+Const 3 (str): 'Dermatology VQA — Hybrid AI'
+Const 4 (str): 'hospital'
+Const 5 (str): 'wide'
+Const 6 (str): 'expanded'
+Const 7 (tuple): ('page_title', 'page_icon', 'layout', 'initial_sidebar_state')
+Const 8 (str): '127.0.0.1,localhost'
+Const 9 (str): 'NO_PROXY'
+Const 10 (str): 'Streamlit Multi-modal Medical EHR Dashboard — Hybrid VQA v2.0\n# Nâng cấp: Fusion Prompt, Safety Gate UI, LLM Logging, Plotly Charts, ABCD Metrics.\n'
+Const 11 (tuple): ('Any', 'Dict', 'List', 'Optional')
+Const 12 (tuple): ('datetime',)
+Const 13 (tuple): ('Path',)
+Const 14 (tuple): ('load_dotenv',)
+Const 15 (tuple): ('service_account',)
+Const 16 (tuple): ('FPDF',)
+Const 17 (tuple): ('OpenAI',)
+Const 18 (str): '159bc5d50210a5104a5c1b1018368f75'
+Const 19 (str): '5_Results/system_logs.log'
+Const 20 (bool): True
+Const 21 (tuple): ('parents', 'exist_ok')
+Const 22 (str): '5_Results/probability_charts'
+Const 23 (str): 'Dày sừng quang hóa / Tiền ung thư'
+Const 24 (str): 'Ung thư biểu mô tế bào đáy'
+Const 25 (str): 'Tổn thương sừng hóa lành tính'
+Const 26 (str): 'U xơ da'
+Const 27 (str): 'U hắc tố ác tính (Melanoma)'
+Const 28 (str): 'Nốt ruồi lành tính'
+Const 29 (str): 'Tổn thương mạch máu'
+Const 30 (tuple): ('AKIEC', 'BCC', 'BKL', 'DF', 'MEL', 'NV', 'VASC')
+Const 31 (str): 'DIAGNOSIS_DICTIONARY'
+Const 32 (str): 'Ung thư hắc tố (Melanoma) thường biểu hiện dưới dạng dát hoặc sẩn sắc tố màu nâu sẫm, đen hoặc nhiều màu hỗn hợp. Triệu chứng lâm sàng điển hình gồm tổn thương bất đối xứng, bờ răng cưa không đều, màu sắc không đồng nhất, kích thước tiến triển nhanh (>6mm) và có thể gây ngứa, loét hoặc chảy máu tự phát.'
+Const 33 (str): 'Melanoma typically presents as a dark brown, black, or multi-colored pigmented macule or papule. Classic clinical symptoms include asymmetry, irregular or notched borders, color variation, rapid diameter growth (>6mm), and occasionally pruritus, ulceration, or spontaneous bleeding.'
+Const 34 (tuple): ('vi', 'en')
+Const 35 (str): 'Phác đồ chăm sóc vùng da nghi ngờ melanoma đòi hỏi tránh tuyệt đối chấn thương vật lý, không cào gãi, tẩy nốt ruồi bằng hóa chất hoặc đắp thuốc lá dân gian. Bảo vệ da nghiêm ngặt khỏi bức xạ UV bằng kem chống nắng phổ rộng (SPF >= 50) và mặc quần áo che chắn.'
+Const 36 (str): 'Care for suspected melanoma skin lesions strictly requires avoiding physical trauma, scratching, chemical mole removal, or herbal poultices. Protect the skin rigorously from UV radiation using broad-spectrum sunscreen (SPF >= 50) and protective clothing.'
+Const 37 (str): 'Giải thích chỉ số ABCD: (A) Bất đối xứng cao do tế bào sắc tố tăng sinh vô tổ chức. (B) Bờ tổn thương không đều, dạng răng cưa. (C) Màu sắc không đồng nhất (đen, nâu, hồng xen kẽ). (D) Đường kính thường vượt quá 6mm và có xu hướng lan rộng nhanh.'
+Const 38 (str): 'ABCD abnormalities: (A) High asymmetry due to disorganized melanocyte proliferation. (B) Irregular, notched, or blurred borders. (C) Color variation (intermingled black, brown, red, or blue). (D) Diameter typically exceeds 6mm and shows active evolution.'
+Const 39 (str): 'Đối với tổn thương nghi ngờ Melanoma, định hướng bắt buộc là chuyển tuyến chuyên khoa da liễu ngay lập tức. Chỉ định chuẩn vàng là sinh thiết trọn (excisional biopsy) toàn bộ tổn thương để đánh giá giải phẫu bệnh và đo độ sâu Breslow. Không thực hiện sinh thiết bấm hoặc sinh thiết cạo nếu có thể phẫu thuật trọn.'
+Const 40 (str): 'For suspected Melanoma, immediate referral to a specialist dermatologist is mandatory. The gold standard is an excisional biopsy of the entire lesion for histopathological evaluation and Breslow thickness measurement. Avoid punch or shave biopsies if complete excision is feasible.'
+Const 41 (str): 'Tổn thương này có đặc điểm của Melanoma - một dạng ung thư da ác tính nghiêm trọng. Cần được bác sĩ chuyên khoa khám lâm sàng và sinh thiết chẩn đoán sớm để có phác đồ điều trị kịp thời.'
+Const 42 (str): 'This lesion exhibits characteristics of Melanoma, a serious malignant skin cancer. Early dermatological evaluation and biopsy are critical for a timely treatment plan.'
+Const 43 (tuple): ('symptoms', 'care', 'abcd', 'biopsy', 'general')
+Const 44 (str): 'Ung thư biểu mô tế bào đáy (BCC) thường xuất hiện ở vùng hở (mặt, cổ) dưới dạng sẩn bóng như ngọc trai, có giãn mạch hình sợi chỉ dưới da. Tổn thương tiến triển chậm, lâu dần lõm giữa tạo vết loét gặm gặm khó lành, dễ chảy máu khi va chạm nhẹ.'
+Const 45 (str): 'Basal Cell Carcinoma (BCC) commonly appears on sun-exposed areas (face, neck) as a pearly, translucent papule with telangiectasia (visible thread-like vessels). It progresses slowly, eventually developing a central ulceration with rolled borders.'
+Const 46 (str): 'Chăm sóc vùng tổn thương BCC bao gồm giữ vệ sinh bằng nước muối sinh lý hoặc chất tẩy rửa dịu nhẹ, tránh chà xát mạnh gây chảy máu. Chống nắng tích cực là bắt buộc để ngăn ngừa tổn thương tiến triển hoặc xuất hiện tổn thương mới.'
+Const 47 (str): 'Care for a BCC lesion includes keeping the area clean with saline or gentle non-soap cleansers, avoiding vigorous scrubbing to prevent bleeding. Active sun protection is mandatory to halt lesion progression.'
+Const 48 (str): 'Giải thích chỉ số ABCD đối với BCC: Tổn thương thường hơi bất đối xứng (A) và bờ nổi gờ ngọc trai (B). Chỉ số màu sắc (C) có thể đơn sắc hồng/đỏ hoặc có đốm sắc tố đen nhẹ (ở thể BCC sắc tố). Đường kính tiến triển chậm theo năm tháng.'
+Const 49 (str): 'ABCD features in BCC: The lesion often shows slight asymmetry (A) and characteristic rolled, pearly borders (B). Color (C) is typically pink/flesh-toned, but can have dark speckles in pigmented variants. Diameter evolves slowly over years.'
+Const 50 (str): 'Cần thực hiện sinh thiết bấm (punch biopsy) hoặc sinh thiết cạo sâu để chẩn đoán thể mô bệnh học (thể nốt, thể nông, thể xâm lấn). Phương pháp điều trị chính bao gồm phẫu thuật cắt rộng (phẫu thuật Mohs cho vùng mặt), áp lạnh nitơ lỏng hoặc liệu pháp quang động (PDT).'
+Const 51 (str): 'A punch biopsy or deep shave biopsy is indicated to confirm the histopathological subtype (nodular, superficial, or infiltrative). Key treatments include wide local excision (Mohs micrographic surgery for facial lesions), cryosurgery, or photodynamic therapy (PDT).'
+Const 52 (str): 'Đây là tổn thương nghi ngờ Ung thư biểu mô tế bào đáy (BCC). Mặc dù là ung thư da phổ biến nhất nhưng BCC tiến triển rất chậm và hiếm khi di căn xa, có thể chữa khỏi hoàn toàn nếu phẫu thuật sớm.'
+Const 53 (str): 'This lesion is suspicious for Basal Cell Carcinoma (BCC). Although it is the most common skin cancer, it is slow-growing and rarely metastasizes, with high cure rates via early surgical removal.'
+Const 54 (str): 'Dày sừng ánh sáng hoặc bệnh Bowen (AKIEC) biểu hiện dưới dạng dát hoặc mảng màu hồng, đỏ, bề mặt thô ráp, phủ vảy sừng khô bám chặt, đôi khi có cảm giác đau nhói hoặc châm chích khi chạm vào da.'
+Const 55 (str): "Actinic Keratosis or Bowen's disease (AKIEC) presents as a pink to red scaly plaque with a rough, sandpaper-like texture. Lesions are adherent and may feel tender or prickly upon touch."
+Const 56 (str): 'Phác đồ chăm sóc gồm bôi kem dưỡng ẩm dịu nhẹ để làm mềm lớp vảy sừng, tuyệt đối không tự ý cạy vảy hoặc dùng hóa chất lột da. Chống nắng nghiêm ngặt bằng kem chống nắng phổ rộng là yếu tố tiên quyết.'
+Const 57 (str): 'Care protocol involves applying gentle emollients to soften the hyperkeratotic scale; do not scratch or use harsh chemical peels. Strict photoprotection using broad-spectrum sunscreen is crucial.'
+Const 58 (str): 'Giải thích chỉ số ABCD: Tổn thương AKIEC thường có bờ không rõ ràng (B), bề mặt gồ ghề bất đối xứng nhẹ (A). Màu sắc (C) đỏ nhạt hoặc hồng, phủ vảy màu xám/trắng. Đường kính thường từ vài milimet đến hơn 1cm.'
+Const 59 (str): 'ABCD indicators: AKIEC lesions typically display poorly demarcated borders (B), rough and slightly asymmetric surface (A). Color (C) varies from light red to pink, covered by white-gray scale. Diameter ranges from millimeters to over a centimeter.'
+Const 60 (str): 'Cần đi khám da liễu để chẩn đoán phân biệt với ung thư biểu mô tế bào vảy xâm lấn (SCC). Sinh thiết da được chỉ định nếu tổn thương dày lên nhanh, loét hoặc đau. Điều trị có thể dùng thuốc bôi tại chỗ (Imiquimod, 5-Fluorouracil), áp nitơ lỏng hoặc liệu pháp quang động.'
+Const 61 (str): 'A dermatological exam is needed to differentiate from invasive Squamous Cell Carcinoma (SCC). Skin biopsy is indicated if lesions become indurated, ulcerated, or painful. Treatments include topical agents (Imiquimod, 5-Fluorouracil), cryotherapy, or PDT.'
+Const 62 (str): 'Tổn thương này thuộc nhóm tiền ác tính (AKIEC). Cần được theo dõi sát và điều trị sớm để ngăn ngừa nguy cơ tiến triển thành ung thư biểu mô tế bào vảy xâm lấn.'
+Const 63 (str): 'This lesion belongs to the pre-malignant group (AKIEC). Regular monitoring and early ablation are recommended to prevent progression to invasive squamous cell carcinoma.'
+Const 64 (str): "Dày sừng lành tính (BKL/Seborrheic Keratosis) biểu hiện là sẩn hoặc mảng màu nâu nhạt, nâu sẫm đến đen, bề mặt khô ráp, mụn mỡ gồ cao trông như 'dán' lên da, giới hạn rất rõ với vùng da lành xung quanh."
+Const 65 (str): "Benign Keratosis (BKL/Seborrheic Keratosis) presents as a brown, tan, or black waxy papule or plaque. It often has a characteristic 'stuck-on' appearance with a verrucous, greasy surface and distinct borders."
+Const 66 (str): 'Chăm sóc tổn thương lành tính này rất đơn giản: Tránh chà xát mạnh bằng bông tắm hoặc cào gãi khi ngứa vì dễ gây nhiễm trùng thứ phát. Giữ da sạch sẽ và dưỡng ẩm bình thường.'
+Const 67 (str): 'Care for this benign lesion is straightforward: avoid aggressive scrubbing or scratching when itchy to prevent secondary infection. Keep skin clean and moisturized normally.'
+Const 68 (str): 'Giải thích chỉ số ABCD đối với BKL: Tổn thương thường đối xứng (A) và bờ rất rõ ràng (B). Màu sắc (C) từ vàng nhạt đến đen sẫm. Dù có đường kính lớn và màu tối dễ nhầm với melanoma, cấu trúc bề mặt dạng mỡ lành tính giúp phân biệt tốt.'
+Const 69 (str): 'ABCD analysis for BKL: Lesions are usually symmetric (A) with sharply demarcated borders (B). Color (C) ranges from light tan to deep black. Although its large diameter and dark color can mimic melanoma, its greasy, stuck-on texture is diagnostic.'
+Const 70 (str): 'Đây là tổn thương lành tính hoàn toàn, không cần can thiệp y tế trừ khi bị kích ứng hoặc ảnh hưởng thẩm mỹ. Các phương pháp loại bỏ thẩm mỹ phổ biến là laser CO2, áp nitơ lỏng hoặc nạo bằng thìa muỗng chuyên dụng.'
+Const 71 (str): 'This is an entirely benign lesion requiring no medical intervention unless irritated or cosmetically undesirable. Removal options include CO2 laser ablation, cryotherapy, or curettage.'
+Const 72 (str): 'Hệ thống xác định đây là Dày sừng lành tính (BKL), một tổn thương da lành tính do tuổi tác, không có khả năng chuyển dạng ác tính. Bạn có thể hoàn toàn yên tâm.'
+Const 73 (str): 'The system identifies this as a Benign Keratosis (BKL), which is a common age-related benign skin growth. It is non-cancerous and poses no health risks.'
+Const 74 (str): 'Nốt ruồi lành tính (Melanocytic Nevus) biểu hiện dưới dạng dát phẳng hoặc sẩn gồ nhẹ, màu sắc nâu hoặc đen đồng nhất, giới hạn rõ nét, hình tròn hoặc bầu dục đối xứng hoàn hảo.'
+Const 75 (str): 'A benign Melanocytic Nevus (mole) presents as a flat macule or slightly raised papule with uniform tan, brown, or black color, sharp borders, and symmetric round or oval shape.'
+Const 76 (str): 'Chăm sóc nốt ruồi lành tính chủ yếu là theo dõi định kỳ các thay đổi. Bôi kem chống nắng bảo vệ da khỏi tia cực tím và tránh dùng các biện pháp tẩy nốt ruồi thủ công tại nhà vì dễ để lại sẹo lồi hoặc kích thích tổn thương.'
+Const 77 (str): 'Care for a benign mole primarily involves routine self-monitoring. Use sunscreen to protect against UV radiation and avoid home remedies for mole removal due to scar risks.'
+Const 78 (str): 'Giải thích chỉ số ABCD: (A) Đối xứng hoàn hảo. (B) Bờ đều, sắc nét. (C) Màu sắc đơn nhất (đồng màu nâu/đen). (D) Đường kính thường nhỏ (<6mm) và không thay đổi theo thời gian.'
+Const 79 (str): 'ABCD parameters: (A) Perfectly symmetric. (B) Smooth, well-defined borders. (C) Uniform color (single shade of brown/black). (D) Diameter is typically small (<6mm) and remains stable over time.'
+Const 80 (str): 'Tổn thương lành tính không cần làm sinh thiết hay xét nghiệm y văn. Chỉ tiến hành khám chuyên khoa và sinh thiết khi nốt ruồi đột ngột thay đổi kích thước, bờ nham nhở hoặc chảy máu.'
+Const 81 (str): 'Benign nevi do not require biopsy or specialized tests. A clinical evaluation and biopsy are only indicated if the mole undergoes sudden changes in size, shape, borders, or starts bleeding.'
+Const 82 (str): 'Hệ thống chẩn đoán đây là Nốt ruồi lành tính (NV). Đây là tổn thương sắc tố lành tính vô hại thường gặp, không cần can thiệp y khoa.'
+Const 83 (str): 'The system diagnoses this as a benign Melanocytic Nevus (NV). This is a common, harmless skin lesion that requires no medical treatment.'
+Const 84 (str): 'Tổn thương mạch máu (VASC - u máu, giãn mạch) thường là các dát hoặc sẩn màu đỏ, đỏ tía hoặc xanh đen. Đặc điểm lâm sàng đặc trưng là ấn kính sẽ nhạt màu hoặc biến mất tạm thời do máu dồn đi nơi khác.'
+Const 85 (str): 'Vascular lesions (VASC - cherry angiomas, hemangiomas) present as bright red, purple, or blue-black macules or papules. A key clinical symptom is blanching (fading) under pressure (diascopy) as blood temporarily leaves the vessels.'
+Const 86 (str): 'Phác đồ chăm sóc vùng tổn thương mạch máu: Tránh chọc, châm kim hoặc cào gãi vì có thể gây chảy máu kéo dài khó cầm. Giữ vệ sinh da nhẹ nhàng bằng nước mát.'
+Const 87 (str): 'Care protocol for vascular lesions: Avoid puncturing, scratching, or trauma, as this can cause prolonged, difficult-to-control bleeding. Clean the skin area gently with cool water.'
+Const 88 (str): 'Giải thích chỉ số ABCD đối với VASC: Tổn thương có dạng tròn/bầu dục đối xứng tốt (A), bờ đều rõ (B). Màu đỏ hoặc đỏ tía đồng nhất (C). Đường kính thường nhỏ và ổn định.'
+Const 89 (str): 'ABCD indices in VASC: Highly symmetric round or oval shape (A), smooth and regular borders (B). Uniform red, crimson, or purple color (C). Diameter is usually small and stable.'
+Const 90 (str): 'Tổn thương lành tính, không cần sinh thiết. Nếu có nghi ngờ lâm sàng lớn hoặc tổn thương phát triển sâu dưới da, có thể kết hợp siêu âm Doppler mạch máu để xác định cấu trúc dòng chảy. Điều trị thẩm mỹ bằng laser xung màu (Dye Laser) hoặc áp lạnh.'
+Const 91 (str): 'This is a benign lesion that does not require biopsy. For deep or large lesions, Doppler ultrasound may be used to assess vascular flow. Cosmetic options include pulsed dye laser (PDL) or cryotherapy.'
+Const 92 (str): 'Đây là Tổn thương mạch máu lành tính (VASC). Tổn thương mạch máu này hoàn toàn lành tính, không nguy hiểm và chỉ ảnh hưởng đến mặt thẩm mỹ nếu nằm ở vùng da hở.'
+Const 93 (str): 'This is a benign Vascular Lesion (VASC). It is entirely harmless, non-cancerous, and poses only cosmetic concerns if located on visible skin areas.'
+Const 94 (str): 'U xơ da (DF/Dermatofibroma) là sẩn cứng nằm sâu dưới da, màu hồng, nâu nhạt hoặc hơi xám. Triệu chứng lâm sàng điển hình là dấu hiệu lúm đồng tiền (dimple sign) - da bị lõm xuống khi bóp nhẹ vào hai bên tổn thương.'
+Const 95 (str): "Dermatofibroma (DF) presents as a firm, hyperpigmented dermal nodule, typically pink, light brown, or gray. A classic clinical sign is the 'dimple sign' - the lesion dimples downward when pinched gently from the sides."
+Const 96 (str): 'Chăm sóc u xơ da uốn nắn bình thường, tránh cạo lông/râu trực tiếp đè lên sẩn cứng vì dễ gây trầy xước và đau nhẹ do cọ xát. Không tự ý dùng vật sắc nhọn rạch hoặc chọc tổn thương.'
+Const 97 (str): 'Care for a dermatofibroma is standard: avoid shaving directly over the nodule to prevent abrasion or mild pain from friction. Do not attempt to puncture or excise the lesion at home.'
+Const 98 (str): 'Giải thích chỉ số ABCD đối với DF: Tổn thương đối xứng tốt (A), bờ rõ ràng nhưng đôi khi mờ dần vào mô xung quanh (B). Màu sắc (C) thường có trung tâm nhạt màu hơn viền nâu ngoài. Đường kính thường < 1cm.'
+Const 99 (str): 'ABCD characteristics of DF: Usually symmetric (A), well-defined but sometimes fading into surrounding tissue (B). Color (C) often features a pale center with a darker brown ring. Diameter is typically under 1cm.'
+Const 100 (str): 'U xơ da hoàn toàn lành tính. Không cần can thiệp ngoại khoa trừ khi tổn thương gây đau nhiều hoặc cản trở hoạt động. Nếu cần chẩn đoán phân biệt với các u trung mô khác, bác sĩ sẽ chỉ định sinh thiết bấm và làm giải phẫu bệnh.'
+Const 101 (str): 'Dermatofibromas are completely benign. No surgery is required unless the lesion causes persistent pain or functional impairment. A punch biopsy is indicated only to rule out other mesenchymal tumors.'
+Const 102 (str): 'Mô hình nhận diện tổn thương là U xơ da lành tính (DF). Đây là một phản ứng xơ hóa lành tính thường gặp sau côn trùng cắn hoặc chấn thương nhỏ, hoàn toàn không nguy hiểm.'
+Const 103 (str): 'The model identifies this as a benign Dermatofibroma (DF). This is a common reactive fibrous nodule, often appearing after insect bites or minor trauma, and is completely harmless.'
+Const 104 (tuple): ('MEL', 'BCC', 'AKIEC', 'BKL', 'NV', 'VASC', 'DF')
+Const 105 (tuple): ('MEL', 'BCC', 'AKIEC')
+Const 106 (str): 'MALIGNANT_CLASSES'
+Const 107 (tuple): ('BKL', 'NV', 'DF', 'VASC')
+Const 108 (str): 'BENIGN_CLASSES'
+Const 109 (float): 0.15
+Const 110 (str): 'MALIGNANT_ALERT_THRESHOLD'
+Const 111 (str): 'Không phát hiện được vùng tổn thương rõ ràng trong ảnh'
+Const 112 (str): 'Tỉ lệ diện tích tổn thương nằm ngoài ngưỡng hợp lệ'
+Const 113 (str): 'Độ phức tạp bờ quá cao — có thể do nhiễu ảnh'
+Const 114 (str): 'Mô hình phân loại không khả dụng'
+Const 115 (str): 'Độ tin cậy phân loại thấp hơn ngưỡng an toàn (τ_c)'
+Const 116 (str): 'Không thể đọc file ảnh'
+Const 117 (tuple): ('empty_or_low_confidence_mask', 'area_ratio_out_of_bounds', 'border_complexity_out_of_bounds', 'classification_unavailable', 'low_classification_confidence', 'image_load_failed')
+Const 118 (str): 'TRIAGE_REASON_VI'
+Const 119 (tuple): ('--- Chọn Vị trí tổn thương ---', 'Lưng', 'Ngực / Bụng', 'Cánh tay', 'Bàn tay', 'Đùi', 'Cẳng chân', 'Bàn chân', 'Đầu / Mặt', 'Cổ', 'Vai', 'Mông / Bẹn', 'Vị trí khác')
+Const 120 (str): 'BODY_LOCATIONS'
+Const 121 (tuple): ('--- Chọn Tỉnh/Thành ---', 'Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ', 'An Giang', 'Bà Rịa - Vũng Tàu', 'Bắc Giang', 'Bắc Kạn', 'Bạc Liêu', 'Bắc Ninh', 'Bến Tre', 'Bình Định', 'Bình Dương', 'Bình Phước', 'Bình Thuận', 'Cà Mau', 'Cao Bằng', 'Đắk Lắk', 'Đắk Nông', 'Điện Biên', 'Đồng Nai', 'Đồng Tháp', 'Gia Lai', 'Hà Giang', 'Hà Nam', 'Hà Tĩnh', 'Hải Dương', 'Hậu Giang', 'Hòa Bình', 'Hưng Yên', 'Khánh Hòa', 'Kiên Giang', 'Kon Tum', 'Lai Châu', 'Lâm Đồng', 'Lạng Sơn', 'Lào Cai', 'Long An', 'Nam Định', 'Nghệ An', 'Ninh Bình', 'Ninh Thuận', 'Phú Thọ', 'Phú Yên', 'Quảng Bình', 'Quảng Nam', 'Quảng Ngãi', 'Quảng Ninh', 'Quảng Trị', 'Sóc Trăng', 'Sơn La', 'Tây Ninh', 'Thái Bình', 'Thái Nguyên', 'Thanh Hóa', 'Thừa Thiên Huế', 'Tiền Giang', 'Trà Vinh', 'Tuyên Quang', 'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái', 'Tỉnh/Thành khác')
+Const 122 (str): 'VIETNAM_PROVINCES'
+Const 123 (str): '**TUYÊN BỐ MIỄN TRỪ TRÁCH NHIỆM:** Hệ thống này chỉ cấu thành một công cụ hỗ trợ sàng lọc sơ bộ bằng công nghệ AI, hoàn toàn **không thay thế** cho các chẩn đoán y khoa chuyên môn của bác sĩ da liễu.'
+Const 124 (str): 'pred_label'
+Const 125 (str): 'return'
+Const 126 (CodeObject): get_vietnamese_diagnosis
+
+=========================================
+Code object: <module> -> get_vietnamese_diagnosis
+=========================================
+Names: ['DIAGNOSIS_DICTIONARY', 'get']
+
+Const 0 (NoneType): None
+Const 1 (str): 'Bệnh lý da liễu khác'
+Const 127 (CodeObject): cleanup_temp_file
+
+=========================================
+Code object: <module> -> cleanup_temp_file
+=========================================
+Names: ['st', 'session_state', 'get', 'os', 'path', 'exists', 'remove', 'dirname', 'basename', 'startswith', 'lower', 'join', 'rmdir', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (str): 'saved_local_img_path'
+Const 2 (str): 'tmp'
+Const 3 (tuple): ('mask.png', 'gradcam.png', 'crop.png')
+Const 128 (str): 'img_rgb'
+Const 129 (str): 'mask'
+Const 130 (CodeObject): detect_multiple_lesions
+
+=========================================
+Code object: <module> -> detect_multiple_lesions
+=========================================
+Names: ['sum', 'ndim', 'astype', 'np', 'uint8', 'cv2', 'findContours', 'RETR_EXTERNAL', 'CHAIN_APPROX_SIMPLE', 'contourArea', 'boundingRect', 'append', 'sorted']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 2 (int): 2
+Const 3 (int): 1
+Const 4 (int): 150
+Const 5 (tuple): ('id', 'bbox', 'contour', 'area')
+Const 6 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> detect_multiple_lesions -> <lambda>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 1 (str): 'area'
+Const 7 (bool): True
+Const 8 (tuple): ('key', 'reverse')
+Const 131 (str): 'lesions'
+Const 132 (CodeObject): draw_lesions_overlay
+
+=========================================
+Code object: <module> -> draw_lesions_overlay
+=========================================
+Names: ['copy', 'cv2', 'rectangle', 'getTextSize', 'FONT_HERSHEY_SIMPLEX']
+
+Const 0 (NoneType): None
+Const 1 (str): 'bbox'
+Const 2 (tuple): (56, 161, 105)
+Const 3 (int): 3
+Const 4 (str): 'Not '
+Const 5 (str): 'id'
+Const 6 (float): 0.7
+Const 7 (int): 2
+Const 133 (str): 'bbox'
+Const 134 (str): 'padding'
+Const 135 (CodeObject): crop_lesion
+
+=========================================
+Code object: <module> -> crop_lesion
+=========================================
+Names: ['shape', 'max', 'min']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 136 (bool): False
+Const 137 (tuple): ('show_spinner',)
+Const 138 (CodeObject): get_whisper_pipeline
+
+=========================================
+Code object: <module> -> get_whisper_pipeline
+=========================================
+Names: ['transformers', 'pipeline', 'torch', 'cuda', 'is_available', 'os', 'path', 'exists']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 2 (tuple): ('pipeline',)
+Const 3 (int): -1
+Const 4 (str): 'd:/DoAn_DaLieu/4_Models/whisper-tiny'
+Const 5 (str): 'automatic-speech-recognition'
+Const 6 (tuple): ('model', 'device')
+Const 7 (str): 'openai/whisper-tiny'
+Const 139 (CodeObject): transcribe_audio
+
+=========================================
+Code object: <module> -> transcribe_audio
+=========================================
+Names: ['tempfile', 'NamedTemporaryFile', 'write', 'read', 'name', 'speech_recognition', 'Recognizer', 'AudioFile', 'record', 'recognize_google', 'strip', 'os', 'path', 'exists', 'remove', 'Exception', 'print', 'getenv', 'openai', 'OpenAI', 'open', 'audio', 'transcriptions', 'create', 'text', 'get_whisper_pipeline', 'get', 'st', 'error']
+
+Const 0 (NoneType): None
+Const 1 (str): ''
+Const 2 (bool): False
+Const 3 (str): '.wav'
+Const 4 (tuple): ('delete', 'suffix')
+Const 5 (int): 0
+Const 6 (str): 'vi-VN'
+Const 7 (tuple): ('language',)
+Const 8 (str): 'Google Speech Recognition error: '
+Const 9 (str): '. Fallback to Whisper...'
+Const 10 (str): 'OPENAI_API_KEY'
+Const 11 (tuple): ('OpenAI',)
+Const 12 (tuple): ('api_key',)
+Const 13 (str): 'rb'
+Const 14 (str): 'whisper-1'
+Const 15 (str): 'vi'
+Const 16 (tuple): ('model', 'file', 'language')
+Const 17 (str): 'OpenAI Whisper API error: '
+Const 18 (str): '. Fallback to local...'
+Const 19 (str): 'language'
+Const 20 (str): 'vietnamese'
+Const 21 (tuple): ('generate_kwargs',)
+Const 22 (str): 'text'
+Const 23 (str): 'Lỗi chuyển giọng nói thành văn bản: '
+Const 140 (CodeObject): process_dicom_file
+
+=========================================
+Code object: <module> -> process_dicom_file
+=========================================
+Names: ['pydicom', 'tempfile', 'NamedTemporaryFile', 'write', 'read', 'name', 'dcmread', 'hasattr', 'ValueError', 'pixel_array', 'min', 'max', 'astype', 'np', 'uint8', 'zeros_like', 'len', 'shape', 'cv2', 'cvtColor', 'COLOR_GRAY2RGB', 'str', 'PatientName', 'replace', 'strip', 'PatientAge', 'endswith', 'int', 'PatientSex', 'upper', 'os', 'path', 'exists', 'remove']
+
+Const 0 (str): 'Đọc tệp DICOM và trích xuất ảnh RGB cùng các siêu dữ liệu nhân khẩu học.'
+Const 1 (int): 0
+Const 2 (NoneType): None
+Const 3 (bool): False
+Const 4 (str): '.dcm'
+Const 5 (tuple): ('delete', 'suffix')
+Const 6 (str): 'pixel_array'
+Const 7 (str): 'Tệp DICOM không chứa dữ liệu hình ảnh (pixel_array).'
+Const 8 (float): 255.0
+Const 9 (tuple): ('dtype',)
+Const 10 (int): 2
+Const 11 (int): 3
+Const 12 (str): 'Dữ liệu hình ảnh DICOM không hợp lệ.'
+Const 13 (str): 'PatientName'
+Const 14 (str): '^'
+Const 15 (str): ' '
+Const 16 (str): 'name'
+Const 17 (str): 'PatientAge'
+Const 18 (str): 'Y'
+Const 19 (str): 'y'
+Const 20 (int): -1
+Const 21 (str): 'age'
+Const 22 (str): 'PatientSex'
+Const 23 (str): 'M'
+Const 24 (str): 'Nam'
+Const 25 (str): 'gender'
+Const 26 (str): 'F'
+Const 27 (str): 'Nữ'
+Const 141 (CodeObject): _NumpySafeEncoder
+
+=========================================
+Code object: <module> -> _NumpySafeEncoder
+=========================================
+Names: ['__name__', '__module__', '__qualname__', '__firstlineno__', 'default', '__static_attributes__', '__classcell__']
+
+Const 0 (str): '_NumpySafeEncoder'
+Const 1 (int): 483
+Const 2 (CodeObject): default
+
+=========================================
+Code object: <module> -> _NumpySafeEncoder -> default
+=========================================
+Names: ['numpy', 'isinstance', 'integer', 'int', 'floating', 'float', 'ndarray', 'tolist', 'ImportError', 'super', 'default']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 3 (tuple): ()
+Const 142 (str): '_NumpySafeEncoder'
+Const 143 (str): 'data'
+Const 144 (str): 'action_type'
+Const 145 (CodeObject): write_dev_log
+
+=========================================
+Code object: <module> -> write_dev_log
+=========================================
+Names: ['datetime', 'now', 'strftime', 'open', 'LOG_FILE_PATH', 'write', 'json', 'dumps', '_NumpySafeEncoder']
+
+Const 0 (NoneType): None
+Const 1 (str): '%Y-%m-%d %H:%M:%S'
+Const 2 (tuple): ('action_time', 'action_type', 'payload')
+Const 3 (str): 'a'
+Const 4 (str): 'utf-8'
+Const 5 (tuple): ('encoding',)
+Const 6 (bool): False
+Const 7 (tuple): ('ensure_ascii', 'cls')
+Const 8 (str): '\n'
+Const 146 (str): 'local_image_path'
+Const 147 (CodeObject): upload_image_to_imgbb
+
+=========================================
+Code object: <module> -> upload_image_to_imgbb
+=========================================
+Names: ['open', 'IMGBB_API_KEY', 'base64', 'b64encode', 'read', 'requests', 'post', 'status_code', 'json', 'Exception', 'st', 'error']
+
+Const 0 (str): 'Tải ảnh lên ImgBB, trả về URL vĩnh viễn.'
+Const 1 (str): 'rb'
+Const 2 (str): 'https://api.imgbb.com/1/upload'
+Const 3 (tuple): ('key', 'image')
+Const 4 (int): 200
+Const 5 (str): 'data'
+Const 6 (str): 'url'
+Const 7 (NoneType): None
+Const 8 (str): 'Lỗi tải ảnh lên ImgBB: '
+Const 148 (str): 'patient_name'
+Const 149 (CodeObject): check_patient_exists
+
+=========================================
+Code object: <module> -> check_patient_exists
+=========================================
+Names: ['strip', 'os', 'path', 'exists', 'service_account', 'Credentials', 'from_service_account_file', 'gcp_firestore', 'Client', 'project_id', 'join', 'upper', 'split', 'collection', 'document', 'get', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (bool): False
+Const 2 (str): 'gcp-credentials.json'
+Const 3 (str): '(default)'
+Const 4 (tuple): ('credentials', 'project', 'database')
+Const 5 (str): ''
+Const 6 (str): 'medical_records'
+Const 150 (str): 'doc_id'
+Const 151 (CodeObject): check_patient_exists_by_id
+
+=========================================
+Code object: <module> -> check_patient_exists_by_id
+=========================================
+Names: ['strip', 'os', 'path', 'exists', 'service_account', 'Credentials', 'from_service_account_file', 'gcp_firestore', 'Client', 'project_id', 'collection', 'document', 'get', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (bool): False
+Const 2 (str): 'gcp-credentials.json'
+Const 3 (str): '(default)'
+Const 4 (tuple): ('credentials', 'project', 'database')
+Const 5 (str): 'medical_records'
+Const 152 (CodeObject): find_patients_by_name
+
+=========================================
+Code object: <module> -> find_patients_by_name
+=========================================
+Names: ['strip', 'os', 'path', 'exists', 'service_account', 'Credentials', 'from_service_account_file', 'gcp_firestore', 'Client', 'project_id', 'collection', 'stream', 'join', 'upper', 'split', 'to_dict', 'get', 'id', 'append', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (str): 'gcp-credentials.json'
+Const 2 (str): '(default)'
+Const 3 (tuple): ('credentials', 'project', 'database')
+Const 4 (str): 'medical_records'
+Const 5 (str): ''
+Const 6 (str): 'patient_info'
+Const 7 (str): 'name'
+Const 8 (str): 'patient_id'
+Const 9 (str): 'created_at'
+Const 10 (tuple): ('patient_id', 'patient_info', 'created_at')
+Const 153 (str): 'patient_info'
+Const 154 (str): 'visit_data'
+Const 155 (str): 'patient_id'
+Const 156 (CodeObject): save_medical_record_to_gcp
+
+=========================================
+Code object: <module> -> save_medical_record_to_gcp
+=========================================
+Names: ['os', 'path', 'exists', 'service_account', 'Credentials', 'from_service_account_file', 'gcp_firestore', 'Client', 'project_id', 'join', 'strip', 'upper', 'split', 'collection', 'document', 'get', 'datetime', 'now', 'strftime', 'to_dict', 'append', 'update', 'set', 'write_dev_log', 'st', 'error', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (str): 'gcp-credentials.json'
+Const 2 (str): '(default)'
+Const 3 (tuple): ('credentials', 'project', 'database')
+Const 4 (str): ''
+Const 5 (str): 'medical_records'
+Const 6 (str): '%Y-%m-%d %H:%M:%S'
+Const 7 (str): 'visits'
+Const 8 (tuple): ('patient_info', 'updated_at', 'visits')
+Const 9 (tuple): ('patient_id', 'patient_info', 'created_at', 'updated_at', 'visits')
+Const 10 (tuple): ('patient_id', 'visit')
+Const 11 (str): 'SAVE_OR_UPDATE_RECORD'
+Const 12 (tuple): ('action_type',)
+Const 13 (bool): True
+Const 14 (str): ' Không tìm thấy file gcp-credentials.json!'
+Const 15 (bool): False
+Const 16 (str): ' Lỗi ghi dữ liệu lên Cloud Firestore: '
+Const 157 (CodeObject): fetch_all_medical_records
+
+=========================================
+Code object: <module> -> fetch_all_medical_records
+=========================================
+Names: ['os', 'path', 'exists', 'service_account', 'Credentials', 'from_service_account_file', 'gcp_firestore', 'Client', 'project_id', 'collection', 'order_by', 'Query', 'DESCENDING', 'stream', 'to_dict', 'id', 'append', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (str): 'gcp-credentials.json'
+Const 2 (str): '(default)'
+Const 3 (tuple): ('credentials', 'project', 'database')
+Const 4 (str): 'medical_records'
+Const 5 (str): 'updated_at'
+Const 6 (tuple): ('direction',)
+Const 7 (str): 'patient_id'
+Const 158 (str): 'min_conf'
+Const 159 (CodeObject): get_pipeline
+
+=========================================
+Code object: <module> -> get_pipeline
+=========================================
+Names: ['pipeline', 'UnifiedDermatologyPipeline', 'float']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 2 (tuple): ('UnifiedDermatologyPipeline',)
+Const 3 (str): 'both'
+Const 4 (str): 'min_class_confidence'
+Const 5 (tuple): ('mode', 'safety_overrides')
+Const 160 (CodeObject): get_rag_engine
+
+=========================================
+Code object: <module> -> get_rag_engine
+=========================================
+Names: ['pipeline.rag_engine', 'DermatologyRAG', 'Exception', 'print']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 2 (tuple): ('DermatologyRAG',)
+Const 3 (str): 'Warning: RAG Engine initialization failed: '
+Const 161 (CodeObject): _mask_to_image
+
+=========================================
+Code object: <module> -> _mask_to_image
+=========================================
+Names: ['ndim', 'shape', 'cv2', 'resize', 'astype', 'np', 'uint8', 'INTER_NEAREST']
+
+Const 0 (NoneType): None
+Const 1 (int): 2
+Const 2 (int): 0
+Const 3 (int): 1
+Const 4 (tuple): ('interpolation',)
+Const 5 (int): 255
+Const 162 (str): 'cv_context'
+Const 163 (CodeObject): _build_fusion_system_prompt
+
+=========================================
+Code object: <module> -> _build_fusion_system_prompt
+=========================================
+Names: ['get', 'get_vietnamese_diagnosis', 'float', 'join', 'sorted', 'items']
+
+Const 0 (NoneType): None
+Const 1 (str): 'prediction'
+Const 2 (str): 'N/A'
+Const 3 (str): 'confidence'
+Const 4 (float): 0.0
+Const 5 (str): 'metrics'
+Const 6 (str): 'probabilities'
+Const 7 (str): '\n'
+Const 8 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> _build_fusion_system_prompt -> <genexpr>
+=========================================
+Names: ['get_vietnamese_diagnosis']
+
+Const 0 (str): '    • '
+Const 1 (str): ' ('
+Const 2 (str): '): '
+Const 3 (str): '.4f'
+Const 4 (NoneType): None
+Const 9 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> _build_fusion_system_prompt -> <lambda>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 1 (int): 1
+Const 10 (tuple): ('key',)
+Const 11 (str): '[IDENTITY]\n# Bạn là Trợ lý Da liễu AI — một hệ thống hỗ trợ sàng lọc y tế tích hợp mô hình Thị giác Máy tính (CV) và Mô hình Ngôn ngữ Lớn (LLM). Bạn tư vấn dựa HOÀN TOÀN trên dữ liệu CV được cung cấp bên dưới, không được bịa đặt số liệu.\n\n[CV_CONTEXT — DỮ LIỆU CHẮC CHẮN TỪ MÔ HÌNH CV]\n# Kết quả phân loại mô hình chuyên biệt EfficientNet-B1 + CBAM Attention:\n# • Nhãn dự đoán cao nhất : '
+Const 12 (str): ' → '
+Const 13 (str): '\n#     • Độ tin cậy            : '
+Const 14 (str): '.4f'
+Const 15 (str): ' ('
+Const 16 (int): 100
+Const 17 (str): '.1f'
+Const 18 (str): '%)\n\n# Phân phối xác suất đầy đủ 7 nhãn bệnh lý (ISIC):\n    '
+Const 19 (str): '\n\n# Chỉ số hình học tổn thương (DeepLabV3+ Segmentation):\n    • Tỉ lệ diện tích (Area ratio)      : '
+Const 20 (str): 'area_ratio'
+Const 21 (str): '\n    • Độ phức tạp bờ (Border complexity): '
+Const 22 (str): 'border_complexity'
+Const 23 (str): '\n    • Bất đối xứng (Asymmetry score)    : '
+Const 24 (str): 'asymmetry'
+Const 25 (str): '  [0=đối xứng, 1=bất đối xứng]\n    • Độ tròn (Circularity)             : '
+Const 26 (str): 'circularity'
+Const 27 (str): '  [0=không tròn, 1=tròn đều]\n\n    [GUARDRAIL_RULES — QUY TẮC BẮT BUỘC TUYỆT ĐỐI]\n\nĐƯỢC PHÉP:\n# ✅ Giải thích cơ chế bệnh sinh, mô tả triệu chứng lâm sàng phổ biến của nhãn bệnh trên.\n#   ✅ Hướng dẫn chăm sóc da không dùng thuốc (làm sạch, tránh nắng, dưỡng ẩm, bảo vệ).\n  ✅ Phân nhóm thuốc tổng quát (ví dụ: "nhóm kháng nấm bôi tại chỗ", "nhóm corticosteroid bôi ngoài").\n# ✅ Giải thích ý nghĩa các chỉ số hình học CV ở trên khi người dùng hỏi.\n# ✅ Luôn khuyên người dùng đến gặp bác sĩ da liễu chuyên khoa để được chẩn đoán chính xác.\n\nQUY TẮC GIẢI THÍCH TIẾN TRIỂN & HẬU QUẢ BỆNH (CLINICAL PATHOLOGY PROGRESSION RULES):\n#   Khi người dùng hỏi về tiến triển, biến chứng hoặc hậu quả của bệnh, hãy dựa vào NHÃN DỰ ĐOÁN CAO NHẤT ('
+Const 28 (str): ') từ mô hình CV để phản hồi chính xác:\n#   - Nếu nhãn dự đoán là LÀNH TÍNH (BKL, NV, VASC, DF):\n# • Phải khẳng định rõ đây là tổn thương bản chất LÀNH TÍNH, không có khả năng tự biến đổi hoặc phát triển thành ung thư.\n#     • Làm rõ các ảnh hưởng chỉ dừng lại ở mặt thẩm mỹ, kích ứng tại chỗ (như cọ xát quần áo, ngứa nhẹ), hoặc tâm lý lo lắng.\n• Nhấn mạnh nguy cơ lớn nhất là "nhầm lẫn" (misdiagnosis) — tự chẩn đoán nhầm một tổn thương ác tính thực sự thành nốt lành tính, dẫn đến chủ quan không đi khám.\n#   - Nếu nhãn dự đoán là TIỀN ÁC TÍNH hoặc ÁC TÍNH (AKIEC, BCC, MEL):\n#     • Giải thích thận trọng, khách quan về nguy cơ tiến triển nếu không can thiệp (ví dụ: AKIEC có thể tiến triển thành ung thư biểu mô tế bào vảy xâm lấn; BCC xâm lấn phá hủy mô tại chỗ; MEL có thể di căn xa).\n# • Tránh dùng từ ngữ gây hoảng loạn cực đoan cho bệnh nhân, nhưng phải nhấn mạnh tầm quan trọng của việc đi khám bác sĩ, sinh thiết và điều trị y khoa kịp thời để kiểm soát bệnh.\n\nTUYỆT ĐỐI CẤM — MEDICATION GUARDRAIL:\n#   🚫 KHÔNG được nêu tên bất kỳ biệt dược cụ thể nào (Amoxicillin, Tretinoin, Mometasone, Hydrocortisone, Clotrimazole, Acyclovir, v.v.)\n#   🚫 KHÔNG được nêu liều lượng (mg, ml, %, IU, lần/ngày, tuần/lần).\n#   🚫 KHÔNG được nêu thời gian dùng thuốc (7 ngày, 2 tuần, 1 tháng).\n🚫 KHÔNG được đề xuất thuốc kể cả khi người dùng đặt câu hỏi dạng "ví dụ", "giả sử", "trường hợp giả định".\n# 🚫 KHÔNG được xác nhận hay phủ nhận một loại thuốc cụ thể người dùng tự đề xuất.\n# → Nếu bị hỏi về tên thuốc cụ thể: Lịch sự từ chối, giải thích lý do y đức, và hướng dẫn gặp bác sĩ.\n\nĐỊNH DẠNG PHẢN HỒI:\n# - Ngôn ngữ: Tiếng Việt, rõ ràng, chuyên nghiệp, dễ hiểu với bệnh nhân.\n# - Độ dài: Tối đa 400 từ mỗi câu trả lời. Nếu câu hỏi phức tạp, chia thành đề mục ngắn.\n# - Kết thúc mỗi câu trả lời bằng nhắc nhở đến khám bác sĩ da liễu.\n\n'
+Const 164 (str): 'question'
+Const 165 (str): 'result'
+Const 166 (CodeObject): _fallback_response
+
+=========================================
+Code object: <module> -> _fallback_response
+=========================================
+Names: ['get', 'float']
+
+Const 0 (NoneType): None
+Const 1 (str): 'classification'
+Const 2 (str): 'Bạn hỏi: "'
+Const 3 (str): '". Mô hình dự đoán: '
+Const 4 (str): 'prediction'
+Const 5 (str): 'N/A'
+Const 6 (str): ' ('
+Const 7 (str): 'confidence'
+Const 8 (float): 0.0
+Const 9 (str): '.3f'
+Const 10 (str): '). Vui lòng tham khảo ý kiến bác sĩ da liễu.'
+Const 167 (str): 'api_key'
+Const 168 (str): 'history'
+Const 169 (str): 'vqa_mode'
+Const 170 (str): 'local_model'
+Const 171 (CodeObject): generate_vqa_response
+
+=========================================
+Code object: <module> -> generate_vqa_response
+=========================================
+Names: ['get', 'TRIAGE_REASON_VI', 'float', '_build_fusion_system_prompt', 'OpenAI', 'os', 'getenv', '_fallback_response', 'chat', 'completions', 'create', 'choices', 'message', 'content', 'Exception', 'write_dev_log', 'str', 'len']
+
+Const 0 (NoneType): None
+Const 1 (str): 'status'
+Const 2 (str): 'triage'
+Const 3 (str): 'triage_reason'
+Const 4 (str): 'unknown'
+Const 5 (str): ' **Safety Gate đã kích hoạt** — Hệ thống không thể đưa ra tư vấn vì:\n\n> _'
+Const 6 (str): '_\n\nVui lòng chụp lại ảnh tổn thương với ánh sáng tốt hơn, hoặc liên hệ trực tiếp với bác sĩ da liễu để được thăm khám chính xác.'
+Const 7 (str): 'classification'
+Const 8 (str): 'prediction'
+Const 9 (str): 'N/A'
+Const 10 (str): 'confidence'
+Const 11 (float): 0.0
+Const 12 (str): 'probabilities'
+Const 13 (str): 'metrics'
+Const 14 (tuple): ('prediction', 'confidence', 'probabilities', 'metrics')
+Const 15 (str): 'role'
+Const 16 (tuple): ('user', 'assistant')
+Const 17 (str): 'content'
+Const 18 (tuple): ('role', 'content')
+Const 19 (int): -1
+Const 20 (str): 'user'
+Const 21 (str): 'system'
+Const 22 (str): 'Offline (Local Ollama)'
+Const 23 (str): ''
+Const 24 (str): 'gpt-4o-mini'
+Const 25 (str): 'http://127.0.0.1:11434/v1'
+Const 26 (str): 'ollama'
+Const 27 (float): 60.0
+Const 28 (tuple): ('base_url', 'http_client', 'api_key', 'timeout')
+Const 29 (str): 'OPENAI_API_KEY'
+Const 30 (tuple): ('api_key', 'timeout')
+Const 31 (str): 'OPENAI_MODEL'
+Const 32 (float): 0.2
+Const 33 (int): 800
+Const 34 (tuple): ('model', 'temperature', 'max_tokens', 'messages')
+Const 35 (int): 0
+Const 36 (tuple): ('error', 'question', 'vqa_mode')
+Const 37 (str): 'LLM_ERROR'
+Const 38 (tuple): ('action_type',)
+Const 39 (tuple): ('system_prompt', 'user_message', 'chat_history_len', 'raw_response', 'cv_context', 'vqa_mode', 'model_used')
+Const 40 (str): 'LLM_VQA_EXCHANGE'
+Const 172 (str): 'qa_info'
+Const 173 (CodeObject): generate_quality_advice
+
+=========================================
+Code object: <module> -> generate_quality_advice
+=========================================
+Names: ['get', 'join', 'os', 'getenv', 'OpenAI', 'chat', 'completions', 'create', 'choices', 'message', 'content', 'strip', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (str): 'status'
+Const 2 (str): 'ok'
+Const 3 (str): ''
+Const 4 (str): ', '
+Const 5 (str): 'issues'
+Const 6 (str): 'Bạn là trợ lý y khoa AI. Hãy viết một lời khuyên ngắn gọn, thân thiện bằng tiếng Việt (tối đa 2-3 câu) cho bác sĩ/bệnh nhân để họ chụp lại bức ảnh tổn thương da tốt hơn. Ảnh hiện tại bị các lỗi sau: '
+Const 7 (str): '. Hãy tập trung hướng dẫn cách khắc phục lỗi này (ví dụ: giữ chắc tay tránh mờ, tăng/giảm độ sáng, đổi góc chụp để tránh bóng lóa).'
+Const 8 (str): 'OPENAI_API_KEY'
+Const 9 (str): ' '
+Const 10 (str): 'recommendations'
+Const 11 (tuple): ('api_key',)
+Const 12 (str): 'OPENAI_MODEL'
+Const 13 (str): 'gpt-4o-mini'
+Const 14 (float): 0.3
+Const 15 (int): 150
+Const 16 (str): 'user'
+Const 17 (tuple): ('role', 'content')
+Const 18 (tuple): ('model', 'temperature', 'max_tokens', 'messages')
+Const 19 (int): 0
+Const 174 (CodeObject): load_custom_vqa_model
+
+=========================================
+Code object: <module> -> load_custom_vqa_model
+=========================================
+Names: ['torch', 'sys', 'pathlib', 'Path', 'str', 'path', 'insert', 'scripts.train_vqa_joint', 'VisionBackbone', 'CPUMedicalVQAModel', 'ImportError', 'transformers', 'AutoTokenizer', 'peft', 'LoraConfig', 'get_peft_model', 'device', 'cuda', 'is_available', 'os', 'exists', 'to', 'llm', 'Exception', 'load', 'get', 'use_spatial_tokens', 'vision_backbone', 'any', 'keys', 'has_prefix', 'load_state_dict', 'eval', 'from_pretrained', 'pad_token', 'eos_token']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 2 (tuple): ('Path',)
+Const 3 (str): 'd:/DoAn_DaLieu'
+Const 4 (tuple): ('VisionBackbone', 'CPUMedicalVQAModel')
+Const 5 (tuple): (None, None, 'cpu')
+Const 6 (tuple): ('AutoTokenizer',)
+Const 7 (tuple): ('LoraConfig', 'get_peft_model')
+Const 8 (str): 'cuda'
+Const 9 (str): 'cpu'
+Const 10 (str): 'd:\\DoAn_DaLieu\\9_VQA\\models\\dermavqa_gpt2_joint_best.pth'
+Const 11 (int): 8
+Const 12 (int): 16
+Const 13 (str): 'c_attn'
+Const 14 (float): 0.05
+Const 15 (str): 'none'
+Const 16 (str): 'CAUSAL_LM'
+Const 17 (tuple): ('r', 'lora_alpha', 'target_modules', 'lora_dropout', 'bias', 'task_type')
+Const 18 (tuple): ('map_location',)
+Const 19 (str): 'use_spatial_tokens'
+Const 20 (bool): False
+Const 21 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> load_custom_vqa_model -> <genexpr>
+=========================================
+Names: ['startswith']
+
+Const 0 (str): 'clinical_prefix.'
+Const 1 (NoneType): None
+Const 22 (str): 'model_state_dict'
+Const 23 (tuple): ('strict',)
+Const 24 (str): 'distilgpt2'
+Const 175 (str): 'text'
+Const 176 (str): 'target_lang'
+Const 177 (CodeObject): translate_text
+
+=========================================
+Code object: <module> -> translate_text
+=========================================
+Names: ['os', 'getenv', 'openai', 'OpenAI', 'chat', 'completions', 'create', 'choices', 'message', 'content', 'strip', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (str): 'OPENAI_API_KEY'
+Const 2 (int): 0
+Const 3 (tuple): ('OpenAI',)
+Const 4 (tuple): ('api_key',)
+Const 5 (str): 'Translate the following medical text into '
+Const 6 (str): '. Return ONLY the translated text. Do not add any conversational introduction, quotes, or explanation. Text: '
+Const 7 (str): 'gpt-4o-mini'
+Const 8 (str): 'user'
+Const 9 (tuple): ('role', 'content')
+Const 10 (float): 0.1
+Const 11 (int): 300
+Const 12 (tuple): ('model', 'messages', 'temperature', 'max_tokens')
+Const 178 (CodeObject): generate_vqa_response_stream
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream
+=========================================
+Names: ['st', 'session_state', 'get', 'lower', 'any', 'TRIAGE_REASON_VI', 'CLINICAL_KB', 'torch', 'load_custom_vqa_model', 'torchvision.transforms', 'transforms', 'os', 'path', 'exists', 'Image', 'open', 'convert', 'Compose', 'Resize', 'ToTensor', 'Normalize', 'unsqueeze', 'to', 'no_grad', 'hasattr', 'llm', 'transformer', 'wte', 'base_model', 'model', 'get_image_embeddings', 'projection', 'vision_backbone', 'getattr', 'clinical_prefix', 'size', 'device', 'cat', 'ones', 'shape', 'long', 'generate', 'eos_token_id', 'decode', 'replace', 'split', 'strip', 'translate_text', 'len', 'locals', 't', 'Exception', 'float', '_build_fusion_system_prompt', 'get_rag_engine', 'retrieve', 'print', 'OpenAI', 'getenv', '_fallback_response', 'base64', 'b64encode', 'read', 'append', 'chat', 'completions', 'create', 'choices', 'delta', 'content', 'write_dev_log', 'str', 'join']
+
+Const 0 (NoneType): None
+Const 1 (str): 'language_select'
+Const 2 (str): 'English'
+Const 3 (str): 'en'
+Const 4 (str): 'vi'
+Const 5 (str): 'classification'
+Const 6 (str): 'prediction'
+Const 7 (str): 'NV'
+Const 8 (str): 'general'
+Const 9 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 10 (tuple): ('triệu chứng', 'symptom', 'biểu hiện', 'dấu hiệu', 'lâm sàng', 'clinical')
+Const 11 (str): 'symptoms'
+Const 12 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 13 (tuple): ('chăm sóc', 'phác đồ', 'care', 'dưỡng', 'bôi', 'vệ sinh', 'rửa', 'điều trị', 'treatment')
+Const 14 (str): 'care'
+Const 15 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 16 (tuple): ('abcd', 'chỉ số', 'độ tròn', 'bờ', 'đối xứng', 'asymmetry', 'circularity', 'border')
+Const 17 (str): 'abcd'
+Const 18 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 19 (tuple): ('sinh thiết', 'xét nghiệm', 'biopsy', 'test', 'khám', 'tiếp theo', 'next step')
+Const 20 (str): 'biopsy'
+Const 21 (str): 'status'
+Const 22 (str): 'triage'
+Const 23 (str): 'triage_reason'
+Const 24 (str): 'unknown'
+Const 25 (str): ' **Safety Gate đã kích hoạt** — Hệ thống không thể đưa ra tư vấn vì:\n\n> _'
+Const 26 (str): '_\n\nVui lòng chụp lại ảnh tổn thương với ánh sáng tốt hơn, hoặc liên hệ trực tiếp với bác sĩ da liễu để được thăm khám chính xác.'
+Const 27 (tuple): ('Nội bộ (Offline - CPUMedicalVQAModel)', 'Offline (Custom CPUMedicalVQAModel)')
+Const 28 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 29 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 30 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 31 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> generate_vqa_response_stream -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 32 (int): 0
+Const 33 (str): 'saved_local_img_path'
+Const 34 (str): 'RGB'
+Const 35 (tuple): (224, 224)
+Const 36 (tuple): (0.485, 0.456, 0.406)
+Const 37 (tuple): (0.229, 0.224, 0.225)
+Const 38 (tuple): ('mean', 'std')
+Const 39 (str): 'What is the diagnosis for this skin condition?'
+Const 40 (str): 'What are the typical clinical symptoms of this pathology?'
+Const 41 (str): 'What is the recommended skin care protocol for this lesion?'
+Const 42 (str): 'Explain the ABCD abnormalities of this lesion.'
+Const 43 (str): 'What are the next recommended biopsy and clinical diagnostic tests?'
+Const 44 (str): '<|user|>: '
+Const 45 (str): ' <|doctor|>:'
+Const 46 (str): 'pt'
+Const 47 (tuple): ('return_tensors',)
+Const 48 (str): 'transformer'
+Const 49 (str): 'input_ids'
+Const 50 (str): 'base_model'
+Const 51 (str): 'get_image_embeddings'
+Const 52 (tuple): ('text_embeds',)
+Const 53 (int): 1
+Const 54 (str): 'clinical_prefix'
+Const 55 (str): 'has_prefix'
+Const 56 (bool): True
+Const 57 (tuple): ('dim',)
+Const 58 (int): 2
+Const 59 (tuple): ('device', 'dtype')
+Const 60 (int): 256
+Const 61 (float): 0.85
+Const 62 (tuple): ('inputs_embeds', 'attention_mask', 'max_new_tokens', 'top_p', 'pad_token_id', 'do_sample')
+Const 63 (tuple): ('skip_special_tokens',)
+Const 64 (str): ''
+Const 65 (str): '<|'
+Const 66 (str): 'Vietnamese'
+Const 67 (int): 15
+Const 68 (str): 'prozac'
+Const 69 (str): 'diphtheria'
+Const 70 (str): 'allergic'
+Const 71 (str): 'Theo mô hình VQA nội bộ kết hợp phân tích hình ảnh: '
+Const 72 (str): 'According to the local VQA vision analysis: '
+Const 73 (str): '\n\n👉 **'
+Const 74 (str): 't'
+Const 75 (str): 'clinical_warning'
+Const 76 (str): 'Tư vấn y tế bổ sung'
+Const 77 (str): '**: '
+Const 78 (str): 'N/A'
+Const 79 (str): 'confidence'
+Const 80 (float): 0.0
+Const 81 (str): 'probabilities'
+Const 82 (str): 'metrics'
+Const 83 (tuple): ('prediction', 'confidence', 'probabilities', 'metrics')
+Const 84 (str): ' '
+Const 85 (tuple): ('n_results',)
+Const 86 (str): 'text'
+Const 87 (str): "LƯU Ý QUAN TRỌNG: Hãy sử dụng thông tin từ tài liệu y khoa tham khảo trên để làm cơ sở trả lời và trích dẫn nguồn cụ thể (ví dụ: 'Theo Hướng dẫn chẩn đoán và điều trị của Bộ Y tế...')."
+Const 88 (str): 'RAG Error during query: '
+Const 89 (str): 'role'
+Const 90 (tuple): ('user', 'assistant')
+Const 91 (str): 'content'
+Const 92 (tuple): ('role', 'content')
+Const 93 (int): -1
+Const 94 (str): 'user'
+Const 95 (str): 'system'
+Const 96 (str): 'Offline (Local Ollama)'
+Const 97 (str): 'Nội bộ (Offline)'
+Const 98 (str): 'Ollama'
+Const 99 (str): 'gpt-4o-mini'
+Const 100 (str): 'http://127.0.0.1:11434/v1'
+Const 101 (str): 'ollama'
+Const 102 (float): 60.0
+Const 103 (tuple): ('base_url', 'http_client', 'api_key', 'timeout')
+Const 104 (str): 'OPENAI_API_KEY'
+Const 105 (tuple): ('api_key', 'timeout')
+Const 106 (str): 'OPENAI_MODEL'
+Const 107 (str): 'rb'
+Const 108 (str): 'utf-8'
+Const 109 (str): 'Error encoding image to base64: '
+Const 110 (tuple): ('type', 'text')
+Const 111 (str): 'image_url'
+Const 112 (str): 'url'
+Const 113 (str): 'data:image/jpeg;base64,'
+Const 114 (tuple): ('type', 'image_url')
+Const 115 (float): 0.2
+Const 116 (int): 800
+Const 117 (tuple): ('model', 'temperature', 'max_tokens', 'messages', 'stream')
+Const 118 (tuple): ('error', 'question', 'vqa_mode')
+Const 119 (str): 'LLM_ERROR'
+Const 120 (tuple): ('action_type',)
+Const 121 (tuple): ()
+Const 122 (tuple): ('system_prompt', 'user_message', 'chat_history_len', 'raw_response', 'cv_context', 'vqa_mode', 'model_used')
+Const 123 (str): 'LLM_VQA_EXCHANGE'
+Const 179 (str): 'probabilities'
+Const 180 (str): 'timestamp'
+Const 181 (CodeObject): render_probability_chart
+
+=========================================
+Code object: <module> -> render_probability_chart
+=========================================
+Names: ['keys', 'get_vietnamese_diagnosis', 'list', 'values', 'int', 'min', 'append', 'go', 'Figure', 'add_trace', 'Bar', 'dict', 'max', 'get', 'update_layout', 'st', 'plotly_chart', 'datetime', 'now', 'strftime', 'replace', 'join', 'strip', 'upper', 'CHART_SAVE_DIR', 'to_image', 'open', 'write', 'Exception', 'matplotlib', 'use', 'matplotlib.pyplot', 'pyplot', 'subplots', 'set_facecolor', 'sorted', 'items', 'barh', 'set_xlabel', 'set_title', 'tick_params', 'spines', 'set_edgecolor', 'zip', 'text', 'get_y', 'get_height', 'tight_layout', 'savefig', 'close', 'caption']
+
+Const 0 (NoneType): None
+Const 1 (str): '<br><sub>'
+Const 2 (str): '</sub>'
+Const 3 (int): 255
+Const 4 (float): 1.0
+Const 5 (int): 2
+Const 6 (float): 2.0
+Const 7 (str): 'rgba('
+Const 8 (str): ','
+Const 9 (str): ',60,0.85)'
+Const 10 (str): 'h'
+Const 11 (str): 'rgba(255,255,255,0.3)'
+Const 12 (int): 1
+Const 13 (tuple): ('color', 'width')
+Const 14 (tuple): ('color', 'line')
+Const 15 (str): '.3f'
+Const 16 (str): 'outside'
+Const 17 (int): 11
+Const 18 (str): 'white'
+Const 19 (tuple): ('size', 'color')
+Const 20 (str): '<b>%{y}</b><br>Xác suất: %{x:.4f}<extra></extra>'
+Const 21 (tuple): ('x', 'y', 'orientation', 'marker', 'text', 'textposition', 'textfont', 'hovertemplate')
+Const 22 (tuple): ('key',)
+Const 23 (str): 'Phân phối Xác suất Bệnh lý<br><sup>Dự đoán cao nhất: <b>'
+Const 24 (str): '</b> — '
+Const 25 (str): '.2%'
+Const 26 (str): '</sup>'
+Const 27 (int): 14
+Const 28 (str): '#1e293b'
+Const 29 (float): 0.5
+Const 30 (tuple): ('text', 'font', 'x')
+Const 31 (str): 'Xác suất'
+Const 32 (str): '.0%'
+Const 33 (str): 'rgba(0,0,0,0.08)'
+Const 34 (tuple): ('title', 'tickformat', 'gridcolor', 'color')
+Const 35 (str): 'reversed'
+Const 36 (int): 10
+Const 37 (tuple): ('size',)
+Const 38 (tuple): ('autorange', 'color', 'tickfont')
+Const 39 (str): 'rgba(255,255,255,0.6)'
+Const 40 (tuple): ('color',)
+Const 41 (int): 60
+Const 42 (int): 80
+Const 43 (int): 40
+Const 44 (tuple): ('l', 'r', 't', 'b')
+Const 45 (int): 320
+Const 46 (tuple): ('title', 'xaxis', 'yaxis', 'plot_bgcolor', 'paper_bgcolor', 'font', 'margin', 'height')
+Const 47 (bool): True
+Const 48 (tuple): ('use_container_width',)
+Const 49 (str): '%Y%m%d_%H%M%S'
+Const 50 (str): '/'
+Const 51 (str): ''
+Const 52 (str): '\\'
+Const 53 (str): ':'
+Const 54 (str): ' '
+Const 55 (str): '_'
+Const 56 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> render_probability_chart -> <genexpr>
+=========================================
+Names: ['isalnum']
+
+Const 0 (tuple): ('-', '_')
+Const 1 (NoneType): None
+Const 57 (str): 'UNKNOWN'
+Const 58 (str): 'prob_chart_'
+Const 59 (str): '.png'
+Const 60 (str): 'png'
+Const 61 (int): 800
+Const 62 (int): 400
+Const 63 (tuple): ('format', 'width', 'height', 'scale')
+Const 64 (str): 'wb'
+Const 65 (int): 0
+Const 66 (str): 'Agg'
+Const 67 (tuple): (10, 5)
+Const 68 (str): '#111928'
+Const 69 (tuple): ('figsize', 'facecolor')
+Const 70 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> render_probability_chart -> <lambda>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 1 (int): 1
+Const 71 (str): ' ('
+Const 72 (str): ')'
+Const 73 (float): 0.2
+Const 74 (str): 'Phân phối Xác suất — '
+Const 75 (str): ' — '
+Const 76 (tuple): ('colors',)
+Const 77 (float): 0.01
+Const 78 (str): 'center'
+Const 79 (int): 9
+Const 80 (tuple): ('va', 'color', 'fontsize')
+Const 81 (int): 150
+Const 82 (str): 'tight'
+Const 83 (tuple): ('dpi', 'bbox_inches', 'facecolor')
+Const 84 (str): '📁 Đã lưu biểu đồ báo cáo: `'
+Const 85 (str): '`'
+Const 86 (str): '_(Không lưu được PNG: '
+Const 87 (str): ')_'
+Const 182 (str): 'metrics'
+Const 183 (CodeObject): render_radar_chart
+
+=========================================
+Code object: <module> -> render_radar_chart
+=========================================
+Names: ['float', 'get', 'min', 'go', 'Figure', 'add_trace', 'Scatterpolar', 'dict', 'update_layout', 'st', 'plotly_chart']
+
+Const 0 (NoneType): None
+Const 1 (str): 'area_ratio'
+Const 2 (float): 0.0
+Const 3 (str): 'border_complexity'
+Const 4 (str): 'asymmetry'
+Const 5 (str): 'circularity'
+Const 6 (float): 8.0
+Const 7 (float): 1.0
+Const 8 (float): 0.75
+Const 9 (tuple): ('Diện tích<br>(Area ratio)', 'Độ phức tạp bờ<br>(Border)', 'Bất đối xứng<br>(Asymmetry)', 'Độ tròn<br>(Circularity)')
+Const 10 (int): 0
+Const 11 (str): 'toself'
+Const 12 (str): 'rgba(99,179,237,0.2)'
+Const 13 (str): 'rgba(99,179,237,0.9)'
+Const 14 (int): 2
+Const 15 (tuple): ('color', 'width')
+Const 16 (str): 'Chỉ số ABCD'
+Const 17 (tuple): ('r', 'theta', 'fill', 'fillcolor', 'line', 'name')
+Const 18 (str): 'rgba(255,255,255,0.6)'
+Const 19 (bool): True
+Const 20 (int): 1
+Const 21 (str): '#1e293b'
+Const 22 (str): 'rgba(0,0,0,0.08)'
+Const 23 (tuple): ('visible', 'range', 'color', 'gridcolor')
+Const 24 (tuple): ('color', 'gridcolor')
+Const 25 (tuple): ('bgcolor', 'radialaxis', 'angularaxis')
+Const 26 (int): 10
+Const 27 (tuple): ('color', 'size')
+Const 28 (bool): False
+Const 29 (int): 40
+Const 30 (int): 30
+Const 31 (tuple): ('l', 'r', 't', 'b')
+Const 32 (int): 280
+Const 33 (tuple): ('polar', 'paper_bgcolor', 'font', 'showlegend', 'margin', 'height')
+Const 34 (tuple): ('use_container_width',)
+Const 184 (CodeObject): MedicalPDF
+
+=========================================
+Code object: <module> -> MedicalPDF
+=========================================
+Names: ['__name__', '__module__', '__qualname__', '__firstlineno__', 'header', 'footer', '__static_attributes__']
+
+Const 0 (str): 'MedicalPDF'
+Const 1 (int): 1475
+Const 2 (CodeObject): header
+
+=========================================
+Code object: <module> -> MedicalPDF -> header
+=========================================
+Names: ['set_fill_color', 'rect', 'set_text_color', 'set_font', 'cell', 'ln']
+
+Const 0 (NoneType): None
+Const 1 (int): 26
+Const 2 (int): 54
+Const 3 (int): 93
+Const 4 (int): 0
+Const 5 (int): 210
+Const 6 (int): 35
+Const 7 (str): 'F'
+Const 8 (int): 255
+Const 9 (str): 'helvetica'
+Const 10 (str): 'B'
+Const 11 (int): 16
+Const 12 (int): 10
+Const 13 (str): 'BAO CAO CHAN DOAN Y KHOA DA LIEU'
+Const 14 (bool): True
+Const 15 (str): 'C'
+Const 16 (tuple): ('ln', 'align')
+Const 17 (str): ''
+Const 18 (int): 5
+Const 19 (str): 'He thong sang loc so bo tich hop Hoc sau & VQA'
+Const 3 (CodeObject): footer
+
+=========================================
+Code object: <module> -> MedicalPDF -> footer
+=========================================
+Names: ['set_y', 'set_font', 'set_text_color', 'cell', 'page_no']
+
+Const 0 (NoneType): None
+Const 1 (int): -15
+Const 2 (str): 'helvetica'
+Const 3 (str): 'I'
+Const 4 (int): 8
+Const 5 (int): 128
+Const 6 (int): 0
+Const 7 (int): 10
+Const 8 (str): 'Trang '
+Const 9 (str): '/{nb} | Tai lieu y te bao mat'
+Const 10 (str): 'C'
+Const 11 (tuple): ('align',)
+Const 4 (tuple): ()
+Const 5 (NoneType): None
+Const 185 (str): 'MedicalPDF'
+Const 186 (CodeObject): _safe
+
+=========================================
+Code object: <module> -> _safe
+=========================================
+Names: ['unicodedata', 'normalize', 'str', 'encode', 'decode']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 2 (str): 'NFKD'
+Const 3 (str): 'ascii'
+Const 4 (str): 'ignore'
+Const 187 (str): 'pdf'
+Const 188 (str): 'txt'
+Const 189 (str): 'ln'
+Const 190 (CodeObject): _cell
+
+=========================================
+Code object: <module> -> _cell
+=========================================
+Names: ['pop', 'cell', '_safe']
+
+Const 0 (NoneType): None
+Const 1 (str): 'new_x'
+Const 2 (str): 'new_y'
+Const 3 (str): 'ln'
+Const 191 (CodeObject): _multi_cell
+
+=========================================
+Code object: <module> -> _multi_cell
+=========================================
+Names: ['pop', 'multi_cell', '_safe']
+
+Const 0 (NoneType): None
+Const 1 (str): 'new_x'
+Const 2 (str): 'new_y'
+Const 192 (CodeObject): generate_pdf_report
+
+=========================================
+Code object: <module> -> generate_pdf_report
+=========================================
+Names: ['MedicalPDF', 'alias_nb_pages', 'add_page', 'set_font', 'set_text_color', 'ln', '_cell', 'line', 'get_y', 'get', 'upper', 'get_vietnamese_diagnosis', 'float', '_safe', 'sorted', 'items', 'matplotlib', 'use', 'matplotlib.pyplot', 'pyplot', 'subplots', 'patch', 'set_facecolor', 'barh', 'spines', 'set_visible', 'tick_params', 'zip', 'text', 'get_height', 'tight_layout', 'tempfile', 'NamedTemporaryFile', 'name', 'savefig', 'close', 'image', 'os', 'path', 'exists', 'remove', 'Exception', 'set_y', 'max', 'set_fill_color', 'str', 'Optional', '_multi_cell', 'output', 'isinstance', 'bytes']
+
+Const 0 (NoneType): None
+Const 1 (str): 'helvetica'
+Const 2 (str): ''
+Const 3 (int): 10
+Const 4 (int): 0
+Const 5 (int): 15
+Const 6 (str): 'B'
+Const 7 (int): 12
+Const 8 (int): 26
+Const 9 (int): 54
+Const 10 (int): 93
+Const 11 (int): 8
+Const 12 (str): 'I. THONG TIN BENH NHAN'
+Const 13 (int): 1
+Const 14 (tuple): ('ln',)
+Const 15 (int): 200
+Const 16 (int): 4
+Const 17 (int): 50
+Const 18 (int): 95
+Const 19 (int): 6
+Const 20 (str): 'Ho va ten: '
+Const 21 (str): 'name'
+Const 22 (str): 'N/A'
+Const 23 (str): 'Tuoi: '
+Const 24 (str): 'age'
+Const 25 (str): ' | Gioi tinh: '
+Const 26 (str): 'gender'
+Const 27 (str): 'Khong ro'
+Const 28 (str): 'Dia chi: '
+Const 29 (str): 'hometown'
+Const 30 (str): 'Ngay kham: '
+Const 31 (str): 'created_at'
+Const 32 (str): 'So dinh danh (CCCD/BHYT): '
+Const 33 (str): 'national_id'
+Const 34 (str): 'Vi tri ton thuong: '
+Const 35 (str): 'location'
+Const 36 (str): 'II. KET QUA PHAN TICH HOC SAU (COMPUTER VISION)'
+Const 37 (str): 'ai_extracted_metrics'
+Const 38 (str): 'prediction'
+Const 39 (str): 'confidence'
+Const 40 (float): 0.0
+Const 41 (str): 'status'
+Const 42 (str): 'ok'
+Const 43 (str): 'triage'
+Const 44 (int): 220
+Const 45 (str): 'Trang thai: BI TU CHOI (Safety Gate Triage)'
+Const 46 (str): 'Chan doan du doan: '
+Const 47 (str): ' - '
+Const 48 (str): 'Do tin cay: '
+Const 49 (str): '.2%'
+Const 50 (str): 'probabilities'
+Const 51 (int): 2
+Const 52 (int): 9
+Const 53 (int): 100
+Const 54 (int): 5
+Const 55 (str): 'Phan phoi xac suat (Top 5):'
+Const 56 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> generate_pdf_report -> <lambda>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 1 (int): 1
+Const 57 (tuple): ('key',)
+Const 58 (str): '  - '
+Const 59 (str): ' ('
+Const 60 (str): '): '
+Const 61 (str): 'Agg'
+Const 62 (tuple): (6, 2.5)
+Const 63 (tuple): ('figsize',)
+Const 64 (str): '#ffffff'
+Const 65 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> generate_pdf_report -> <lambda>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 1 (int): 1
+Const 66 (int): -5
+Const 67 (tuple): ('MEL', 'BCC', 'AKIEC')
+Const 68 (str): '#e53e3e'
+Const 69 (str): '#3182ce'
+Const 70 (float): 0.6
+Const 71 (tuple): ('color', 'height')
+Const 72 (str): 'top'
+Const 73 (bool): False
+Const 74 (str): 'right'
+Const 75 (str): '#4a5568'
+Const 76 (tuple): ('colors', 'labelsize')
+Const 77 (float): 0.01
+Const 78 (str): '.1%'
+Const 79 (str): 'center'
+Const 80 (str): 'left'
+Const 81 (str): '#2d3748'
+Const 82 (str): 'bold'
+Const 83 (tuple): ('va', 'ha', 'color', 'fontsize', 'fontweight')
+Const 84 (str): '.png'
+Const 85 (tuple): ('delete', 'suffix')
+Const 86 (int): 150
+Const 87 (str): 'tight'
+Const 88 (tuple): ('dpi', 'bbox_inches', 'facecolor')
+Const 89 (int): 110
+Const 90 (int): 85
+Const 91 (int): 33
+Const 92 (tuple): ('x', 'y', 'w', 'h')
+Const 93 (int): 35
+Const 94 (int): 240
+Const 95 (int): 244
+Const 96 (int): 248
+Const 97 (int): 45
+Const 98 (str): 'Chi so ABCD'
+Const 99 (str): 'C'
+Const 100 (bool): True
+Const 101 (tuple): ('border', 'align', 'fill')
+Const 102 (str): 'Gia tri'
+Const 103 (str): 'Y nghia lam sang'
+Const 104 (tuple): ('border', 'align', 'fill', 'ln')
+Const 105 (str): 'Area ratio (Dien tich)'
+Const 106 (str): 'area_ratio'
+Const 107 (str): '.4f'
+Const 108 (str): 'Ti le dien tich ton thuong tren toan vung anh chup'
+Const 109 (str): 'Border complexity (Bo)'
+Const 110 (str): 'border_complexity'
+Const 111 (str): 'Do phuc tap va go ghe cua duong bien ton thuong'
+Const 112 (str): 'Asymmetry (Bat doi xung)'
+Const 113 (str): 'asymmetry'
+Const 114 (str): 'Do bat doi xung cua ton thuong qua hai truc doi xung chinh'
+Const 115 (str): 'Circularity (Do tron)'
+Const 116 (str): 'circularity'
+Const 117 (str): 'Do tron deu (1.0 la hinh tron hoan hao, lanh tinh)'
+Const 118 (int): 7
+Const 119 (tuple): ('border', 'align')
+Const 120 (str): ' '
+Const 121 (tuple): ('border', 'ln')
+Const 122 (str): 'image_url'
+Const 123 (str): 'mask_url'
+Const 124 (str): 'gradcam_url'
+Const 125 (str): 'url'
+Const 126 (str): 'return'
+Const 127 (CodeObject): _download_as_png
+
+=========================================
+Code object: <module> -> generate_pdf_report -> _download_as_png
+=========================================
+Names: ['requests', 'get', 'status_code', 'PIL', 'Image', 'io', 'open', 'BytesIO', 'content', 'convert', 'tempfile', 'NamedTemporaryFile', 'save', 'name', 'Exception']
+
+Const 0 (NoneType): None
+Const 1 (int): 10
+Const 2 (tuple): ('timeout',)
+Const 3 (int): 200
+Const 4 (int): 0
+Const 5 (tuple): ('Image',)
+Const 6 (str): 'RGB'
+Const 7 (bool): False
+Const 8 (str): '.png'
+Const 9 (tuple): ('delete', 'suffix')
+Const 10 (str): 'PNG'
+Const 11 (tuple): ('format',)
+Const 128 (int): 60
+Const 129 (str): 'Anh ton thuong lam sang'
+Const 130 (tuple): ('align',)
+Const 131 (str): 'Mat na phan vung (AI Mask)'
+Const 132 (str): 'Ban do nhiet (Grad-CAM)'
+Const 133 (tuple): ('align', 'ln')
+Const 134 (int): 55
+Const 135 (int): 41
+Const 136 (int): 75
+Const 137 (int): 135
+Const 138 (int): 20
+Const 139 (int): 115
+Const 140 (int): 58
+Const 141 (int): 67
+Const 142 (str): 'III. NHAT KY HOI THOAI Y KHOA (VQA CHAT LOG)'
+Const 143 (str): 'vqa_conversations'
+Const 144 (str): 'I'
+Const 145 (str): 'Khong co nhat ky hoi thoai cho lan kham nay.'
+Const 146 (str): 'role'
+Const 147 (str): 'content'
+Const 148 (str): 'user'
+Const 149 (int): 40
+Const 150 (str): 'Hoi (Bac si / Benh nhan):'
+Const 151 (int): 30
+Const 152 (int): 80
+Const 153 (str): 'Dap (Tro ly Da lieu AI):'
+Const 154 (int): 128
+Const 155 (str): 'Tuyen bo mien tru trach nhiem: Tai lieu nay duoc tao tu dong boi he thong ho tro chan doan AI. Ket qua phan tich chi mang tinh chat tham khao so bo va hoan toan khong thay the chan doan lam sang cua bac si chuyen khoa da lieu co tham quyen.'
+Const 193 (str): 'Tất cả vị trí'
+Const 194 (str): 'visits'
+Const 195 (str): 'selected_location'
+Const 196 (CodeObject): render_evolution_chart
+
+=========================================
+Code object: <module> -> render_evolution_chart
+=========================================
+Names: ['list', 'set', 'len', 'st', 'info', 'sorted', 'get', 'datetime', 'strptime', 'strftime', 'Exception', 'append', 'float', 'subheader', 'tabs', 'go', 'Figure', 'plotly_chart', 'zip']
+
+Const 0 (NoneType): None
+Const 1 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> render_evolution_chart -> <genexpr>
+=========================================
+Names: ['str', 'get', 'strip', 'capitalize']
+
+Const 0 (str): 'location'
+Const 1 (str): 'Không rõ'
+Const 2 (NoneType): None
+Const 2 (str): 'Tất cả vị trí'
+Const 3 (int): 1
+Const 4 (str): ' Bệnh nhân này có tổn thương ở nhiều vị trí khác nhau. Vui lòng chọn một vị trí tổn thương cụ thể từ bộ lọc bên trên để xem đồ thị tiến triển chi tiết của tổn thương đó.'
+Const 5 (int): 2
+Const 6 (str): ' Cần ít nhất 2 mốc khám của cùng một tổn thương để vẽ biểu đồ theo dõi tiến triển lâm sàng.'
+Const 7 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> render_evolution_chart -> <lambda>
+=========================================
+Names: ['get']
+
+Const 0 (NoneType): None
+Const 1 (str): 'timestamp_id'
+Const 2 (str): ''
+Const 8 (tuple): ('key',)
+Const 9 (str): 'created_at'
+Const 10 (str): 'N/A'
+Const 11 (str): '%Y/%m/%d %H:%M:%S'
+Const 12 (str): '%d/%m %H:%M'
+Const 13 (str): 'ai_extracted_metrics'
+Const 14 (str): 'area_ratio'
+Const 15 (float): 0.0
+Const 16 (str): 'border_complexity'
+Const 17 (str): 'asymmetry'
+Const 18 (str): 'circularity'
+Const 19 (str): 'confidence'
+Const 20 (str): 'prediction'
+Const 21 (str): ' Đồ thị Tiến triển Lâm sàng theo Thời gian'
+Const 22 (tuple): (' Diện tích & Độ phức tạp bờ', ' Đối xứng & Độ tròn', ' Độ tin cậy Chẩn đoán')
+Const 23 (int): 0
+Const 24 (bool): True
+Const 25 (tuple): ('use_container_width',)
+Const 26 (str): ' ('
+Const 27 (str): '.1%'
+Const 28 (str): ')'
+Const 197 (CodeObject): render_doctor_dashboard
+
+=========================================
+Code object: <module> -> render_doctor_dashboard
+=========================================
+Names: ['st', 'header', 'info', 'fetch_all_medical_records', 'warning', 'get', 'len', 'selectbox', 'list', 'keys', 'sorted', 'markdown', 'subheader', 'columns', 'upper', 'set', 'str', 'strip', 'capitalize', 'render_evolution_chart', 'enumerate', 'get_vietnamese_diagnosis', 'index', 'expander', 'tabs', 'image', 'metric', 'float', 'items', 'write', 'caption', 'button', 'spinner', 'generate_pdf_report', 'session_state', 'Exception', 'error', 'download_button']
+
+Const 0 (NoneType): None
+Const 1 (str): ' Hệ thống Tra cứu Hồ sơ Bệnh án Điện tử (Đa mốc thời gian)'
+Const 2 (str): 'Hỗ trợ hiển thị lịch sử tiến triển lâm sàng đa phương thức (nhiều ảnh ở các thời điểm khác nhau).'
+Const 3 (str): '📭 Hiện tại kho lưu trữ đám mây chưa có dữ liệu bệnh án nào hợp lệ.'
+Const 4 (str): 'patient_info'
+Const 5 (str): 'name'
+Const 6 (str): 'Ẩn danh'
+Const 7 (str): 'age'
+Const 8 (str): '??'
+Const 9 (str): 'patient_id'
+Const 10 (str): 'N/A'
+Const 11 (str): 'visits'
+Const 12 (str): ' BN: '
+Const 13 (str): ' ('
+Const 14 (str): ' tuổi) | Mã: '
+Const 15 (str): ' — ['
+Const 16 (str): ' mốc ảnh bệnh án]'
+Const 17 (str): ' Chọn bệnh nhân cần tra cứu:'
+Const 18 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> render_doctor_dashboard -> <lambda>
+=========================================
+Names: ['get']
+
+Const 0 (NoneType): None
+Const 1 (str): 'timestamp_id'
+Const 2 (str): ''
+Const 19 (bool): True
+Const 20 (tuple): ('key', 'reverse')
+Const 21 (str): '---'
+Const 22 (str): ' Thông tin hành chính bệnh nhân'
+Const 23 (int): 3
+Const 24 (str): '**Họ và tên:** `'
+Const 25 (str): ''
+Const 26 (str): '`'
+Const 27 (str): '**Tuổi lâm sàng:** `'
+Const 28 (str): '**Địa chỉ thường trú:** `'
+Const 29 (str): 'hometown'
+Const 30 (str): ' Lọc theo Vị trí Tổn thương'
+Const 31 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> render_doctor_dashboard -> <genexpr>
+=========================================
+Names: ['str', 'get', 'strip', 'capitalize']
+
+Const 0 (str): 'location'
+Const 1 (str): 'Không rõ'
+Const 2 (NoneType): None
+Const 32 (str): 'Tất cả vị trí'
+Const 33 (str): 'Chọn vị trí tổn thương để xem tiến triển:'
+Const 34 (str): 'dashboard_location_filter'
+Const 35 (tuple): ('key',)
+Const 36 (str): 'location'
+Const 37 (str): 'Không rõ'
+Const 38 (str): ' Biên niên sử hình ảnh & Chẩn đoán qua các thời kỳ'
+Const 39 (str): 'created_at'
+Const 40 (str): 'ai_extracted_metrics'
+Const 41 (str): 'image_url'
+Const 42 (str): 'vqa_conversations'
+Const 43 (str): 'prediction'
+Const 44 (str): ' LẦN KHÁM THỨ '
+Const 45 (str): ' — Ngày: '
+Const 46 (str): ' — Vị trí: '
+Const 47 (int): 0
+Const 48 (tuple): ('expanded',)
+Const 49 (int): 1
+Const 50 (float): 1.2
+Const 51 (str): 'mask_url'
+Const 52 (str): 'gradcam_url'
+Const 53 (tuple): (' Ảnh gốc', ' Mặt nạ', ' Grad-CAM')
+Const 54 (tuple): ('use_container_width',)
+Const 55 (str): 'Không có ảnh gốc.'
+Const 56 (str): 'Không có ảnh mặt nạ.'
+Const 57 (str): 'Không có ảnh Grad-CAM.'
+Const 58 (str): 'Ảnh tổn thương: '
+Const 59 (tuple): ('caption', 'use_container_width')
+Const 60 (str): 'Không có tệp ảnh cho lần khám này.'
+Const 61 (str): '####  Kết quả phân tích AI'
+Const 62 (str): 'confidence'
+Const 63 (float): 0.0
+Const 64 (int): 2
+Const 65 (str): 'Nhãn dự đoán'
+Const 66 (str): 'Độ tin cậy'
+Const 67 (int): 100
+Const 68 (str): '.1f'
+Const 69 (str): '%'
+Const 70 (str): "**Giải nghĩa:** <span style='color:#63b3ed;font-weight:bold;'>"
+Const 71 (str): '</span>'
+Const 72 (tuple): ('unsafe_allow_html',)
+Const 73 (str): 'probabilities'
+Const 74 (str): '**Phân phối xác suất (Top 5):**'
+Const 75 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> render_doctor_dashboard -> <lambda>
+=========================================
+Names: []
+
+Const 0 (NoneType): None
+Const 1 (int): 1
+Const 76 (int): 5
+Const 77 (str): '- `'
+Const 78 (str): '` ('
+Const 79 (str): '): `'
+Const 80 (str): '.2%'
+Const 81 (str): '**Chỉ số hình học:**'
+Const 82 (str): '- Area ratio: `'
+Const 83 (str): 'area_ratio'
+Const 84 (str): '.4f'
+Const 85 (str): '- Border complexity: `'
+Const 86 (str): 'border_complexity'
+Const 87 (str): '- Asymmetry: `'
+Const 88 (str): 'asymmetry'
+Const 89 (str): '- Circularity: `'
+Const 90 (str): 'circularity'
+Const 91 (str): '#####  Nhật ký tư vấn y khoa (VQA)'
+Const 92 (str): 'Lần khám này không thực hiện hội thoại phụ.'
+Const 93 (str): 'role'
+Const 94 (str): 'content'
+Const 95 (str): 'user'
+Const 96 (str): "<div style='background:rgba(99,179,237,0.15);border-left:3px solid #63b3ed;padding:6px 10px;margin:4px 0;border-radius:4px;overflow-wrap:break-word;'><b> Hỏi:</b> "
+Const 97 (str): '</div>'
+Const 98 (str): "<div style='background:rgba(72,187,120,0.12);border-left:3px solid #48bb78;padding:6px 10px;margin:4px 0;border-radius:4px;overflow-wrap:break-word;max-height:200px;overflow-y:auto;'><b> Đáp:</b> "
+Const 99 (str): ' Tạo báo cáo PDF'
+Const 100 (str): 'gen_btn_'
+Const 101 (str): 'timestamp_id'
+Const 102 (str): 'Đang khởi tạo PDF (tải dữ liệu từ máy chủ đám mây)...'
+Const 103 (str): 'pdf_data_'
+Const 104 (str): ' Lỗi tạo báo cáo PDF: '
+Const 105 (str): ' Tải xuống báo cáo PDF'
+Const 106 (str): 'EHR_Report_'
+Const 107 (str): '_'
+Const 108 (str): '.pdf'
+Const 109 (str): 'application/pdf'
+Const 110 (str): 'download_btn_'
+Const 111 (tuple): ('label', 'data', 'file_name', 'mime', 'key')
+Const 198 (CodeObject): strip_emojis
+
+=========================================
+Code object: <module> -> strip_emojis
+=========================================
+Names: ['re', 'compile', 'UNICODE', 'sub', 'strip']
+
+Const 0 (NoneType): None
+Const 1 (str): '[𐀀-\U0010ffff]+'
+Const 2 (tuple): ('flags',)
+Const 3 (str): ''
+Const 199 (str): 'message'
+Const 200 (str): 'level'
+Const 201 (CodeObject): glass_alert
+
+=========================================
+Code object: <module> -> glass_alert
+=========================================
+Names: ['strip_emojis', 'str', 'st', 'session_state', 'get', 'markdown']
+
+Const 0 (NoneType): None
+Const 1 (str): 'language_select'
+Const 2 (str): 'Tiếng Việt'
+Const 3 (str): 'success'
+Const 4 (str): 'rgba(72, 187, 120, 0.08)'
+Const 5 (str): 'rgba(72, 187, 120, 0.25)'
+Const 6 (str): '#15803d'
+Const 7 (str): 'Thành công'
+Const 8 (str): 'Success'
+Const 9 (str): 'warning'
+Const 10 (str): 'rgba(237, 137, 54, 0.08)'
+Const 11 (str): 'rgba(237, 137, 54, 0.25)'
+Const 12 (str): '#c2410c'
+Const 13 (str): 'Cảnh báo'
+Const 14 (str): 'Warning'
+Const 15 (str): 'error'
+Const 16 (str): 'rgba(229, 62, 62, 0.08)'
+Const 17 (str): 'rgba(229, 62, 62, 0.25)'
+Const 18 (str): '#b91c1c'
+Const 19 (str): 'Lỗi'
+Const 20 (str): 'Error'
+Const 21 (str): 'rgba(99, 179, 237, 0.08)'
+Const 22 (str): 'rgba(99, 179, 237, 0.25)'
+Const 23 (str): '#0369a1'
+Const 24 (str): 'Thông báo'
+Const 25 (str): 'Information'
+Const 26 (str): '\n    <div style="\n        background: '
+Const 27 (str): ';\n        border: 1px solid '
+Const 28 (str): ';\n        border-radius: 12px;\n        padding: 12px 18px;\n        margin: 10px 0;\n        color: '
+Const 29 (str): ';\n        backdrop-filter: blur(8px);\n    ">\n        <strong style="display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.92rem;">'
+Const 30 (str): '</strong>\n        <span style="font-size: 0.88rem; line-height: 1.4;">'
+Const 31 (str): '</span>\n    </div>\n    '
+Const 32 (bool): True
+Const 33 (tuple): ('unsafe_allow_html',)
+Const 202 (str): 'Actinic keratoses and intraepithelial carcinoma'
+Const 203 (str): 'Basal cell carcinoma'
+Const 204 (str): 'Benign keratosis-like lesions'
+Const 205 (str): 'Dermatofibroma'
+Const 206 (str): 'Melanoma'
+Const 207 (str): 'Melanocytic nevi'
+Const 208 (str): 'Vascular lesions'
+Const 209 (str): 'DIAGNOSIS_DICTIONARY_EN'
+Const 210 (str): 'medical_disclaimer'
+Const 211 (str): 'TUYÊN BỐ MIỄN TRỪ TRÁCH NHIỆM: Hệ thống này chỉ cấu thành một công cụ hỗ trợ sàng lọc sơ bộ bằng công nghệ AI, hoàn toàn không thay thế cho các chẩn đoán y khoa chuyên môn của bác sĩ da liễu.'
+Const 212 (str): 'main_title'
+Const 213 (str): 'Hệ thống Trợ lý Da liễu Đa phương thức và EHR Dashboard'
+Const 214 (str): 'main_subtitle'
+Const 215 (str): 'Tích hợp chẩn đoán hình học, lọc chất lượng ảnh chụp và tư vấn phác đồ điều trị y văn'
+Const 216 (str): 'tab_diagnosis'
+Const 217 (str): 'Thực hiện Chẩn đoán'
+Const 218 (str): 'tab_doctor'
+Const 219 (str): 'Màn hình Xem lại của Bác sĩ'
+Const 220 (str): 'sidebar_header_patient'
+Const 221 (str): 'THÔNG TIN BỆNH NHÂN'
+Const 222 (str): 'Họ và tên bệnh nhân:'
+Const 223 (str): 'patient_name_placeholder'
+Const 224 (str): 'Nguyễn Văn A'
+Const 225 (str): 'patient_age'
+Const 226 (str): 'Tuổi bệnh nhân:'
+Const 227 (str): 'patient_age_placeholder'
+Const 228 (str): 'Ví dụ: 30'
+Const 229 (str): 'patient_gender'
+Const 230 (str): 'Giới tính bệnh nhân:'
+Const 231 (str): 'patient_gender_options'
+Const 232 (tuple): ('--- Chọn Giới tính ---', 'Nam', 'Nữ', 'Khác')
+Const 233 (str): 'patient_hometown'
+Const 234 (str): 'Quê quán / Địa chỉ:'
+Const 235 (str): 'patient_location'
+Const 236 (str): 'Vị trí tổn thương:'
+Const 237 (str): 'patient_national_id'
+Const 238 (str): 'Số định danh (CCCD/BHYT/Mã BN):'
+Const 239 (str): 'patient_national_id_placeholder'
+Const 240 (str): 'Ví dụ: 031090123456 (để trống để tự sinh)'
+Const 241 (str): 'reset_form_btn'
+Const 242 (str): 'Reset Form'
+Const 243 (str): 'system_config'
+Const 244 (str): 'CẤU HÌNH HỆ THỐNG'
+Const 245 (str): 'quality_threshold'
+Const 246 (str): 'Ngưỡng lọc ảnh kém chất lượng'
+Const 247 (str): 'quality_threshold_help'
+Const 248 (str): 'Ngưỡng kiểm soát chất lượng ảnh đầu vào. Nếu ảnh có chất lượng/độ tin cậy thấp hơn ngưỡng này, hệ thống sẽ kích hoạt Cổng lọc chất lượng.'
+Const 249 (str): 'malignancy_threshold'
+Const 250 (str): 'Độ nhạy phát hiện nguy cơ ác tính'
+Const 251 (str): 'malignancy_threshold_help'
+Const 252 (str): 'Ngưỡng xác suất để phát hiện và cảnh báo bệnh lý ác tính. Khi xác suất tính toán vượt quá ngưỡng này, hệ thống sẽ hiển thị cảnh báo để bác sĩ lưu ý thực hiện sinh thiết.'
+Const 253 (str): 'lambda_priority'
+Const 254 (str): 'Độ ưu tiên: Ảnh thực thể vs Bệnh sử'
+Const 255 (str): 'lambda_priority_help'
+Const 256 (str): 'Trọng số điều chỉnh độ ưu tiên giữa đặc trưng hình ảnh và dữ liệu dịch tễ. Giá trị 1.0 là chỉ chẩn đoán bằng ảnh, 0.5 là kết hợp 50-50 giữa ảnh và thông tin dịch tễ.'
+Const 257 (str): 'clinical_workflow'
+Const 258 (str): 'QUY TRÌNH HỖ TRỢ QUYẾT ĐỊNH LÂM SÀNG'
+Const 259 (str): 'workflow_steps'
+Const 260 (str): '\n        - 1. Upload clinical image or DICOM\n        - 2. Run quality screening (blur/exposure)\n        - 3. Automatic or interactive segmentation\n        - 4. Pathological classification and demographic fusion\n        - 5. Medical literature guidelines search\n        - 6. Treatment protocol recommendation\n        '
+Const 261 (str): 'model_specs'
+Const 262 (str): 'Thông số kỹ thuật đường ống AI'
+Const 263 (str): 'model_specs_content'
+Const 264 (str): '\n        - Độ trễ trung bình: 0.5 giây\n        - Tải lượng bộ nhớ VRAM sử dụng: 8192 MB\n        - Kích thước hình học đệm biên ROI: δ = 10px\n        '
+Const 265 (str): 'upload_label'
+Const 266 (str): 'Tải ảnh tổn thương da lên:'
+Const 267 (str): 'run_analysis_btn'
+Const 268 (str): 'Chạy Phân tích'
+Const 269 (str): 'analyzing'
+Const 270 (str): 'Đang thực hiện phân tích...'
+Const 271 (str): 'analysis_success'
+Const 272 (str): 'Phân tích thành công — Độ tin cậy:'
+Const 273 (str): 'quality_warning'
+Const 274 (str): 'Cảnh báo chất lượng ảnh chụp:'
+Const 275 (str): 'clinical_warning'
+Const 276 (str): 'Cảnh báo Lâm sàng'
+Const 277 (str): 'image_type_label'
+Const 278 (str): 'Hệ thống tự phát hiện loại ảnh để áp dụng cấu hình chẩn đoán phù hợp.'
+Const 279 (str): 'image_type_dermoscopy'
+Const 280 (str): 'Ảnh nội soi chuyên dụng (Dermoscopy)'
+Const 281 (str): 'image_type_phone'
+Const 282 (str): 'Ảnh chụp thực tế thiết bị di động (TTA)'
+Const 283 (str): 'quantitative_metrics'
+Const 284 (str): 'Số liệu Phân tích Định lượng'
+Const 285 (str): 'metric_time'
+Const 286 (str): 'Thời gian chẩn đoán'
+Const 287 (str): 'metric_area'
+Const 288 (str): 'Tỷ lệ diện tích'
+Const 289 (str): 'metric_border'
+Const 290 (str): 'Độ phức tạp viền'
+Const 291 (str): 'metric_asymmetry'
+Const 292 (str): 'Độ bất đối xứng'
+Const 293 (str): 'metric_circularity'
+Const 294 (str): 'Độ tròn'
+Const 295 (str): 'metric_confidence'
+Const 296 (str): 'Độ tin cậy'
+Const 297 (str): 'probability_distribution'
+Const 298 (str): 'Phân phối Xác suất Bệnh lý'
+Const 299 (str): 'radar_title'
+Const 300 (str): 'Chỉ số đánh giá ABCD tổn thương'
+Const 301 (str): 'radar_metrics'
+Const 302 (tuple): ('Diện tích<br>(Area ratio)', 'Độ phức tạp bờ<br>(Border)', 'Bất đối xứng<br>(Asymmetry)', 'Độ tròn<br>(Circularity)')
+Const 303 (str): 'vqa_chat_space'
+Const 304 (str): 'Hội thoại tư vấn lâm sàng'
+Const 305 (str): 'vqa_chat_disabled'
+Const 306 (str): 'Cổng an toàn đang kích hoạt — VQA bị khóa.'
+Const 307 (str): 'vqa_chat_placeholder'
+Const 308 (str): 'Đặt câu hỏi về tổn thương da (sau khi chạy phân tích)...'
+Const 309 (str): 'voice_stt_label'
+Const 310 (str): 'Nói để nhập câu hỏi (Tiếng Việt):'
+Const 311 (str): 'voice_stt_loading'
+Const 312 (str): 'Đang chuyển âm thanh thành văn bản...'
+Const 313 (str): 'audio_upload_label'
+Const 314 (str): 'Chọn tệp âm thanh ghi âm (.wav):'
+Const 315 (str): 'sync_ehr_header'
+Const 316 (str): 'Đồng bộ Bệnh án điện tử'
+Const 317 (str): 'sync_ehr_btn'
+Const 318 (str): 'Xác nhận và Lưu toàn bộ hồ sơ lên Google Cloud'
+Const 319 (str): 'export_pdf_header'
+Const 320 (str): 'Xuất báo cáo PDF trực tiếp'
+Const 321 (str): 'export_pdf_btn'
+Const 322 (str): 'Tạo báo cáo PDF cho bệnh án này'
+Const 323 (str): 'download_pdf_btn'
+Const 324 (str): 'Tải xuống báo cáo PDF'
+Const 325 (str): 'export_json_btn'
+Const 326 (str): 'Tải hồ sơ dạng JSON (Nghiên cứu)'
+Const 327 (str): 'export_csv_btn'
+Const 328 (str): 'Tải lịch sử dạng CSV (Thống kê)'
+Const 329 (str): 'doctor_dashboard_header'
+Const 330 (str): 'Hệ thống Tra cứu Hồ sơ Bệnh án Điện tử (Đa mốc thời gian)'
+Const 331 (str): 'doctor_dashboard_info'
+Const 332 (str): 'Hỗ trợ hiển thị lịch sử tiến triển lâm sàng đa phương thức (nhiều ảnh ở các thời điểm khác nhau).'
+Const 333 (str): 'select_patient'
+Const 334 (str): 'Chọn bệnh nhân cần tra cứu:'
+Const 335 (str): 'patient_admin_info'
+Const 336 (str): 'Thông tin hành chính bệnh nhân'
+Const 337 (str): 'patient_full_name'
+Const 338 (str): 'Họ và tên:'
+Const 339 (str): 'patient_age_val'
+Const 340 (str): 'Tuổi lâm sàng:'
+Const 341 (str): 'patient_hometown_val'
+Const 342 (str): 'Địa chỉ thường trú:'
+Const 343 (str): 'filter_location'
+Const 344 (str): 'Lọc theo Vị trí Tổn thương'
+Const 345 (str): 'filter_location_select'
+Const 346 (str): 'Chọn vị trí tổn thương để xem tiến triển:'
+Const 347 (str): 'select_all_locations'
+Const 348 (str): 'chronological_title'
+Const 349 (str): 'Biên niên sử hình ảnh và Chẩn đoán qua các thời kỳ'
+Const 350 (str): 'visit_header'
+Const 351 (str): 'LẦN KHÁM THỨ {visit_index} — Ngày: {v_time} — Vị trí: {v_loc}'
+Const 352 (str): 'tab_img'
+Const 353 (str): 'Ảnh gốc'
+Const 354 (str): 'tab_mask'
+Const 355 (str): 'Mặt nạ'
+Const 356 (str): 'tab_grad'
+Const 357 (str): 'Grad-CAM'
+Const 358 (str): 'ai_results_header'
+Const 359 (str): 'Kết quả phân tích AI'
+Const 360 (str): 'Nhãn dự đoán'
+Const 361 (str): 'confidence_label'
+Const 362 (str): 'translation_label'
+Const 363 (str): 'Giải nghĩa:'
+Const 364 (str): 'probability_top5'
+Const 365 (str): 'Phân phối xác suất (Top 5):'
+Const 366 (str): 'geometric_metrics'
+Const 367 (str): 'Chỉ số hình học:'
+Const 368 (str): 'chat_log_header'
+Const 369 (str): 'Nhật ký tư vấn y khoa (VQA)'
+Const 370 (str): 'chat_log_empty'
+Const 371 (str): 'Lần khám này không thực hiện hội thoại phụ.'
+Const 372 (str): 'generate_pdf_btn'
+Const 373 (str): 'Tạo báo cáo PDF'
+Const 374 (str): 'download_pdf_visit_btn'
+Const 375 (str): 'preset_qs_label'
+Const 376 (str): 'Gợi ý câu hỏi lâm sàng nhanh:'
+Const 377 (str): 'rag_guidelines_header'
+Const 378 (str): 'Tra cứu phác đồ điều trị y văn'
+Const 379 (str): 'rag_guidelines_help'
+Const 380 (str): 'Nhập từ khóa bệnh lý hoặc mã bệnh (ví dụ: MEL, BCC, AKIEC) để truy vấn hướng dẫn điều trị chính thức:'
+Const 381 (str): 'rag_search_placeholder'
+Const 382 (str): 'Từ khóa tìm kiếm...'
+Const 383 (str): 'rag_no_results'
+Const 384 (str): 'Không tìm thấy tài liệu phù hợp.'
+Const 385 (str): 'rag_reference_title'
+Const 386 (str): 'Tài liệu tham khảo #{r_idx} (Khoảng cách vector: {dist:.4f}):'
+Const 387 (str): 'comparison_mode_label'
+Const 388 (str): 'Đối chiếu tiến triển tổn thương (Comparison Mode)'
+Const 389 (str): 'comparison_insufficient'
+Const 390 (str): 'Cần ít nhất 2 lần khám để thực hiện đối chiếu tiến triển.'
+Const 391 (str): 'comparison_select_a'
+Const 392 (str): 'Lần khám thứ nhất (Mốc A):'
+Const 393 (str): 'comparison_select_b'
+Const 394 (str): 'Lần khám thứ hai (Mốc B):'
+Const 395 (str): 'comparison_table_title'
+Const 396 (str): 'Đánh giá sự biến đổi các chỉ số lâm sàng (ABCD)'
+Const 397 (str): 'col_metric'
+Const 398 (str): 'Chỉ số'
+Const 399 (str): 'col_moca'
+Const 400 (str): 'Mốc A ({date})'
+Const 401 (str): 'col_mocb'
+Const 402 (str): 'Mốc B ({date})'
+Const 403 (str): 'col_diff_abs'
+Const 404 (str): 'Thay đổi tuyệt đối'
+Const 405 (str): 'col_diff_pct'
+Const 406 (str): 'Thay đổi phần trăm'
+Const 407 (str): 'col_eval'
+Const 408 (str): 'Đánh giá diễn biến'
+Const 409 (str): 'metric_area_full'
+Const 410 (str): 'Diện tích tổn thương'
+Const 411 (str): 'metric_border_full'
+Const 412 (str): 'metric_asym_full'
+Const 413 (str): 'metric_circ_full'
+Const 414 (str): 'eval_area_up'
+Const 415 (str): 'Phát triển rộng hơn'
+Const 416 (str): 'eval_area_down'
+Const 417 (str): 'Thu nhỏ kích thước'
+Const 418 (str): 'eval_border_up'
+Const 419 (str): 'Viền u gồ ghề/phức tạp hơn'
+Const 420 (str): 'eval_border_down'
+Const 421 (str): 'Đường biên phẳng hơn'
+Const 422 (str): 'eval_asym_up'
+Const 423 (str): 'Mất đối xứng tăng (Nguy hiểm)'
+Const 424 (str): 'eval_asym_down'
+Const 425 (str): 'Cải thiện đối xứng'
+Const 426 (str): 'eval_circ_up'
+Const 427 (str): 'Tròn đều hơn'
+Const 428 (str): 'eval_circ_down'
+Const 429 (str): 'Méo mó hơn (Cảnh báo)'
+Const 430 (str): 'eval_no_change'
+Const 431 (str): 'Không thay đổi'
+Const 432 (str): 'chat_q'
+Const 433 (str): 'Hỏi'
+Const 434 (str): 'chat_a'
+Const 435 (str): 'Đáp'
+Const 436 (str): 'segmenter_mode_label'
+Const 437 (str): 'Chế độ phân đoạn tổn thương da (AI Segmenter Mode):'
+Const 438 (str): 'interactive_point_label'
+Const 439 (str): 'Điểm SAM được chọn:'
+Const 440 (str): 'Không có ảnh gốc.'
+Const 441 (str): 'Không có ảnh mặt nạ.'
+Const 442 (str): 'Không có ảnh Grad-CAM.'
+Const 443 (str): 'Không có tệp ảnh cho lần khám này.'
+Const 444 (str): 'Bản đồ định vị đa tổn thương (Phát hiện nhiều nốt)'
+Const 445 (str): 'Chọn nốt tổn thương để chẩn đoán và hỏi đáp VQA:'
+Const 446 (str): 'Lời khuyên chất lượng ảnh:'
+Const 447 (tuple): ('no_orig_img', 'no_mask_img', 'no_grad_img', 'no_img_visit', 'multi_lesion_header', 'multi_lesion_select', 'quality_adv_label')
+Const 448 (str): 'DISCLAIMER: This system is a preliminary screening tool powered by AI. It does not replace professional medical diagnosis by a dermatologist.'
+Const 449 (str): 'Multimodal Dermatology Assistant and EHR Dashboard'
+Const 450 (str): 'Integrated geometric diagnosis, image quality screening, and medical guidelines consultation'
+Const 451 (str): 'Perform Diagnosis'
+Const 452 (str): 'Doctor Dashboard'
+Const 453 (str): 'PATIENT DATA'
+Const 454 (str): 'Patient full name:'
+Const 455 (str): 'John Doe'
+Const 456 (str): 'Patient age:'
+Const 457 (str): 'Example: 30'
+Const 458 (str): 'Patient gender:'
+Const 459 (str): 'Address / Hometown:'
+Const 460 (str): 'Lesion location:'
+Const 461 (str): 'National ID / Insurance ID / ID:'
+Const 462 (str): 'Example: 031090123456 (leave empty to auto-generate)'
+Const 463 (str): 'SYSTEM CONFIGURATION'
+Const 464 (str): 'Image Quality Threshold'
+Const 465 (str): 'Input image quality control threshold. If the image quality/confidence is below this, the Safety Gate activates.'
+Const 466 (str): 'Malignancy Alert Sensitivity'
+Const 467 (str): 'Probability threshold to flag and warn of malignant lesions. If exceeded, a warning is shown for biopsy reference.'
+Const 468 (str): 'Priority: Clinical Image vs Epidemiology'
+Const 469 (str): 'Weight adjustment between image features and demographic data. 1.0 relies only on image, 0.5 balances 50-50 with demographic data.'
+Const 470 (str): 'CLINICAL DECISION WORKFLOW'
+Const 471 (str): 'AI Pipeline Specifications'
+Const 472 (str): 'Upload skin lesion image:'
+Const 473 (str): 'Run Analysis'
+Const 474 (str): 'Analyzing clinical data...'
+Const 475 (str): 'Analysis completed — Confidence:'
+Const 476 (str): 'Image quality warning:'
+Const 477 (str): 'Clinical Warning'
+Const 478 (str): 'The system automatically detects image type to apply optimal configurations.'
+Const 479 (str): 'Specialized Dermoscopy Image'
+Const 480 (str): 'Clinical Phone Image (TTA)'
+Const 481 (str): 'Quantitative Analysis Metrics'
+Const 482 (str): 'Diagnosis latency'
+Const 483 (str): 'Area ratio'
+Const 484 (str): 'Border complexity'
+Const 485 (str): 'Asymmetry score'
+Const 486 (str): 'Circularity score'
+Const 487 (str): 'Confidence'
+Const 488 (str): 'Pathology Probability Distribution'
+Const 489 (str): 'ABCD Evaluation Metrics'
+Const 490 (tuple): ('Area ratio', 'Border complexity', 'Asymmetry', 'Circularity')
+Const 491 (str): 'Clinical Consultation Dialog'
+Const 492 (str): 'Safety Gate active — VQA conversation locked.'
+Const 493 (str): 'Ask a clinical question about this lesion (after analysis finishes)...'
+Const 494 (str): 'Speak to type question (Vietnamese):'
+Const 495 (str): 'Converting speech to text...'
+Const 496 (str): 'Select audio recording file (.wav):'
+Const 497 (str): 'Synchronize Electronic Health Record'
+Const 498 (str): 'Confirm and Save Record to Google Cloud'
+Const 499 (str): 'Export PDF Report'
+Const 500 (str): 'Generate PDF Report for this Visit'
+Const 501 (str): 'Download PDF Report'
+Const 502 (str): 'Download JSON Data (Research)'
+Const 503 (str): 'Download CSV Timeline (Stats)'
+Const 504 (str): 'Electronic Health Record System (Multi-visit Timeline)'
+Const 505 (str): 'Displays multi-modal clinical history (multiple images across different time periods).'
+Const 506 (str): 'Select patient to view:'
+Const 507 (str): 'Patient Administrative Information'
+Const 508 (str): 'Full Name:'
+Const 509 (str): 'Clinical Age:'
+Const 510 (str): 'Permanent Residence:'
+Const 511 (str): 'Filter by Lesion Location'
+Const 512 (str): 'Select lesion location to track progression:'
+Const 513 (str): 'All locations'
+Const 514 (str): 'Clinical Visit Timeline and Pathology Progression'
+Const 515 (str): 'VISIT NUMBER {visit_index} — Date: {v_time} — Location: {v_loc}'
+Const 516 (str): 'Original Image'
+Const 517 (str): 'Segmentation Mask'
+Const 518 (str): 'AI Analysis Results'
+Const 519 (str): 'Predicted Label'
+Const 520 (str): 'Translation:'
+Const 521 (str): 'Probability Distribution (Top 5):'
+Const 522 (str): 'Geometric Metrics:'
+Const 523 (str): 'Clinical Consultation Dialog (VQA)'
+Const 524 (str): 'No clinical consultation was conducted for this visit.'
+Const 525 (str): 'Generate PDF Report'
+Const 526 (str): 'Quick Preset Clinical Questions:'
+Const 527 (str): 'Medical Guidelines Browser'
+Const 528 (str): 'Enter pathology keyword or code (e.g., MEL, BCC, AKIEC) to search official guidelines:'
+Const 529 (str): 'Search keyword...'
+Const 530 (str): 'No matching guidelines found.'
+Const 531 (str): 'Reference document #{r_idx} (Distance: {dist:.4f}):'
+Const 532 (str): 'Clinical Comparison Mode'
+Const 533 (str): 'At least 2 visits are required to perform a side-by-side progression comparison.'
+Const 534 (str): 'First visit (Point A):'
+Const 535 (str): 'Second visit (Point B):'
+Const 536 (str): 'ABCD Geometric Metric Progression Analysis'
+Const 537 (str): 'Metric'
+Const 538 (str): 'Point A ({date})'
+Const 539 (str): 'Point B ({date})'
+Const 540 (str): 'Absolute Change'
+Const 541 (str): 'Percentage Change'
+Const 542 (str): 'Clinical Progress Assessment'
+Const 543 (str): 'Lesion Area'
+Const 544 (str): 'Border Complexity'
+Const 545 (str): 'Asymmetry Score'
+Const 546 (str): 'Circularity Score'
+Const 547 (str): 'Increased area'
+Const 548 (str): 'Decreased area'
+Const 549 (str): 'More irregular/complex border'
+Const 550 (str): 'Smoother border'
+Const 551 (str): 'Increased asymmetry (High risk)'
+Const 552 (str): 'Improved symmetry'
+Const 553 (str): 'More circular'
+Const 554 (str): 'More irregular/distorted (Warning)'
+Const 555 (str): 'No change'
+Const 556 (str): 'Question'
+Const 557 (str): 'Response'
+Const 558 (str): 'AI Segmenter Mode:'
+Const 559 (str): 'SAM Point Selected:'
+Const 560 (str): 'no_orig_img'
+Const 561 (str): 'No original image available.'
+Const 562 (str): 'No mask image available.'
+Const 563 (str): 'No Grad-CAM image available.'
+Const 564 (str): 'No image available for this visit.'
+Const 565 (str): 'Multi-Lesion Mapping (Multiple Spots Detected)'
+Const 566 (str): 'Select lesion spot for diagnosis and VQA chat:'
+Const 567 (str): 'Image Quality Advice:'
+Const 568 (tuple): ('no_mask_img', 'no_grad_img', 'no_img_visit', 'multi_lesion_header', 'multi_lesion_select', 'quality_adv_label')
+Const 569 (tuple): ('Tiếng Việt', 'English')
+Const 570 (CodeObject): _inject_custom_css
+
+=========================================
+Code object: <module> -> _inject_custom_css
+=========================================
+Names: ['st', 'markdown']
+
+Const 0 (str): 'Inject CSS for Light Mode, improved visibility, and enhanced aesthetics.'
+Const 1 (str): '<style>\n    @import url(\'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap\');\n    \n    /* Force Light Mode Theme */\n    :root {\n        --primary-color: #0284c7;\n        --background-color: #F8FAFC;\n        --secondary-background-color: #f1f5f9;\n        --text-color: #1e293b;\n        --gray-text-color: #64748b;\n        --border-color: #cbd5e1;\n        --sidebar-bg: #0F172A;\n        --sidebar-text: #F8FAFC;\n    }\n\n    html, body, .stApp, .main, .block-container {\n        font-family: \'Outfit\', sans-serif !important;\n        background-color: var(--background-color) !important;\n        color: var(--text-color) !important;\n    }\n\n    /* Global text color */\n    h1, h2, h3, h4, h5, h6, p, li, span, div[data-testid="stMarkdownContainer"] {\n        color: var(--text-color) !important;\n    }\n    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6, .stApp p, .stApp span, .stApp label {\n        color: #1e293b !important;\n    }\n\n    /* Sidebar Styling */\n    section[data-testid="stSidebar"] {\n        background-color: var(--sidebar-bg) !important;\n        border-right: 1px solid rgba(255, 255, 255, 0.1);\n    }\n    section[data-testid="stSidebar"] * {\n        color: var(--sidebar-text) !important;\n    }\n    section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p,\n    section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] span,\n    section[data-testid="stSidebar"] label,\n    section[data-testid="stSidebar"] .stMarkdown p {\n        color: var(--sidebar-text) !important;\n    }\n\n    /* Input Field Styling */\n    div[data-testid="stTextInput"] > div:first-child,\n    div[data-testid="stNumberInput"] > div:first-child,\n    div[data-testid="stSelectbox"] > div:first-child,\n    div[data-testid="stRadio"] > div:first-child,\n    div[data-testid="stFileUploader"] > div:first-child {\n        background-color: #ffffff !important;\n        border: 1px solid var(--border-color) !important;\n        border-radius: 0.375rem;\n        padding: 0.25rem 0.5rem;\n        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);\n    }\n    input[type="text"], input[type="number"], .st-bc, .st-ci, .st-bi,\n    .stSelectbox > div[data-testid="stSelectboxDropdown"] {\n        background-color: #ffffff !important;\n        color: var(--text-color) !important;\n    }\n    .stTextInput label, .stNumberInput label, .stSelectbox label, .stRadio label,\n    .stFileUploader label {\n        color: var(--text-color) !important;\n        font-weight: 500;\n    }\n\n    /* File Uploader */\n    [data-testid="stFileUploader"] {\n        background-color: #ffffff !important;\n        border: 2px dashed #cbd5e1 !important;\n        padding: 10px !important;\n        border-radius: 12px !important;\n    }\n    [data-testid="stFileUploaderText"],\n    [data-testid="stFileUploadDropzone"],\n    div[data-testid="stFileUploader"] section > div {\n        color: #1e293b !important;\n    }\n\n    /* Selectbox and Radio */\n    div[data-baseweb="select"] > div {\n        background-color: #ffffff !important;\n        color: #1e293b !important;\n    }\n    div[role="listbox"] {\n        background-color: #ffffff !important;\n    }\n    div[role="option"],\n    div[data-testid="stRadio"] label p {\n        color: #1e293b !important;\n    }\n    .stRadio > label > div[data-testid="stMarkdownContainer"] span,\n    .stRadio div[data-testid="stFlex"] label span {\n        color: var(--text-color) !important;\n    }\n    .stSelectbox div[data-testid="stMarkdownContainer"] div[data-testid="stLabel"] span {\n        color: var(--text-color) !important;\n    }\n    ::placeholder {\n        color: var(--gray-text-color) !important;\n        opacity: 1;\n    }\n\n    /* Metrics and glassmorphism */\n    div[data-testid="stMetric"] {\n        background: rgba(255, 255, 255, 0.9) !important;\n        border: 1px solid rgba(15, 23, 42, 0.1) !important;\n        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;\n        border-radius: 12px !important;\n        backdrop-filter: blur(8px);\n    }\n    div[data-testid="stMetricValue"] > div,\n    div[data-testid="stMetric"] div[data-testid="stMarkdownContainer"] span {\n        color: #0f172a !important;\n    }\n    div[data-testid="stMetricLabel"] > div,\n    div[data-testid="stMetric"] label {\n        color: #475569 !important;\n    }\n\n    /* Main Title */\n    .main-title {\n        background: linear-gradient(to right, #0284c7, #0f172a);\n        -webkit-background-clip: text;\n        -webkit-text-fill-color: transparent;\n        font-size: 2.8rem !important;\n        font-weight: 800 !important;\n        text-align: center;\n        margin-bottom: 0.5rem !important;\n    }\n\n    /* Tabs and Buttons */\n    .stButton > button {\n        border-radius: 0.375rem;\n    }\n    .stTabs [data-testid="stMarkdownContainer"] p {\n        color: var(--text-color) !important;\n    }\n    </style>'
+Const 2 (bool): True
+Const 3 (tuple): ('unsafe_allow_html',)
+Const 4 (NoneType): None
+Const 571 (CodeObject): main
+
+=========================================
+Code object: <module> -> main
+=========================================
+Names: ['_inject_custom_css', 'st', 'sidebar', 'selectbox', 'TRANSLATIONS', 'success', 'error', 'warning', 'info', 'markdown', 'session_state', 'header', 'text_input', 'get', 'index', 'VIETNAM_PROVINCES', 'BODY_LOCATIONS', 'strip', 'join', 'upper', 'split', 'spinner', 'check_patient_exists_by_id', 'find_patients_by_name', 'len', 'append', 'enumerate', 'radio', 'button', 'slider', 'expander', 'write', 'tabs', 'file_uploader', 'name', 'cleanup_temp_file', 'pop', 'lower', 'endswith', 'process_dicom_file', 'str', 'Exception', 'Image', 'fromarray', 'open', 'convert', 'np', 'array', 'draw_lesions_overlay', 'image', 'int', 'crop_lesion', 'tempfile', 'mkdtemp', 'os', 'path', 'save', 'ValueError', 'get_pipeline', 'run', 'rerun', 'columns', 'streamlit_drawable_canvas', 'st_canvas', 'caption', 'resize', 'json_data', 'shape', 'image_data', 'sum', 'cv2', 'astype', 'uint8', 'INTER_NEAREST', 'datetime', 'now', 'strftime', 'pipeline.image_qa', 'check_image_quality', 'getenv', 'generate_quality_advice', 'detect_multiple_lesions', '_mask_to_image', 'get_vietnamese_diagnosis', 'DIAGNOSIS_DICTIONARY_EN', 'float', 'TRIAGE_REASON_VI', 'BENIGN_CLASSES', 'max', 'MALIGNANT_CLASSES', 'format', 'subheader', 'metric', 'keys', 'list', 'values', 'min', 'go', 'Figure', 'add_trace', 'Bar', 'dict', 'update_layout', 'plotly_chart', 'Scatterpolar', 'divider', 'bool', 'container', 'chat_message', 'isinstance', 'form', 'form_submit_button', 'streamlit.components.v1', 'components', 'v1', 'dirname', 'abspath', '__file__', 'declare_component', 'any', 'generate_vqa_response_stream', 'write_stream', 'stop', 'upload_image_to_imgbb', 'exists', 'remove', 'save_medical_record_to_gcp', 'generate_pdf_report', 'download_button', 'render_doctor_dashboard']
+
+Const 0 (NoneType): None
+Const 1 (str): 'Ngôn ngữ / Language'
+Const 2 (str): 'Tiếng Việt'
+Const 3 (str): 'English'
+Const 4 (str): 'language_select'
+Const 5 (tuple): ('key',)
+Const 6 (CodeObject): custom_success
+
+=========================================
+Code object: <module> -> main -> custom_success
+=========================================
+Names: ['glass_alert']
+
+Const 0 (NoneType): None
+Const 1 (str): 'success'
+Const 7 (CodeObject): custom_error
+
+=========================================
+Code object: <module> -> main -> custom_error
+=========================================
+Names: ['glass_alert']
+
+Const 0 (NoneType): None
+Const 1 (str): 'error'
+Const 8 (CodeObject): custom_warning
+
+=========================================
+Code object: <module> -> main -> custom_warning
+=========================================
+Names: ['glass_alert']
+
+Const 0 (NoneType): None
+Const 1 (str): 'warning'
+Const 9 (CodeObject): custom_info
+
+=========================================
+Code object: <module> -> main -> custom_info
+=========================================
+Names: ['glass_alert']
+
+Const 0 (NoneType): None
+Const 1 (str): 'info'
+Const 10 (str): '<div class="medical-disclaimer-warning">'
+Const 11 (str): 'medical_disclaimer'
+Const 12 (str): '</div>'
+Const 13 (bool): True
+Const 14 (tuple): ('unsafe_allow_html',)
+Const 15 (str): "<h1 class='main-title'>"
+Const 16 (str): 'main_title'
+Const 17 (str): '</h1>'
+Const 18 (str): "<p class='main-subtitle'>"
+Const 19 (str): 'main_subtitle'
+Const 20 (str): '</p>'
+Const 21 (str): 'messages'
+Const 22 (tuple): ('result', None)
+Const 23 (tuple): ('analysis_time', None)
+Const 24 (tuple): ('saved_local_img_path', None)
+Const 25 (tuple): ('last_uploaded_file_name', None)
+Const 26 (tuple): ('form_patient_name', '')
+Const 27 (tuple): ('form_patient_age', '')
+Const 28 (str): 'form_patient_gender'
+Const 29 (str): '--- Chọn Giới tính ---'
+Const 30 (str): '--- Select Gender ---'
+Const 31 (tuple): ('form_patient_national_id', '')
+Const 32 (str): 'form_patient_hometown'
+Const 33 (str): '--- Chọn Tỉnh/Thành ---'
+Const 34 (str): '--- Select Province/City ---'
+Const 35 (str): 'form_patient_location'
+Const 36 (str): '--- Chọn Vị trí tổn thương ---'
+Const 37 (str): '--- Select Lesion Location ---'
+Const 38 (tuple): ('last_saved_record', None)
+Const 39 (tuple): ('main_pdf_data', None)
+Const 40 (tuple): ('selected_patient_id', None)
+Const 41 (tuple): ('chat_input_val', '')
+Const 42 (CodeObject): reset_patient_form
+
+=========================================
+Code object: <module> -> main -> reset_patient_form
+=========================================
+Names: ['st', 'session_state']
+
+Const 0 (NoneType): None
+Const 1 (str): ''
+Const 2 (str): 'form_patient_name'
+Const 3 (str): 'form_patient_age'
+Const 4 (str): '--- Chọn Giới tính ---'
+Const 5 (str): '--- Select Gender ---'
+Const 6 (str): 'form_patient_gender'
+Const 7 (str): 'form_patient_national_id'
+Const 8 (str): '--- Chọn Tỉnh/Thành ---'
+Const 9 (str): '--- Select Province/City ---'
+Const 10 (str): 'form_patient_hometown'
+Const 11 (str): '--- Chọn Vị trí tổn thương ---'
+Const 12 (str): '--- Select Lesion Location ---'
+Const 13 (str): 'form_patient_location'
+Const 14 (str): 'last_saved_record'
+Const 15 (str): 'main_pdf_data'
+Const 16 (str): 'selected_patient_id'
+Const 43 (str): 'sidebar_header_patient'
+Const 44 (str): 'patient_name'
+Const 45 (str): 'form_patient_name'
+Const 46 (str): 'patient_name_placeholder'
+Const 47 (tuple): ('key', 'placeholder')
+Const 48 (str): 'patient_age'
+Const 49 (str): 'form_patient_age'
+Const 50 (str): 'patient_age_placeholder'
+Const 51 (tuple): ('--- Chọn Giới tính ---', 'Nam', 'Nữ', 'Khác')
+Const 52 (tuple): ('--- Select Gender ---', 'Male', 'Female', 'Other')
+Const 53 (int): 0
+Const 54 (str): 'patient_gender'
+Const 55 (tuple): ('options', 'index')
+Const 56 (int): 1
+Const 57 (str): 'patient_hometown'
+Const 58 (tuple): ('--- Select Lesion Location ---', 'Back', 'Chest / Abdomen', 'Arm', 'Hand', 'Thigh', 'Calf', 'Foot', 'Head / Face', 'Neck', 'Shoulder', 'Buttocks / Groin', 'Other location')
+Const 59 (str): 'patient_location'
+Const 60 (str): 'patient_national_id'
+Const 61 (str): 'form_patient_national_id'
+Const 62 (str): 'patient_national_id_placeholder'
+Const 63 (str): ''
+Const 64 (str): 'Đang kiểm tra mã định danh trên hệ thống...'
+Const 65 (str): 'Checking ID on database...'
+Const 66 (str): "Tìm thấy hồ sơ khớp với số định danh '"
+Const 67 (str): "'. Cập nhật mốc khám mới vào hồ sơ này."
+Const 68 (str): "Found matching record for ID '"
+Const 69 (str): "'. Updating visits timeline."
+Const 70 (str): "Tạo tài khoản hồ sơ mới với số định danh tự định nghĩa: '"
+Const 71 (str): "'."
+Const 72 (str): "Creating new patient account with user-defined ID: '"
+Const 73 (str): 'Phát hiện: Có '
+Const 74 (str): " bệnh nhân trùng tên '"
+Const 75 (str): "' trên máy chủ đám mây."
+Const 76 (str): 'Warning: '
+Const 77 (str): " patients with matching name '"
+Const 78 (str): "' on Cloud."
+Const 79 (str): '--- Chọn hồ sơ bệnh án ---'
+Const 80 (str): '--- Select patient record ---'
+Const 81 (str): 'Tạo hồ sơ bệnh nhân mới hoàn toàn (Mã ID mới tự động)'
+Const 82 (str): 'Create new patient account (Auto ID)'
+Const 83 (str): 'patient_info'
+Const 84 (str): 'Bệnh nhân cũ #'
+Const 85 (str): ': Tuổi '
+Const 86 (str): 'age'
+Const 87 (str): ' | Quê: '
+Const 88 (str): 'hometown'
+Const 89 (str): ' (Mã: '
+Const 90 (str): 'patient_id'
+Const 91 (str): ')'
+Const 92 (str): 'Existing Patient #'
+Const 93 (str): ': '
+Const 94 (str): ' yo | Hometown: '
+Const 95 (str): ' (ID: '
+Const 96 (str): 'Chọn hành động cho bệnh nhân này:'
+Const 97 (str): 'Select patient action:'
+Const 98 (str): 'confirm_update'
+Const 99 (tuple): ('options', 'index', 'key')
+Const 100 (tuple): ('--- Chọn hồ sơ bệnh án ---', '--- Select patient record ---')
+Const 101 (bool): False
+Const 102 (str): 'Vui lòng lựa chọn tạo hồ sơ mới hoặc cập nhật bệnh nhân cũ để mở khoá nút Lưu.'
+Const 103 (str): 'Please select an action to enable the save button.'
+Const 104 (tuple): ('Tạo hồ sơ bệnh nhân mới hoàn toàn (Mã ID mới tự động)', 'Create new patient account (Auto ID)')
+Const 105 (str): 'Tạo tài khoản hồ sơ mới với mã định danh tự động.'
+Const 106 (str): 'Will create new patient with auto-generated ID.'
+Const 107 (str): '_'
+Const 108 (str): 'Ghi nhận thêm mốc khám mới vào bệnh nhân cũ được chọn.'
+Const 109 (str): 'Will append visit records to the selected patient profile.'
+Const 110 (int): 2
+Const 111 (str): 'Hồ sơ mới: Tạo tài khoản hồ sơ mới cho bệnh nhân.'
+Const 112 (str): 'New profile: Will create new patient account.'
+Const 113 (str): '_1'
+Const 114 (str): 'selected_patient_id'
+Const 115 (str): 'reset_form_btn'
+Const 116 (tuple): ('on_click',)
+Const 117 (str): '---'
+Const 118 (str): 'system_config'
+Const 119 (str): 'quality_threshold'
+Const 120 (str): 'quality_threshold_help'
+Const 121 (tuple): ('help',)
+Const 122 (str): 'malignancy_threshold'
+Const 123 (float): 0.05
+Const 124 (float): 0.3
+Const 125 (float): 0.15
+Const 126 (float): 0.01
+Const 127 (str): 'malignancy_threshold_help'
+Const 128 (str): 'lambda_priority'
+Const 129 (float): 0.5
+Const 130 (float): 1.0
+Const 131 (float): 0.85
+Const 132 (str): 'lambda_priority_help'
+Const 133 (str): 'Chế độ Trợ lý VQA'
+Const 134 (str): 'VQA Assistant Mode'
+Const 135 (tuple): ('Trực tuyến (Cloud)', 'Nội bộ (Offline - CPUMedicalVQAModel)', 'Nội bộ (Offline - Local Ollama)')
+Const 136 (tuple): ('Online (Cloud)', 'Offline (Custom CPUMedicalVQAModel)', 'Offline (Local Ollama)')
+Const 137 (str): 'Chọn chế độ hoạt động cho trợ lý VQA.'
+Const 138 (str): 'Select operation mode for VQA assistant.'
+Const 139 (str): 'qwen2.5:3b'
+Const 140 (str): 'clinical_workflow'
+Const 141 (tuple): ('expanded',)
+Const 142 (str): 'workflow_steps'
+Const 143 (str): 'model_specs'
+Const 144 (str): 'model_specs_content'
+Const 145 (str): 'tab_diagnosis'
+Const 146 (str): 'tab_doctor'
+Const 147 (str): 'upload_label'
+Const 148 (tuple): ('jpg', 'jpeg', 'png', 'dcm')
+Const 149 (str): 'visible'
+Const 150 (tuple): ('type', 'label_visibility')
+Const 151 (str): 'last_uploaded_file_name'
+Const 152 (str): 'result'
+Const 153 (str): 'analysis_time'
+Const 154 (str): 'detected_lesions'
+Const 155 (str): 'full_result'
+Const 156 (str): 'active_lesion_id'
+Const 157 (str): 'last_saved_record'
+Const 158 (str): 'main_pdf_data'
+Const 159 (str): '.dcm'
+Const 160 (str): 'dicom_image_array'
+Const 161 (str): 'name'
+Const 162 (str): 'gender'
+Const 163 (str): 'Nam'
+Const 164 (str): 'Male'
+Const 165 (str): 'Nữ'
+Const 166 (str): 'Female'
+Const 167 (str): 'Đã đọc và tự động điền thông tin hành chính từ tệp y khoa DICOM.'
+Const 168 (str): 'Không thể đọc tệp y khoa DICOM: '
+Const 169 (str): 'RGB'
+Const 170 (str): 'gradcam_image'
+Const 171 (str): 'multi_lesion_header'
+Const 172 (str): 'Bản đồ định vị tổn thương'
+Const 173 (str): 'Lesions mapping overlay'
+Const 174 (tuple): ('caption', 'use_container_width')
+Const 175 (str): 'multi_lesion_select'
+Const 176 (str): 'Nốt '
+Const 177 (str): 'id'
+Const 178 (str): ' (Diện tích: '
+Const 179 (str): 'area'
+Const 180 (str): '.0f'
+Const 181 (str): ' px)'
+Const 182 (str): 'Lesion '
+Const 183 (str): ' (Area: '
+Const 184 (str): 'bbox'
+Const 185 (str): 'crop.png'
+Const 186 (str): 'saved_local_img_path'
+Const 187 (str): 'Đang chẩn đoán riêng cho Nốt '
+Const 188 (str): '...'
+Const 189 (str): 'Analyzing lesion '
+Const 190 (tuple): ('Nam', 'Male')
+Const 191 (str): 'male'
+Const 192 (tuple): ('Nữ', 'Female')
+Const 193 (str): 'female'
+Const 194 (tuple): ('return_mask', 'age', 'gender', 'body_location', 'lambda_val')
+Const 195 (str): 'image_quality_qa'
+Const 196 (tuple): ('Phân đoạn tự động (DeepLabV3+)', 'Phân đoạn tương tác (SAM - Click điểm)', 'Vẽ tay chỉnh sửa (Drawable Canvas)')
+Const 197 (tuple): ('Automatic Segmentation (DeepLabV3+)', 'Interactive Segmentation (SAM - Click point)', 'Manual Editing (Drawable Canvas)')
+Const 198 (str): 'segmenter_mode_label'
+Const 199 (str): 'seg_mode_radio'
+Const 200 (tuple): ('label', 'options', 'horizontal', 'key')
+Const 201 (int): 3
+Const 202 (str): 'Ảnh vùng tổn thương (Nốt '
+Const 203 (str): 'Lesion area (Spot '
+Const 204 (str): 'tab_img'
+Const 205 (tuple): ('st_canvas',)
+Const 206 (str): 'Hãy click chuột chọn 1 điểm trung tâm của tổn thương trên hình dưới:'
+Const 207 (str): 'Click at the center of the lesion spot below:'
+Const 208 (str): 'rgba(255, 165, 0, 0.3)'
+Const 209 (str): '#ff0000'
+Const 210 (tuple): (350, 350)
+Const 211 (int): 350
+Const 212 (str): 'point'
+Const 213 (str): 'sam_canvas'
+Const 214 (tuple): ('fill_color', 'stroke_width', 'stroke_color', 'background_image', 'update_streamlit', 'height', 'width', 'drawing_mode', 'display_toolbar', 'key')
+Const 215 (str): 'objects'
+Const 216 (str): 'type'
+Const 217 (str): 'circle'
+Const 218 (int): -1
+Const 219 (str): 'left'
+Const 220 (str): 'top'
+Const 221 (float): 350.0
+Const 222 (str): 'interactive_point_label'
+Const 223 (str): ' `x='
+Const 224 (str): ', y='
+Const 225 (str): '`'
+Const 226 (str): 'Hãy vẽ/tô quanh ranh giới vùng tổn thương trên hình dưới:'
+Const 227 (str): 'Draw a border around the lesion boundary below:'
+Const 228 (str): 'rgba(56, 161, 105, 0.4)'
+Const 229 (int): 10
+Const 230 (str): '#38a169'
+Const 231 (str): 'freedraw'
+Const 232 (str): 'draw_canvas'
+Const 233 (int): 200
+Const 234 (tuple): ('interpolation',)
+Const 235 (str): 'run_analysis_btn'
+Const 236 (str): 'primary'
+Const 237 (tuple): ('type',)
+Const 238 (str): '%Y/%m/%d %H:%M:%S'
+Const 239 (str): 'analyzing'
+Const 240 (str): 'input.png'
+Const 241 (tuple): ('check_image_quality',)
+Const 242 (str): 'OPENAI_API_KEY'
+Const 243 (str): 'llm_advice'
+Const 244 (tuple): ('return_mask', 'age', 'gender', 'body_location', 'lambda_val', 'interactive_point', 'custom_mask')
+Const 245 (str): 'segmentation_mask'
+Const 246 (str): 'tab_mask'
+Const 247 (str): 'L'
+Const 248 (tuple): ('caption', 'clamp', 'channels', 'use_container_width')
+Const 249 (str): 'tab_grad'
+Const 250 (str): 'metrics'
+Const 251 (str): 'classification'
+Const 252 (str): 'status'
+Const 253 (str): 'ok'
+Const 254 (str): 'prediction'
+Const 255 (str): 'N/A'
+Const 256 (str): 'confidence'
+Const 257 (float): 0.0
+Const 258 (int): 100
+Const 259 (str): 'triage'
+Const 260 (str): 'triage_reason'
+Const 261 (str): 'unknown'
+Const 262 (str): "<div class='triage-banner'>SAFETY GATE KÍCH HOẠT<br>Lý do: <i>"
+Const 263 (str): '</i><br>Hệ thống tư vấn VQA bị khóa.</div>'
+Const 264 (str): 'analysis_success'
+Const 265 (str): ' '
+Const 266 (str): '.1f'
+Const 267 (str): '%'
+Const 268 (str): 'warning'
+Const 269 (str): 'quality_warning'
+Const 270 (str): 'probabilities'
+Const 271 (CodeObject): <lambda>
+
+=========================================
+Code object: <module> -> main -> <lambda>
+=========================================
+Names: ['get']
+
+Const 0 (NoneType): None
+Const 1 (float): 0.0
+Const 272 (str): "<div style='background:rgba(237,137,54,0.08);border:1.5px solid rgba(237,137,54,0.3); border-radius:10px;padding:14px 18px;margin:8px 0;backdrop-filter:blur(8px);'><strong style='color:#fbd38d;display:block;margin-bottom:4px;'>"
+Const 273 (str): 'clinical_warning'
+Const 274 (str): "</strong><span style='color:#fbd38d;font-size:0.88rem;line-height:1.4;'>"
+Const 275 (str): 'clinical_warning_text'
+Const 276 (tuple): ('pred', 'max_mal_key', 'vi_mal', 'max_mal_val')
+Const 277 (str): '</span></div>'
+Const 278 (str): 'preprocess'
+Const 279 (str): 'image_type'
+Const 280 (str): 'dermoscopy'
+Const 281 (str): '#63b3ed'
+Const 282 (str): '#f6ad55'
+Const 283 (str): 'image_type_dermoscopy'
+Const 284 (str): 'image_type_phone'
+Const 285 (str): "<span style='color:"
+Const 286 (str): ";font-weight:bold;'>"
+Const 287 (str): '</span> — '
+Const 288 (str): 'image_type_label'
+Const 289 (str): 'quantitative_metrics'
+Const 290 (int): 6
+Const 291 (str): 'metric_time'
+Const 292 (str): '—'
+Const 293 (str): 'metric_area'
+Const 294 (str): 'area_ratio'
+Const 295 (str): '.4f'
+Const 296 (str): 'metric_border'
+Const 297 (str): 'border_complexity'
+Const 298 (str): 'metric_asymmetry'
+Const 299 (str): 'asymmetry'
+Const 300 (str): 'metric_circularity'
+Const 301 (str): 'circularity'
+Const 302 (str): '#e53e3e'
+Const 303 (str): '#10B981'
+Const 304 (float): 1.6
+Const 305 (str): '##### '
+Const 306 (str): 'probability_distribution'
+Const 307 (str): '<br><sub>'
+Const 308 (str): '</sub>'
+Const 309 (int): 255
+Const 310 (float): 2.0
+Const 311 (str): 'rgba('
+Const 312 (str): ','
+Const 313 (str): ',60,0.85)'
+Const 314 (str): 'h'
+Const 315 (str): 'rgba(255,255,255,0.2)'
+Const 316 (tuple): ('color', 'width')
+Const 317 (tuple): ('color', 'line')
+Const 318 (str): '.3f'
+Const 319 (str): 'outside'
+Const 320 (int): 11
+Const 321 (str): 'white'
+Const 322 (tuple): ('size', 'color')
+Const 323 (str): '<b>%{y}</b><br>Xác suất: %{x:.4f}<extra></extra>'
+Const 324 (tuple): ('x', 'y', 'orientation', 'marker', 'text', 'textposition', 'textfont', 'hovertemplate')
+Const 325 (str): '<br><sup>Dự đoán cao nhất: <b>'
+Const 326 (str): '</b> — '
+Const 327 (str): ' ('
+Const 328 (str): '.2%'
+Const 329 (str): ')</sup>'
+Const 330 (int): 13
+Const 331 (tuple): ('text', 'font', 'x')
+Const 332 (str): '.0%'
+Const 333 (str): 'rgba(255,255,255,0.1)'
+Const 334 (tuple): ('tickformat', 'gridcolor', 'color')
+Const 335 (str): 'reversed'
+Const 336 (tuple): ('size',)
+Const 337 (tuple): ('autorange', 'color', 'tickfont')
+Const 338 (str): 'rgba(17,25,40,0.45)'
+Const 339 (tuple): ('color',)
+Const 340 (int): 60
+Const 341 (int): 80
+Const 342 (int): 40
+Const 343 (tuple): ('l', 'r', 't', 'b')
+Const 344 (int): 320
+Const 345 (tuple): ('title', 'xaxis', 'yaxis', 'plot_bgcolor', 'paper_bgcolor', 'font', 'margin', 'height')
+Const 346 (tuple): ('use_container_width',)
+Const 347 (str): 'radar_title'
+Const 348 (float): 8.0
+Const 349 (float): 0.75
+Const 350 (str): 'radar_metrics'
+Const 351 (str): 'toself'
+Const 352 (str): 'rgba(99,179,237,0.2)'
+Const 353 (str): 'rgba(99,179,237,0.9)'
+Const 354 (tuple): ('r', 'theta', 'fill', 'fillcolor', 'line')
+Const 355 (str): 'rgba(255,255,255,0.15)'
+Const 356 (tuple): ('visible', 'range', 'color', 'gridcolor')
+Const 357 (tuple): ('color', 'gridcolor')
+Const 358 (tuple): ('bgcolor', 'radialaxis', 'angularaxis')
+Const 359 (tuple): ('color', 'size')
+Const 360 (int): 30
+Const 361 (int): 280
+Const 362 (tuple): ('polar', 'paper_bgcolor', 'font', 'showlegend', 'margin', 'height')
+Const 363 (str): 'vqa_chat_space'
+Const 364 (str): 'vqa_chat_disabled'
+Const 365 (str): 'vqa_chat_placeholder'
+Const 366 (str): 'partial_response'
+Const 367 (str): 'assistant'
+Const 368 (tuple): ('role', 'content')
+Const 369 (int): 120
+Const 370 (int): 130
+Const 371 (int): 500
+Const 372 (tuple): ('height',)
+Const 373 (str): 'role'
+Const 374 (str): 'content'
+Const 375 (str): 'voice_stt_comp_v3'
+Const 376 (str): 'timestamp'
+Const 377 (str): 'last_voice_timestamp'
+Const 378 (str): 'text'
+Const 379 (str): 'chat_input_val'
+Const 380 (CodeObject): submit_vqa_form
+
+=========================================
+Code object: <module> -> main -> submit_vqa_form
+=========================================
+Names: ['st', 'session_state', 'get', 'strip']
+
+Const 0 (NoneType): None
+Const 1 (str): 'chat_input_val'
+Const 2 (str): ''
+Const 3 (str): 'submitted_vqa_query'
+Const 381 (str): 'vqa_chat_form'
+Const 382 (tuple): ('key', 'clear_on_submit')
+Const 383 (int): 5
+Const 384 (str): 'Đặt câu hỏi về tổn thương da:'
+Const 385 (str): 'collapsed'
+Const 386 (tuple): ('label', 'placeholder', 'disabled', 'label_visibility', 'key')
+Const 387 (str): 'Gửi'
+Const 388 (str): 'Send'
+Const 389 (tuple): ('disabled', 'use_container_width', 'on_click')
+Const 390 (str): 'scratch'
+Const 391 (str): 'voice_component'
+Const 392 (str): 'voice_stt'
+Const 393 (tuple): ('path',)
+Const 394 (str): 'Dịch giọng nói thời gian thực (Nói đến đâu hiện chữ đến đó):'
+Const 395 (int): 48
+Const 396 (tuple): ('key', 'height')
+Const 397 (str): 'Trình duyệt không hỗ trợ Web Speech API hoặc lỗi load component: '
+Const 398 (str): 'preset_qs_label'
+Const 399 (tuple): ('Bệnh lý này thường có triệu chứng lâm sàng đi kèm là gì?', 'Phác đồ chăm sóc vùng da bị tổn thương này như thế nào?', 'Giải thích các chỉ số bất thường ABCD của tổn thương này.', 'Định hướng sinh thiết và các xét nghiệm lâm sàng cần thiết tiếp theo.')
+Const 400 (tuple): ('What are the typical clinical symptoms of this pathology?', 'What is the recommended skin care protocol for this lesion?', 'Explain the ABCD abnormalities of this lesion.', 'What are the next recommended biopsy and clinical diagnostic tests?')
+Const 401 (str): 'preset_0'
+Const 402 (tuple): ('key', 'use_container_width')
+Const 403 (str): 'preset_1'
+Const 404 (str): 'preset_2'
+Const 405 (str): 'preset_3'
+Const 406 (str): 'submitted_vqa_query'
+Const 407 (CodeObject): <genexpr>
+
+=========================================
+Code object: <module> -> main -> <genexpr>
+=========================================
+Names: []
+
+Const 0 (str): 'role'
+Const 1 (str): 'user'
+Const 2 (str): 'content'
+Const 3 (NoneType): None
+Const 408 (str): 'user'
+Const 409 (tuple): ('question', 'result', 'api_key', 'history', 'vqa_mode', 'local_model')
+Const 410 (CodeObject): stream_and_save
+
+=========================================
+Code object: <module> -> main -> stream_and_save
+=========================================
+Names: ['time', 'st', 'session_state', 'sleep']
+
+Const 0 (NoneType): None
+Const 1 (int): 0
+Const 2 (str): ''
+Const 3 (str): 'partial_response'
+Const 4 (float): 0.005
+Const 411 (str): 'sync_ehr_header'
+Const 412 (str): 'sync_ehr_btn'
+Const 413 (tuple): ('type', 'disabled')
+Const 414 (str): 'Vui lòng điền Họ tên bệnh nhân trước.'
+Const 415 (str): 'Vui lòng chọn Quê quán / Địa chỉ của bệnh nhân.'
+Const 416 (str): 'Vui lòng chọn Vị trí tổn thương.'
+Const 417 (str): 'Không tìm thấy file ảnh phân tích.'
+Const 418 (str): 'Tuổi phải nằm trong khoảng từ 0 đến 120.'
+Const 419 (str): 'Vui lòng nhập tuổi bệnh nhân.'
+Const 420 (str): 'Tuổi phải là một số nguyên hợp lệ.'
+Const 421 (str): '%Y%m%d_%H%M%S'
+Const 422 (str): 'Đang đồng bộ dữ liệu ảnh...'
+Const 423 (str): 'mask.png'
+Const 424 (str): 'gradcam.png'
+Const 425 (str): 'Lỗi tải ảnh lên dịch vụ máy chủ đám mây.'
+Const 426 (str): 'Không rõ'
+Const 427 (str): 'Unknown'
+Const 428 (tuple): ('name', 'age', 'gender', 'hometown', 'national_id')
+Const 429 (tuple): ('status', 'area_ratio', 'border_complexity', 'asymmetry', 'circularity', 'prediction', 'confidence', 'probabilities')
+Const 430 (tuple): ('timestamp_id', 'created_at', 'image_url', 'mask_url', 'gradcam_url', 'location', 'ai_extracted_metrics', 'vqa_conversations')
+Const 431 (str): 'Đang đồng bộ vào Cloud Firestore...'
+Const 432 (tuple): ('patient_id',)
+Const 433 (str): 'Đồng bộ thành công hồ sơ bệnh nhân '
+Const 434 (str): '.'
+Const 435 (tuple): ('patient_info', 'visit_data')
+Const 436 (str): '### '
+Const 437 (str): 'export_pdf_header'
+Const 438 (str): 'visit_data'
+Const 439 (str): 'export_pdf_btn'
+Const 440 (str): 'main_pdf_gen_btn'
+Const 441 (tuple): ('key', 'type')
+Const 442 (str): 'Đang khởi tạo PDF...'
+Const 443 (str): 'Khởi tạo báo cáo PDF thành công. Bấm nút Tải xuống.'
+Const 444 (str): 'Lỗi tạo báo cáo PDF: '
+Const 445 (str): 'download_pdf_btn'
+Const 446 (str): 'EHR_Report_'
+Const 447 (str): 'timestamp_id'
+Const 448 (str): '.pdf'
+Const 449 (str): 'application/pdf'
+Const 450 (str): 'main_pdf_download_btn'
+Const 451 (tuple): ('label', 'data', 'file_name', 'mime', 'key', 'type')
+Const 572 (str): '__main__'
+Const 573 (tuple): ('return', None)
+Const 574 (tuple): (20,)
+Const 575 (tuple): (None,)
+Const 576 (tuple): (None, 'Online (OpenAI GPT-4o-mini)', 'qwen2.5:3b')
+Const 577 (tuple): (None, 'Trực tuyến (Cloud)', 'qwen2.5:3b')
+Const 578 (tuple): ('', '')
+Const 579 (tuple): (0,)
+Const 580 (tuple): ('Tất cả vị trí',)
+Const 581 (tuple): ('info',)

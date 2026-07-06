@@ -1,0 +1,60 @@
+--- BỘ Y TẾ - HƯỚNG DẪN CHẨN ĐOÁN VÀ ĐIỀU TRỊ BỆNH DA LIỄU CƠ BẢN ---
+
+[BỆNH LÝ 1: AKIEC - DÀY SỪNG QUANG HÓA / TIỀN UNG THƯ (ACTINIC KERATOSIS)]
+- Định nghĩa: Dày sừng quang hóa (Actinic Keratosis - AKIEC) là tổn thương tiền ung thư biểu mô tế bào vảy da giai đoạn sớm, phát sinh chủ yếu do tác hại tích lũy của tia cực tím (UV) trong ánh nắng mặt trời lên tế bào sừng.
+- Triệu chứng lâm sàng: Tổn thương là các sẩn hoặc mảng hồng ban màu đỏ, hồng hoặc nâu nhạt. Bề mặt tổn thương thô ráp, sần sùi, phủ vảy sừng bám chặt, sờ vào cảm giác ráp như giấy nhám. Tổn thương thường khu trú ở các vùng da hở tiếp xúc nhiều với ánh nắng như mặt, trán, tai, da đầu (ở người hói), mu bàn tay và cẳng tay.
+- Hướng dẫn điều trị & Phác đồ Bộ Y tế: 
+  + Điều trị tại chỗ: Áp lạnh bằng Nitơ lỏng (Cryotherapy) là lựa chọn hàng đầu cho tổn thương đơn lẻ. 
+  + Điều trị diện rộng (trường tổn thương): Sử dụng kem bôi tại nhà như 5-Fluorouracil (5-FU) 5% bôi 1-2 lần/ngày trong 2-4 tuần; hoặc kem Imiquimod 5% bôi 3 lần/tuần trong 4 tuần; hoặc liệu pháp quang động học (PDT) sử dụng chất nhạy sáng ALA.
+  + Phòng ngừa: Hạn chế ra nắng vào khung giờ cao điểm (10h - 16h), bôi kem chống nắng phổ rộng SPF >= 30 và mặc quần áo che chắn kỹ.
+
+[BỆNH LÝ 2: BCC - UNG THƯ BIỂU MÔ TẾ BÀO ĐÁY (BASAL CELL CARCINOMA)]
+- Định nghĩa: Ung thư biểu mô tế bào đáy (Basal Cell Carcinoma - BCC) là loại ung thư da ác tính phổ biến nhất, xuất phát từ các tế bào lớp đáy của biểu bì. Mặc dù là ung thư ác tính, BCC tiến triển rất chậm và hiếm khi di căn xa (<0.1%), tuy nhiên có khả năng xâm lấn tại chỗ rất mạnh, phá hủy sụn, xương và mô xung quanh nếu không được điều trị kịp thời.
+- Triệu chứng lâm sàng: Đặc trưng bởi nốt u nhỏ màu ngọc trai hoặc hồng bóng sáp, có các mạch máu giãn (giãn mạch) chạy ngoằn ngoèo trên bề mặt. Tổn thương có thể có xu hướng loét ở trung tâm tạo thành vết loét khó lành, dễ chảy máu khi va chạm nhẹ, viền vết loét thường gồ cao lên dạng "bờ ngọc trai".
+- Hướng dẫn điều trị & Phác đồ Bộ Y tế:
+  + Phẫu thuật cắt bỏ rộng u với bờ an toàn tối thiểu 4-6 mm là tiêu chuẩn vàng.
+  + Đối với BCC vùng mặt đòi hỏi thẩm mỹ cao và ranh giới không rõ: Phẫu thuật cắt bỏ kiểm soát vi thể Mohs (Mohs micrographic surgery) mang lại tỷ lệ khỏi bệnh cao nhất.
+  + Phương pháp thay thế (cho tổn thương nông, bệnh nhân không thể phẫu thuật): Nạo và đốt điện (Curettage & Electrosurgery), áp lạnh nitơ lỏng, liệu pháp quang động (PDT) hoặc bôi Imiquimod 5% trong 6 tuần. Xạ trị được cân nhắc khi tổn thương lớn hoặc tái phát.
+
+[BỆNH LÝ 3: BKL - TỔN THƯƠNG SỪNG HÓA LÀNH TÍNH (BENIGN KERATOSIS-LIKE LESIONS)]
+- Định nghĩa: Nhóm tổn thương sừng hóa lành tính (Benign Keratosis-Like - BKL) bao gồm dày sừng da dầu (Seborrheic Keratosis), dày sừng ánh sáng lành tính (Lichenoid Keratosis) và mụn cóc lành tính. Đây hoàn toàn là các biến đổi lành tính của biểu bì liên quan đến quá trình lão hóa da hoặc nhiễm virus HPV (đối với mụn cóc), không có nguy cơ chuyển thành ác tính.
+- Triệu chứng lâm sàng: Tổn thương dạng sẩn hoặc mảng nổi gồ lên trên mặt da, có ranh giới rất rõ ràng, màu sắc thay đổi từ vàng nhạt, nâu đến đen sẫm. Bề mặt sần sùi, khô ráp, phủ lớp vảy béo bóng sáp như sáp nến, tạo cảm giác như một miếng sáp "dán" lên da.
+- Hướng dẫn điều trị & Phác đồ Bộ Y tế:
+  + Lành tính hoàn toàn, chủ yếu theo dõi và không bắt buộc điều trị nếu không có triệu chứng cơ năng hoặc yêu cầu thẩm mỹ.
+  + Điều trị thẩm mỹ hoặc giảm khó chịu (khi ngứa, kích ứng do cọ xát quần áo): Sử dụng phương pháp áp lạnh bằng nitơ lỏng, đốt điện cao tần, laser CO2 siêu xung để bóc tách tổn thương, hoặc phẫu thuật nạo bằng thìa (curette).
+
+[BỆNH LÝ 4: DF - U XƠ DA (DERMATOFIBROMA)]
+- Định nghĩa: U xơ da (Dermatofibroma - DF) là tổn thương lành tính dạng sẩn/khối u nhỏ ở trung bì da, đặc trưng bởi sự tăng sinh của các tế bào sợi (fibroblasts) và mô liên kết collagen. Thường xuất hiện sau các chấn thương nhẹ ngoài da như côn trùng cắn, trầy xước nông hoặc nhiễm trùng nang lông.
+- Triệu chứng lâm sàng: Nốt sẩn hoặc u nhỏ tròn, đường kính thường dưới 1cm, mật độ rất cứng chắc khi sờ nắn, màu hồng nhạt, nâu hoặc xám. Thường xuất hiện ở vùng chi dưới (cẳng chân, đùi). Đặc điểm nhận dạng lâm sàng quan trọng là "dấu hiệu lún da" (Dimple Sign) dương tính: khi dùng hai ngón tay kẹp nhẹ vùng da hai bên tổn thương, nốt u sẽ lún chìm xuống dưới mặt da thay vì nhô lên.
+- Hướng dẫn điều trị & Phác đồ Bộ Y tế:
+  + Tổn thương lành tính tuyệt đối, tiến triển ổn định suốt đời và hiếm khi gây biến chứng. Khuyên bệnh nhân không cần can thiệp để tránh để lại sẹo xấu xí.
+  + Chỉ phẫu thuật cắt bỏ hoàn toàn tổn thương khi u nằm ở vị trí cọ xát gây đau, ngứa dai dẳng, loét chảy máu liên tục hoặc để loại trừ hoàn toàn các chẩn đoán ác tính khác qua giải phẫu bệnh (như Dermatofibrosarcoma protuberans).
+
+[BỆNH LÝ 5: MEL - U HẮC TỐ ÁC TÍNH (MELANOMA)]
+- Định nghĩa: U hắc tố ác tính (Melanoma - MEL) là loại ung thư da nguy hiểm nhất, xuất phát từ các tế bào hắc tố (melanocytes) sản sinh sắc tố melanin. Melanoma có tốc độ phát triển nhanh, xâm lấn sâu xuống trung bì và di căn rất sớm theo đường hạch bạch huyết và đường máu đến phổi, gan, não, xương. Tiên lượng bệnh phụ thuộc cực kỳ lớn vào độ dày Breslow (chiều sâu thâm nhiễm) tại thời điểm chẩn đoán ban đầu.
+- Triệu chứng lâm sàng: Nghi ngờ cao dựa trên bộ quy tắc tự khám ABCD:
+  + A (Asymmetry): Bất đối xứng - chia đôi tổn thương thành hai nửa không trùng khớp.
+  + B (Border): Bờ không đều - đường viền nham nhở, có răng cưa, hình bản đồ, ranh giới mờ nhạt.
+  + C (Color): Màu sắc loang lổ - tổn thương chứa nhiều màu sắc khác nhau như đen, nâu sẫm, đỏ, trắng, xanh.
+  + D (Diameter): Đường kính lớn - thường lớn hơn 6 mm (tương đương đầu bút chì) và có xu hướng tiến triển lớn dần.
+  + E (Evolving): Tiến triển thay đổi nhanh về kích thước, hình dạng, màu sắc hoặc xuất hiện triệu chứng ngứa, chảy máu.
+- Hướng dẫn điều trị & Phác đồ Bộ Y tế:
+  + Cần lập tức chuyển tuyến chuyên khoa Ung bướu/Da liễu để làm sinh thiết trọn (excision biopsy). Tuyệt đối không sinh thiết bấm một phần hay đốt laser hủy u khi nghi ngờ Melanoma để tránh kích hoạt di căn nhanh.
+  + Phẫu thuật cắt rộng u (Wide local excision) với bờ an toàn tối đa (từ 1 - 2 cm tùy thuộc vào độ dày u).
+  + Thực hiện kỹ thuật sinh thiết hạch gác cổng (Sentinel Lymph Node Biopsy - SLNB) cho tổn thương có độ dày Breslow > 0.8 mm.
+  + Điều trị bổ trợ giai đoạn tiến triển/di căn: Liệu pháp miễn dịch (thuốc ức chế chốt kiểm soát miễn dịch Pembrolizumab, Nivolumab) hoặc liệu pháp nhắm trúng đích (cho bệnh nhân có đột biến BRAF V600E).
+
+[BỆNH LÝ 6: NV - NỐT RUỒI LÀNH TÍNH (MELANOCYTIC NEVUS)]
+- Định nghĩa: Nốt ruồi lành tính (Melanocytic Nevus - NV) là u lành tính cấu tạo bởi sự tăng sinh khu trú của các tế bào hắc tố lành tính. Nốt ruồi có thể xuất hiện bẩm sinh hoặc mắc phải (phổ biến từ thời thơ ấu đến tuổi 30).
+- Triệu chứng lâm sàng: Tổn thương dạng sẩn hoặc dát phẳng có giới hạn rất rõ, hình tròn hoặc bầu dục hoàn toàn đối xứng. Bờ đều đặn, nhẵn mịn. Màu sắc đồng nhất (chỉ một tông màu nâu nhạt, nâu sẫm hoặc đen). Đường kính nhỏ và ổn định theo thời gian (thường dưới 6 mm). Không có triệu chứng ngứa, đau hay tự chảy máu.
+- Hướng dẫn điều trị & Phác đồ Bộ Y tế:
+  + Lành tính hoàn toàn, không cần can thiệp y khoa.
+  + Hướng dẫn bệnh nhân tự theo dõi tại nhà theo quy tắc ABCD và bôi kem chống nắng bảo vệ da để ngăn ngừa đột biến ác tính hóa.
+  + Chỉ tẩy nốt ruồi khi ảnh hưởng nhiều đến thẩm mỹ bằng laser CO2 hoặc tiểu phẫu cắt khâu thẩm mỹ. Bất kỳ nốt ruồi nào thay đổi kích thước đột ngột cần được bác sĩ khám bằng kính soi da Dermoscopy để loại trừ Melanoma.
+
+[BỆNH LÝ 7: VASC - TỔN THƯƠNG MẠCH MÁU LÀNH TÍNH (VASCULAR LESIONS)]
+- Định nghĩa: Tổn thương mạch máu lành tính (Vascular Lesions - VASC) bao gồm u máu anh đào (Cherry Angioma), u mạch sừng hóa (Angiokeratoma), giãn mạch (Telangiectasia) và các u máu lành tính khác. Đây là các biến dạng hoặc tăng sinh lành tính của các mạch máu nhỏ dưới da, không phải là u tân sinh ác tính.
+- Triệu chứng lâm sàng: Tổn thương có dạng sẩn nhỏ màu đỏ tươi, đỏ sẫm hoặc tím đen. Ấn kính (hoặc đè tay lên) sẽ thấy tổn thương xẹp bớt hoặc đổi màu nhạt đi. Vị trí thường gặp ở thân mình, chi và vùng da tiếp xúc nhiều ánh sáng.
+- Hướng dẫn điều trị & Phác đồ Bộ Y tế:
+  + Đa số là lành tính và ổn định lâu dài, không cần điều trị trừ khi có chảy máu do cọ xát mạnh hoặc yêu cầu thẩm mỹ từ bệnh nhân.
+  + Phương pháp điều trị thẩm mỹ hiệu quả: Laser màu xung (Pulsed Dye Laser - PDL) là tiêu chuẩn vàng nhờ tác động chọn lọc hemoglobin mạch máu; hoặc dùng Laser Nd:YAG, áp lạnh nitơ lỏng, hoặc đốt điện cao tần để đông vách mạch.

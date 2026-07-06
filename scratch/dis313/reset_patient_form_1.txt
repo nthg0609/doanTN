@@ -1,0 +1,73 @@
+  --           COPY_FREE_VARS           1
+
+2598           RESUME                   0
+
+2599           LOAD_CONST               1 ('')
+               LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST               2 ('form_patient_name')
+               STORE_SUBSCR
+
+2600           LOAD_CONST               1 ('')
+               LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST               3 ('form_patient_age')
+               STORE_SUBSCR
+
+2601           LOAD_DEREF               0 (is_english)
+               TO_BOOL
+               POP_JUMP_IF_TRUE         2 (to L1)
+               LOAD_CONST               4 ('--- Chọn Giới tính ---')
+               JUMP_FORWARD             1 (to L2)
+       L1:     LOAD_CONST               5 ('--- Select Gender ---')
+       L2:     LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST               6 ('form_patient_gender')
+               STORE_SUBSCR
+
+2602           LOAD_CONST               1 ('')
+               LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST               7 ('form_patient_national_id')
+               STORE_SUBSCR
+
+2603           LOAD_DEREF               0 (is_english)
+               TO_BOOL
+               POP_JUMP_IF_TRUE         2 (to L3)
+               LOAD_CONST               8 ('--- Chọn Tỉnh/Thành ---')
+               JUMP_FORWARD             1 (to L4)
+       L3:     LOAD_CONST               9 ('--- Select Province/City ---')
+       L4:     LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST              10 ('form_patient_hometown')
+               STORE_SUBSCR
+
+2604           LOAD_DEREF               0 (is_english)
+               TO_BOOL
+               POP_JUMP_IF_TRUE         2 (to L5)
+               LOAD_CONST              11 ('--- Chọn Vị trí tổn thương ---')
+               JUMP_FORWARD             1 (to L6)
+       L5:     LOAD_CONST              12 ('--- Select Lesion Location ---')
+       L6:     LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST              13 ('form_patient_location')
+               STORE_SUBSCR
+
+2605           LOAD_CONST               0 (None)
+               LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST              14 ('last_saved_record')
+               STORE_SUBSCR
+
+2606           LOAD_CONST               0 (None)
+               LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST              15 ('main_pdf_data')
+               STORE_SUBSCR
+
+2607           LOAD_CONST               0 (None)
+               LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST              16 ('selected_patient_id')
+               STORE_SUBSCR
+               RETURN_CONST             0 (None)

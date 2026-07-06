@@ -1,0 +1,115 @@
+1642            RESUME                   0
+
+1644            NOP
+
+1645    L1:     LOAD_GLOBAL              0 (requests)
+                LOAD_ATTR                2 (get)
+                PUSH_NULL
+                LOAD_FAST                0 (url)
+                LOAD_CONST               1 (10)
+                LOAD_CONST               2 (('timeout',))
+                CALL_KW                  2
+                STORE_FAST               1 (resp)
+
+1646            LOAD_FAST                1 (resp)
+                LOAD_ATTR                4 (status_code)
+                LOAD_CONST               3 (200)
+                COMPARE_OP             119 (bool(!=))
+                POP_JUMP_IF_FALSE        1 (to L3)
+
+1647    L2:     RETURN_CONST             0 (None)
+
+1648    L3:     LOAD_CONST               4 (0)
+                LOAD_CONST               5 (('Image',))
+                IMPORT_NAME              3 (PIL)
+                IMPORT_FROM              4 (Image)
+                STORE_FAST               2 (PILImage)
+                POP_TOP
+
+1649            LOAD_CONST               4 (0)
+                LOAD_CONST               0 (None)
+                IMPORT_NAME              5 (io)
+                STORE_FAST               3 (io)
+
+1650            LOAD_FAST                2 (PILImage)
+                LOAD_ATTR               13 (open + NULL|self)
+                LOAD_FAST                3 (io)
+                LOAD_ATTR               14 (BytesIO)
+                PUSH_NULL
+                LOAD_FAST                1 (resp)
+                LOAD_ATTR               16 (content)
+                CALL                     1
+                CALL                     1
+                LOAD_ATTR               19 (convert + NULL|self)
+                LOAD_CONST               6 ('RGB')
+                CALL                     1
+                STORE_FAST               4 (img)
+
+1651            LOAD_GLOBAL             20 (tempfile)
+                LOAD_ATTR               22 (NamedTemporaryFile)
+                PUSH_NULL
+                LOAD_CONST               7 (False)
+                LOAD_CONST               8 ('.png')
+                LOAD_CONST               9 (('delete', 'suffix'))
+                CALL_KW                  2
+                BEFORE_WITH
+        L4:     STORE_FAST               5 (f)
+
+1652            LOAD_FAST                4 (img)
+                LOAD_ATTR               25 (save + NULL|self)
+                LOAD_FAST                5 (f)
+                LOAD_ATTR               26 (name)
+                LOAD_CONST              10 ('PNG')
+                LOAD_CONST              11 (('format',))
+                CALL_KW                  2
+                POP_TOP
+
+1653            LOAD_FAST                5 (f)
+                LOAD_ATTR               26 (name)
+
+1651    L5:     SWAP                     2
+                LOAD_CONST               0 (None)
+                LOAD_CONST               0 (None)
+                LOAD_CONST               0 (None)
+                CALL                     2
+                POP_TOP
+        L6:     RETURN_VALUE
+        L7:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         1 (to L8)
+                RERAISE                  2
+        L8:     POP_TOP
+        L9:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+       L10:     RETURN_CONST             0 (None)
+
+  --   L11:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L12:     PUSH_EXC_INFO
+
+1654            LOAD_GLOBAL             28 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        3 (to L14)
+                POP_TOP
+
+1655   L13:     POP_EXCEPT
+                RETURN_CONST             0 (None)
+
+1654   L14:     RERAISE                  0
+
+  --   L15:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L12 [0]
+  L3 to L4 -> L12 [0]
+  L4 to L5 -> L7 [1] lasti
+  L5 to L6 -> L12 [0]
+  L7 to L9 -> L11 [3] lasti
+  L9 to L10 -> L12 [0]
+  L11 to L12 -> L12 [0]
+  L12 to L13 -> L15 [1] lasti
+  L14 to L15 -> L15 [1] lasti

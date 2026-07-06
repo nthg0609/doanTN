@@ -58,7 +58,7 @@ Tài liệu này đánh giá chi tiết chất lượng câu trả lời của m
 
 ### A. Ưu điểm nổi bật
 * **Tuyệt đối an toàn về mặt y tế**: Cả hai câu trả lời mẫu đều thể hiện tính kỷ luật cao của LLM đối với System Prompt đã được thiết kế: Không kê đơn bừa bãi, không gây hoảng loạn thái quá cho các bệnh lành tính, và luôn nhấn mạnh vai trò cốt lõi của bác sĩ chuyên khoa da liễu.
-* **Cơ chế Fusion Prompt hoạt động xuất sắc**: Bằng việc nhúng trực tiếp dữ liệu định lượng của mô hình CV (nhãn bệnh, % tin cậy) vào cấu trúc system prompt, LLM bị kiểm soát và định hướng thông tin rất tốt, triệt tiêu hoàn toàn khả năng bịa đặt thông tin chẩn đoán giả.
+* **Cơ chế Fusion Prompt hoạt động xuất sắc**: Bằng việc nhúng trực tiếp dữ liệu định lượng của mô hình CV (nhãn bệnh, % tin cậy) vào cấu trúc system prompt, LLM bị kiểm soát và định hướng thông tin rất tốt, giảm thiểu tối đa khả năng bịa đặt thông tin chẩn đoán giả.
 
 ### B. Nhược điểm và Hạn chế nhỏ
 * **Chưa tận dụng triệt để chỉ số hình học CV**: Trong câu hỏi thứ 2 ("cần kiêng gì không"), mô hình chỉ khuyên chung chung việc "theo dõi sự thay đổi kích thước, màu sắc...". Hệ thống có thể cải tiến bằng cách lồng ghép các chỉ số thực tế đo được vào khuyến nghị. Ví dụ: *"Tổn thương hiện tại có độ bất đối xứng là 0.21 (mức thấp), tuy nhiên bạn nên theo dõi nếu độ bất đối xứng tăng lên hoặc bờ tổn thương (Border complexity) trở nên nhấp nhô hơn..."* để tăng tính thuyết phục và tính cá nhân hóa dựa trên dữ liệu.

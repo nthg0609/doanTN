@@ -1,0 +1,58 @@
+  --           COPY_FREE_VARS           1
+
+3314           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+
+3315           LOAD_CONST               1 (0)
+               LOAD_CONST               0 (None)
+               IMPORT_NAME              0 (time)
+               STORE_FAST               0 (time)
+
+3316           LOAD_CONST               2 ('')
+               STORE_FAST               1 (partial_text)
+
+3317           LOAD_DEREF               4 (stream_gen)
+               GET_ITER
+       L2:     FOR_ITER                56 (to L5)
+               STORE_FAST               2 (chunk)
+
+3318           LOAD_FAST                2 (chunk)
+               GET_ITER
+       L3:     FOR_ITER                47 (to L4)
+               STORE_FAST               3 (char)
+
+3319           LOAD_FAST_LOAD_FAST     19 (partial_text, char)
+               BINARY_OP               13 (+=)
+               STORE_FAST               1 (partial_text)
+
+3320           LOAD_FAST                1 (partial_text)
+               LOAD_GLOBAL              2 (st)
+               LOAD_ATTR                4 (session_state)
+               LOAD_CONST               3 ('partial_response')
+               STORE_SUBSCR
+
+3321           LOAD_FAST                3 (char)
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+
+3322           LOAD_FAST                0 (time)
+               LOAD_ATTR                7 (sleep + NULL|self)
+               LOAD_CONST               4 (0.005)
+               CALL                     1
+               POP_TOP
+               JUMP_BACKWARD           49 (to L3)
+
+3318   L4:     END_FOR
+               POP_TOP
+               JUMP_BACKWARD           58 (to L2)
+
+3317   L5:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L6:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L6 -> L6 [0] lasti

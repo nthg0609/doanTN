@@ -1,0 +1,44 @@
+2817           RESUME                   0
+
+2818           NOP
+
+2819   L1:     LOAD_GLOBAL              1 (float + NULL)
+               LOAD_FAST_BORROW         0 (val_a)
+               CALL                     1
+               STORE_FAST               0 (val_a)
+
+2820           LOAD_GLOBAL              1 (float + NULL)
+               LOAD_FAST_BORROW         1 (val_b)
+               CALL                     1
+               STORE_FAST               1 (val_b)
+
+2821           LOAD_FAST_BORROW_LOAD_FAST_BORROW 16 (val_b, val_a)
+               BINARY_OP               10 (-)
+               STORE_FAST               2 (diff)
+
+2822           LOAD_FAST_BORROW         2 (diff)
+               LOAD_CONST               0 ('+.4f')
+               FORMAT_WITH_SPEC
+       L2:     RETURN_VALUE
+
+  --   L3:     PUSH_EXC_INFO
+
+2823           LOAD_GLOBAL              2 (Exception)
+               CHECK_EXC_MATCH
+               POP_JUMP_IF_FALSE        5 (to L5)
+               NOT_TAKEN
+               POP_TOP
+
+2824   L4:     POP_EXCEPT
+               LOAD_CONST               1 ('—')
+               RETURN_VALUE
+
+2823   L5:     RERAISE                  0
+
+  --   L6:     COPY                     3
+               POP_EXCEPT
+               RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L3 [0]
+  L3 to L4 -> L6 [1] lasti
+  L5 to L6 -> L6 [1] lasti

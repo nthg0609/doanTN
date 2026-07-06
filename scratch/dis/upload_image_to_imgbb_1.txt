@@ -1,0 +1,138 @@
+ 349            RESUME                   0
+
+ 351            NOP
+
+ 352    L1:     LOAD_GLOBAL              1 (open + NULL)
+                LOAD_FAST_BORROW         0 (local_image_path)
+                LOAD_CONST               1 ('rb')
+                CALL                     2
+                COPY                     1
+                LOAD_SPECIAL             1 (__exit__)
+                SWAP                     2
+                SWAP                     3
+                LOAD_SPECIAL             0 (__enter__)
+                CALL                     0
+        L2:     STORE_FAST               1 (file)
+
+ 353            LOAD_CONST               2 ('https://api.imgbb.com/1/upload')
+                STORE_FAST               2 (url)
+
+ 354            LOAD_CONST               3 ('key')
+                LOAD_GLOBAL              2 (IMGBB_API_KEY)
+                LOAD_CONST               4 ('image')
+                LOAD_GLOBAL              4 (base64)
+                LOAD_ATTR                6 (b64encode)
+                PUSH_NULL
+                LOAD_FAST_BORROW         1 (file)
+                LOAD_ATTR                9 (read + NULL|self)
+                CALL                     0
+                CALL                     1
+                BUILD_MAP                2
+                STORE_FAST               3 (payload)
+
+ 355            LOAD_GLOBAL             10 (requests)
+                LOAD_ATTR               12 (post)
+                PUSH_NULL
+                LOAD_FAST_BORROW_LOAD_FAST_BORROW 35 (url, payload)
+                CALL                     2
+                STORE_FAST               4 (res)
+
+ 356            LOAD_FAST_BORROW         4 (res)
+                LOAD_ATTR               14 (status_code)
+                LOAD_SMALL_INT         200
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       41 (to L5)
+                NOT_TAKEN
+
+ 357            LOAD_FAST_BORROW         4 (res)
+                LOAD_ATTR               17 (json + NULL|self)
+                CALL                     0
+                LOAD_CONST               5 ('data')
+                BINARY_OP               26 ([])
+                LOAD_CONST               6 ('url')
+                BINARY_OP               26 ([])
+
+ 352    L3:     SWAP                     3
+                SWAP                     2
+                LOAD_CONST               7 (None)
+                LOAD_CONST               7 (None)
+                LOAD_CONST               7 (None)
+                CALL                     3
+                POP_TOP
+        L4:     RETURN_VALUE
+
+ 356    L5:     NOP
+
+ 352    L6:     LOAD_CONST               7 (None)
+                LOAD_CONST               7 (None)
+                LOAD_CONST               7 (None)
+                CALL                     3
+                POP_TOP
+
+ 360    L7:     LOAD_CONST               7 (None)
+                RETURN_VALUE
+
+ 352    L8:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         2 (to L9)
+                NOT_TAKEN
+                RERAISE                  2
+        L9:     POP_TOP
+       L10:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                POP_TOP
+
+ 360   L11:     LOAD_CONST               7 (None)
+                RETURN_VALUE
+
+  --   L12:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L13:     PUSH_EXC_INFO
+
+ 358            LOAD_GLOBAL             18 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE       37 (to L17)
+                NOT_TAKEN
+                STORE_FAST               5 (e)
+
+ 359   L14:     LOAD_GLOBAL             20 (st)
+                LOAD_ATTR               22 (error)
+                PUSH_NULL
+                LOAD_CONST               8 (' Lỗi tải ảnh lên ImgBB: ')
+                LOAD_FAST                5 (e)
+                FORMAT_SIMPLE
+                BUILD_STRING             2
+                CALL                     1
+                POP_TOP
+       L15:     POP_EXCEPT
+                LOAD_CONST               7 (None)
+                STORE_FAST               5 (e)
+                DELETE_FAST              5 (e)
+
+ 360            LOAD_CONST               7 (None)
+                RETURN_VALUE
+
+  --   L16:     LOAD_CONST               7 (None)
+                STORE_FAST               5 (e)
+                DELETE_FAST              5 (e)
+                RERAISE                  1
+
+ 358   L17:     RERAISE                  0
+
+  --   L18:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L13 [0]
+  L2 to L3 -> L8 [2] lasti
+  L3 to L4 -> L13 [0]
+  L6 to L7 -> L13 [0]
+  L8 to L10 -> L12 [4] lasti
+  L10 to L11 -> L13 [0]
+  L12 to L13 -> L13 [0]
+  L13 to L14 -> L18 [1] lasti
+  L14 to L15 -> L16 [1] lasti
+  L16 to L18 -> L18 [1] lasti

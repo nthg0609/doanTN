@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        function sendToStreamlit(text, isFinal) {
+            window.parent.postMessage({
+                isStreamlitMessage: true,
+                type: "streamlit:setComponentValue",
+                value: { text: text, isFinal: isFinal, timestamp: Date.now() }
+            }, "*");
+        }
+
+        let recognition;
+        let recognizing = false;
+        
+        function startDictation() {
+            if (recognizing) {
+                recognition.stop();
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Trình duyệt không hỗ trợ nhận diện giọng nói.");
+                return;
+            }
+            
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'vi-VN';
+            
+            recognition.onstart = function() {
+                recognizing = true;
+                const btn = document.getElementById("btn");
+                btn.innerHTML = "🔴 Đang nghe... (Bấm để dừng)";
+                btn.classList.add("recording");
+            };
+            
+            recognition.onresult = function(event) {
+                let interim_transcript = '';
+                let final_transcript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        final_transcript += event.results[i][0].transcript;
+                    } else {
+                        interim_transcript += event.results[i][0].transcript;
+                    }
+                }
+                
+                const resultText = final_transcript || interim_transcript;
+                if (resultText) {
+                    sendToStreamlit(resultText, !!final_transcript);
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                console.error(event.error);
+                stopRecognition();
+            };
+            
+            recognition.onend = function() {
+                stopRecognition();
+            };
+            
+            recognition.start();
+        }
+        
+        function stopRecognition() {
+            recognizing = false;
+            const btn = document.getElementById("btn");
+            btn.innerHTML = "🎙️ Nói để nhập câu hỏi (Voice)";
+            btn.classList.remove("recording");
+        }
+        
+        window.addEventListener("message", function(event) {
+            if (event.data.type === "streamlit:render") {
+                const height = document.body.scrollHeight;
+                window.parent.postMessage({
+                    isStreamlitMessage: true,
+                    type: "streamlit:setFrameHeight",
+                    value: 60
+                }, "*");
+            }
+        });
+    </script>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: transparent; overflow: hidden; }
+        .container { display: flex; align-items: center; justify-content: center; height: 60px; }
+        #btn {
+            background: #ffffff;
+            color: #2563eb;
+            border: 2px solid #bfdbfe;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.1);
+            width: 90%;
+            justify-content: center;
+        }
+        #btn:hover { background: #eff6ff; border-color: #3b82f6; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); }
+        #btn.recording {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fecaca;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="btn" onclick="startDictation()">🎙️ Nói để nhập câu hỏi (Voice)</button>
+    </div>
+</body>
+</html>

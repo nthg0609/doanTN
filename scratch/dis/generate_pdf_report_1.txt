@@ -1,0 +1,1931 @@
+1476             RESUME                   0
+
+1478             LOAD_GLOBAL              1 (MedicalPDF + NULL)
+                 CALL                     0
+                 STORE_FAST               2 (pdf)
+
+1479             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                3 (alias_nb_pages + NULL|self)
+                 CALL                     0
+                 POP_TOP
+
+1480             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                5 (add_page + NULL|self)
+                 CALL                     0
+                 POP_TOP
+
+1481             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               2 ('')
+                 LOAD_SMALL_INT          10
+                 CALL                     3
+                 POP_TOP
+
+1482             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           0
+                 CALL                     3
+                 POP_TOP
+
+1483             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT          15
+                 CALL                     1
+                 POP_TOP
+
+1486             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT          12
+                 CALL                     3
+                 POP_TOP
+
+1487             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          26
+                 LOAD_SMALL_INT          54
+                 LOAD_SMALL_INT          93
+                 CALL                     3
+                 POP_TOP
+
+1488             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           8
+                 LOAD_CONST               4 ('I. THONG TIN BENH NHAN')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1489             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               15 (line + NULL|self)
+                 LOAD_SMALL_INT          10
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 LOAD_SMALL_INT         200
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 CALL                     4
+                 POP_TOP
+
+1490             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           4
+                 CALL                     1
+                 POP_TOP
+
+1492             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               2 ('')
+                 LOAD_SMALL_INT          10
+                 CALL                     3
+                 POP_TOP
+
+1493             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 CALL                     3
+                 POP_TOP
+
+1494             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          95
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST               6 ('Ho va ten: ')
+                 LOAD_FAST_BORROW         0 (patient_info)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST               7 ('name')
+                 LOAD_CONST               8 ('N/A')
+                 CALL                     2
+                 LOAD_ATTR               21 (upper + NULL|self)
+                 CALL                     0
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     4
+                 POP_TOP
+
+1495             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          95
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST               9 ('Tuoi: ')
+                 LOAD_FAST_BORROW         0 (patient_info)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              10 ('age')
+                 LOAD_CONST               8 ('N/A')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 LOAD_CONST              11 (' | Gioi tinh: ')
+                 LOAD_FAST_BORROW         0 (patient_info)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              12 ('gender')
+                 LOAD_CONST              13 ('Khong ro')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             4
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1496             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          95
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              14 ('Dia chi: ')
+                 LOAD_FAST_BORROW         0 (patient_info)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              15 ('hometown')
+                 LOAD_CONST               8 ('N/A')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     4
+                 POP_TOP
+
+1497             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          95
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              16 ('Ngay kham: ')
+                 LOAD_FAST_BORROW         1 (visit_data)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              17 ('created_at')
+                 LOAD_CONST               8 ('N/A')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1498             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          95
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              18 ('So dinh danh (CCCD/BHYT): ')
+                 LOAD_FAST_BORROW         0 (patient_info)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              19 ('national_id')
+                 LOAD_CONST               8 ('N/A')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     4
+                 POP_TOP
+
+1499             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          95
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              20 ('Vi tri ton thuong: ')
+                 LOAD_FAST_BORROW         1 (visit_data)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              21 ('location')
+                 LOAD_CONST              13 ('Khong ro')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1500             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           6
+                 CALL                     1
+                 POP_TOP
+
+1503             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT          12
+                 CALL                     3
+                 POP_TOP
+
+1504             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          26
+                 LOAD_SMALL_INT          54
+                 LOAD_SMALL_INT          93
+                 CALL                     3
+                 POP_TOP
+
+1505             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           8
+                 LOAD_CONST              22 ('II. KET QUA PHAN TICH HOC SAU (COMPUTER VISION)')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1506             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               15 (line + NULL|self)
+                 LOAD_SMALL_INT          10
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 LOAD_SMALL_INT         200
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 CALL                     4
+                 POP_TOP
+
+1507             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           4
+                 CALL                     1
+                 POP_TOP
+
+1509             LOAD_FAST_BORROW         1 (visit_data)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              23 ('ai_extracted_metrics')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST               3 (metrics)
+
+1510             LOAD_FAST_BORROW         3 (metrics)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              24 ('prediction')
+                 LOAD_CONST               8 ('N/A')
+                 CALL                     2
+                 STORE_FAST               4 (pred)
+
+1511             LOAD_GLOBAL             23 (get_vietnamese_diagnosis + NULL)
+                 LOAD_FAST_BORROW         4 (pred)
+                 CALL                     1
+                 STORE_FAST               5 (vi_name)
+
+1512             LOAD_GLOBAL             25 (float + NULL)
+                 LOAD_FAST_BORROW         3 (metrics)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              25 ('confidence')
+                 LOAD_CONST              26 (0.0)
+                 CALL                     2
+                 CALL                     1
+                 STORE_FAST               6 (conf)
+
+1513             LOAD_FAST_BORROW         3 (metrics)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              27 ('status')
+                 LOAD_CONST              28 ('ok')
+                 CALL                     2
+                 STORE_FAST               7 (status)
+
+1515             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT          10
+                 CALL                     3
+                 POP_TOP
+
+1516             LOAD_FAST_BORROW         7 (status)
+                 LOAD_CONST              29 ('triage')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE       38 (to L1)
+                 NOT_TAKEN
+
+1517             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT         220
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 CALL                     3
+                 POP_TOP
+
+1518             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              30 ('Trang thai: BI TU CHOI (Safety Gate Triage)')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+                 EXTENDED_ARG             3
+                 JUMP_FORWARD          1002 (to L29)
+
+1520     L1:     LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 CALL                     3
+                 POP_TOP
+
+1521             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              31 ('Chan doan du doan: ')
+                 LOAD_FAST_BORROW         4 (pred)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              32 (' - ')
+                 LOAD_GLOBAL             27 (_safe + NULL)
+                 LOAD_FAST_BORROW         5 (vi_name)
+                 CALL                     1
+                 FORMAT_SIMPLE
+                 BUILD_STRING             4
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1522             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              33 ('Do tin cay: ')
+                 LOAD_FAST_BORROW         6 (conf)
+                 LOAD_CONST              34 ('.2%')
+                 FORMAT_WITH_SPEC
+                 BUILD_STRING             2
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1524             LOAD_FAST_BORROW         3 (metrics)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              35 ('probabilities')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST               8 (probs)
+
+1525             LOAD_FAST_BORROW         8 (probs)
+                 TO_BOOL
+                 EXTENDED_ARG             3
+                 POP_JUMP_IF_FALSE      906 (to L29)
+                 NOT_TAKEN
+
+1526             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           2
+                 CALL                     1
+                 POP_TOP
+
+1527             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 STORE_FAST               9 (y_before_probs)
+
+1528             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT           9
+                 CALL                     3
+                 POP_TOP
+
+1529             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT         100
+                 LOAD_SMALL_INT           5
+                 LOAD_CONST              36 ('Phan phoi xac suat (Top 5):')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1530             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               2 ('')
+                 LOAD_SMALL_INT           9
+                 CALL                     3
+                 POP_TOP
+
+1531             LOAD_GLOBAL             29 (sorted + NULL)
+                 LOAD_FAST_BORROW         8 (probs)
+                 LOAD_ATTR               31 (items + NULL|self)
+                 CALL                     0
+                 LOAD_CONST              37 (<code object <lambda> at 0x000002602A35B4B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1531>)
+                 MAKE_FUNCTION
+                 LOAD_CONST              38 (('key',))
+                 CALL_KW                  2
+                 LOAD_CONST              39 (slice(None, 5, None))
+                 BINARY_OP               26 ([])
+                 STORE_FAST              10 (sorted_probs)
+
+1532             LOAD_FAST_BORROW        10 (sorted_probs)
+                 GET_ITER
+         L2:     FOR_ITER                49 (to L3)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST_STORE_FAST  188 (label_key, val)
+
+1533             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT         100
+                 LOAD_SMALL_INT           5
+                 LOAD_CONST              40 ('  - ')
+                 LOAD_FAST_BORROW        11 (label_key)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              41 (' (')
+                 LOAD_GLOBAL             27 (_safe + NULL)
+                 LOAD_GLOBAL             23 (get_vietnamese_diagnosis + NULL)
+                 LOAD_FAST_BORROW        11 (label_key)
+                 CALL                     1
+                 CALL                     1
+                 FORMAT_SIMPLE
+                 LOAD_CONST              42 ('): ')
+                 LOAD_FAST_BORROW        12 (val)
+                 LOAD_CONST              34 ('.2%')
+                 FORMAT_WITH_SPEC
+                 BUILD_STRING             6
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+                 JUMP_BACKWARD           51 (to L2)
+
+1532     L3:     END_FOR
+                 POP_ITER
+
+1534             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 STORE_FAST              13 (y_after_probs)
+
+1537             NOP
+
+1538     L4:     LOAD_SMALL_INT           0
+                 LOAD_CONST              43 (None)
+                 IMPORT_NAME             16 (matplotlib)
+                 STORE_FAST              14 (matplotlib)
+
+1539             LOAD_FAST_BORROW        14 (matplotlib)
+                 LOAD_ATTR               35 (use + NULL|self)
+                 LOAD_CONST              44 ('Agg')
+                 CALL                     1
+                 POP_TOP
+
+1540             LOAD_SMALL_INT           0
+                 LOAD_CONST              43 (None)
+                 IMPORT_NAME             18 (matplotlib.pyplot)
+                 IMPORT_FROM             19 (pyplot)
+                 STORE_FAST              15 (plt)
+                 POP_TOP
+
+1541             LOAD_FAST_BORROW        15 (plt)
+                 LOAD_ATTR               41 (subplots + NULL|self)
+                 LOAD_CONST             114 ((6, 2.5))
+                 LOAD_CONST              45 (('figsize',))
+                 CALL_KW                  1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              16 (fig_mpl)
+                 STORE_FAST              17 (ax)
+
+1542             LOAD_FAST_BORROW        16 (fig_mpl)
+                 LOAD_ATTR               42 (patch)
+                 LOAD_ATTR               45 (set_facecolor + NULL|self)
+                 LOAD_CONST              46 ('#ffffff')
+                 CALL                     1
+                 POP_TOP
+
+1543             LOAD_FAST_BORROW        17 (ax)
+                 LOAD_ATTR               45 (set_facecolor + NULL|self)
+                 LOAD_CONST              46 ('#ffffff')
+                 CALL                     1
+                 POP_TOP
+
+1544             LOAD_GLOBAL             29 (sorted + NULL)
+                 LOAD_FAST_BORROW         8 (probs)
+                 LOAD_ATTR               31 (items + NULL|self)
+                 CALL                     0
+                 LOAD_CONST              47 (<code object <lambda> at 0x000002602A35B5A0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1544>)
+                 MAKE_FUNCTION
+                 LOAD_CONST              38 (('key',))
+                 CALL_KW                  2
+                 LOAD_CONST             115 (-5)
+                 LOAD_CONST              43 (None)
+                 BINARY_SLICE
+                 STORE_FAST              18 (sorted_items)
+
+1545             LOAD_FAST_BORROW        18 (sorted_items)
+                 GET_ITER
+                 LOAD_FAST_AND_CLEAR     19 (k)
+                 LOAD_FAST_AND_CLEAR     20 (_)
+                 SWAP                     3
+         L5:     BUILD_LIST               0
+                 SWAP                     2
+         L6:     FOR_ITER                 8 (to L7)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              19 (k)
+                 STORE_FAST              20 (_)
+                 LOAD_FAST_BORROW        19 (k)
+                 LIST_APPEND              2
+                 JUMP_BACKWARD           10 (to L6)
+         L7:     END_FOR
+                 POP_ITER
+         L8:     STORE_FAST              21 (labels_chart)
+                 STORE_FAST              19 (k)
+                 STORE_FAST              20 (_)
+
+1546             LOAD_FAST_BORROW        18 (sorted_items)
+                 GET_ITER
+                 LOAD_FAST_AND_CLEAR     20 (_)
+                 LOAD_FAST_AND_CLEAR     22 (v)
+                 SWAP                     3
+         L9:     BUILD_LIST               0
+                 SWAP                     2
+        L10:     FOR_ITER                 8 (to L11)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              20 (_)
+                 STORE_FAST              22 (v)
+                 LOAD_FAST_BORROW        22 (v)
+                 LIST_APPEND              2
+                 JUMP_BACKWARD           10 (to L10)
+        L11:     END_FOR
+                 POP_ITER
+        L12:     STORE_FAST              23 (values_chart)
+                 STORE_FAST              20 (_)
+                 STORE_FAST              22 (v)
+
+1548             LOAD_FAST_BORROW        18 (sorted_items)
+                 GET_ITER
+
+1547             LOAD_FAST_AND_CLEAR     19 (k)
+                 LOAD_FAST_AND_CLEAR     20 (_)
+                 SWAP                     3
+        L13:     BUILD_LIST               0
+                 SWAP                     2
+
+1548    L14:     FOR_ITER                17 (to L17)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              19 (k)
+                 STORE_FAST              20 (_)
+
+1547             LOAD_FAST_BORROW        19 (k)
+                 LOAD_CONST             116 (('MEL', 'BCC', 'AKIEC'))
+                 CONTAINS_OP              0 (in)
+                 POP_JUMP_IF_FALSE        3 (to L15)
+                 NOT_TAKEN
+                 LOAD_CONST              48 ('#e53e3e')
+                 JUMP_FORWARD             1 (to L16)
+        L15:     LOAD_CONST              49 ('#3182ce')
+        L16:     LIST_APPEND              2
+                 JUMP_BACKWARD           19 (to L14)
+
+1548    L17:     END_FOR
+                 POP_ITER
+
+1547    L18:     STORE_FAST              24 (colors_chart)
+                 STORE_FAST              19 (k)
+                 STORE_FAST              20 (_)
+
+1549             LOAD_FAST_BORROW        17 (ax)
+                 LOAD_ATTR               47 (barh + NULL|self)
+                 LOAD_FAST_BORROW        21 (labels_chart)
+                 LOAD_FAST_BORROW        23 (values_chart)
+                 LOAD_FAST_BORROW        24 (colors_chart)
+                 LOAD_CONST              50 (0.6)
+                 LOAD_CONST              51 (('color', 'height'))
+                 CALL_KW                  4
+                 STORE_FAST              25 (bars)
+
+1550             LOAD_FAST_BORROW        17 (ax)
+                 LOAD_ATTR               49 (set_xlim + NULL|self)
+                 LOAD_SMALL_INT           0
+                 LOAD_CONST              52 (1.1)
+                 CALL                     2
+                 POP_TOP
+
+1551             LOAD_FAST_BORROW        17 (ax)
+                 LOAD_ATTR               50 (xaxis)
+                 LOAD_ATTR               53 (set_major_formatter + NULL|self)
+                 LOAD_FAST_BORROW        14 (matplotlib)
+                 LOAD_ATTR               54 (ticker)
+                 LOAD_ATTR               57 (PercentFormatter + NULL|self)
+                 LOAD_CONST              53 (1.0)
+                 CALL                     1
+                 CALL                     1
+                 POP_TOP
+
+1552             LOAD_FAST_BORROW        17 (ax)
+                 LOAD_ATTR               58 (spines)
+                 LOAD_CONST              54 ('top')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               61 (set_visible + NULL|self)
+                 LOAD_CONST              55 (False)
+                 CALL                     1
+                 POP_TOP
+
+1553             LOAD_FAST_BORROW        17 (ax)
+                 LOAD_ATTR               58 (spines)
+                 LOAD_CONST              56 ('right')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               61 (set_visible + NULL|self)
+                 LOAD_CONST              55 (False)
+                 CALL                     1
+                 POP_TOP
+
+1554             LOAD_FAST_BORROW        17 (ax)
+                 LOAD_ATTR               63 (tick_params + NULL|self)
+                 LOAD_CONST              57 ('#4a5568')
+                 LOAD_SMALL_INT           8
+                 LOAD_CONST              58 (('colors', 'labelsize'))
+                 CALL_KW                  2
+                 POP_TOP
+
+1555             LOAD_GLOBAL             65 (zip + NULL)
+                 LOAD_FAST_BORROW        25 (bars)
+                 LOAD_FAST_BORROW        23 (values_chart)
+                 CALL                     2
+                 GET_ITER
+        L19:     FOR_ITER                91 (to L22)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              26 (bar)
+                 STORE_FAST              12 (val)
+
+1556             LOAD_FAST_BORROW        12 (val)
+                 LOAD_CONST              59 (0.01)
+                 COMPARE_OP             148 (bool(>))
+        L20:     POP_JUMP_IF_TRUE         3 (to L21)
+                 NOT_TAKEN
+                 JUMP_BACKWARD           15 (to L19)
+
+1557    L21:     LOAD_FAST_BORROW        17 (ax)
+                 LOAD_ATTR               67 (text + NULL|self)
+                 LOAD_FAST_BORROW        12 (val)
+                 LOAD_CONST              59 (0.01)
+                 BINARY_OP                0 (+)
+                 LOAD_FAST_BORROW        26 (bar)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 LOAD_FAST_BORROW        26 (bar)
+                 LOAD_ATTR               69 (get_height + NULL|self)
+                 CALL                     0
+                 LOAD_SMALL_INT           2
+                 BINARY_OP               11 (/)
+                 BINARY_OP                0 (+)
+
+1558             LOAD_FAST_BORROW        12 (val)
+                 LOAD_CONST              60 ('.1%')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              61 ('center')
+                 LOAD_CONST              62 ('left')
+
+1559             LOAD_CONST              63 ('#2d3748')
+                 LOAD_SMALL_INT           8
+                 LOAD_CONST              64 ('bold')
+
+1557             LOAD_CONST              65 (('va', 'ha', 'color', 'fontsize', 'fontweight'))
+                 CALL_KW                  8
+                 POP_TOP
+                 JUMP_BACKWARD           93 (to L19)
+
+1555    L22:     END_FOR
+                 POP_ITER
+
+1560             LOAD_FAST_BORROW        15 (plt)
+                 LOAD_ATTR               71 (tight_layout + NULL|self)
+                 CALL                     0
+                 POP_TOP
+
+1561             LOAD_GLOBAL             72 (tempfile)
+                 LOAD_ATTR               74 (NamedTemporaryFile)
+                 PUSH_NULL
+                 LOAD_CONST              55 (False)
+                 LOAD_CONST              66 ('.png')
+                 LOAD_CONST              67 (('delete', 'suffix'))
+                 CALL_KW                  2
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L23:     STORE_FAST              27 (tmp_chart)
+
+1562             LOAD_FAST_BORROW        27 (tmp_chart)
+                 LOAD_ATTR               76 (name)
+                 STORE_FAST              28 (chart_path)
+
+1561    L24:     LOAD_CONST              43 (None)
+                 LOAD_CONST              43 (None)
+                 LOAD_CONST              43 (None)
+                 CALL                     3
+                 POP_TOP
+
+1563    L25:     LOAD_FAST_BORROW        15 (plt)
+                 LOAD_ATTR               79 (savefig + NULL|self)
+                 LOAD_FAST_CHECK         28 (chart_path)
+                 LOAD_SMALL_INT         150
+                 LOAD_CONST              68 ('tight')
+                 LOAD_CONST              46 ('#ffffff')
+                 LOAD_CONST              69 (('dpi', 'bbox_inches', 'facecolor'))
+                 CALL_KW                  4
+                 POP_TOP
+
+1564             LOAD_FAST_BORROW        15 (plt)
+                 LOAD_ATTR               81 (close + NULL|self)
+                 LOAD_FAST_BORROW        16 (fig_mpl)
+                 CALL                     1
+                 POP_TOP
+
+1565             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               83 (image + NULL|self)
+                 LOAD_FAST_BORROW        28 (chart_path)
+                 LOAD_SMALL_INT         110
+                 LOAD_FAST_BORROW         9 (y_before_probs)
+                 LOAD_SMALL_INT           1
+                 BINARY_OP                0 (+)
+                 LOAD_SMALL_INT          85
+                 LOAD_SMALL_INT          33
+                 LOAD_CONST              70 (('x', 'y', 'w', 'h'))
+                 CALL_KW                  5
+                 POP_TOP
+
+1566             LOAD_GLOBAL             84 (os)
+                 LOAD_ATTR               86 (path)
+                 LOAD_ATTR               89 (exists + NULL|self)
+                 LOAD_FAST_BORROW        28 (chart_path)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       23 (to L28)
+        L26:     NOT_TAKEN
+
+1567    L27:     LOAD_GLOBAL             84 (os)
+                 LOAD_ATTR               90 (remove)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        28 (chart_path)
+                 CALL                     1
+                 POP_TOP
+
+1571    L28:     LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               95 (set_y + NULL|self)
+                 LOAD_GLOBAL             97 (max + NULL)
+                 LOAD_FAST_LOAD_FAST    217 (y_after_probs, y_before_probs)
+                 LOAD_SMALL_INT          35
+                 BINARY_OP                0 (+)
+                 CALL                     2
+                 CALL                     1
+                 POP_TOP
+
+1573    L29:     LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           4
+                 CALL                     1
+                 POP_TOP
+
+1576             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT          10
+                 CALL                     3
+                 POP_TOP
+
+1577             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               99 (set_fill_color + NULL|self)
+                 LOAD_SMALL_INT         240
+                 LOAD_SMALL_INT         244
+                 LOAD_SMALL_INT         248
+                 CALL                     3
+                 POP_TOP
+
+1578             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          26
+                 LOAD_SMALL_INT          54
+                 LOAD_SMALL_INT          93
+                 CALL                     3
+                 POP_TOP
+
+1579             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          45
+                 LOAD_SMALL_INT           8
+                 LOAD_CONST              71 ('Chi so ABCD')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST              72 ('C')
+                 LOAD_CONST              73 (True)
+                 LOAD_CONST              74 (('border', 'align', 'fill'))
+                 CALL_KW                  7
+                 POP_TOP
+
+1580             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          45
+                 LOAD_SMALL_INT           8
+                 LOAD_CONST              75 ('Gia tri')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST              72 ('C')
+                 LOAD_CONST              73 (True)
+                 LOAD_CONST              74 (('border', 'align', 'fill'))
+                 CALL_KW                  7
+                 POP_TOP
+
+1581             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT         100
+                 LOAD_SMALL_INT           8
+                 LOAD_CONST              76 ('Y nghia lam sang')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST              72 ('C')
+                 LOAD_CONST              73 (True)
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST              77 (('border', 'align', 'fill', 'ln'))
+                 CALL_KW                  8
+                 POP_TOP
+
+1583             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               2 ('')
+                 LOAD_SMALL_INT           9
+                 CALL                     3
+                 POP_TOP
+
+1584             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 CALL                     3
+                 POP_TOP
+
+1586             LOAD_CONST              78 ('Area ratio (Dien tich)')
+                 LOAD_FAST_BORROW         3 (metrics)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              79 ('area_ratio')
+                 LOAD_CONST              26 (0.0)
+                 CALL                     2
+                 LOAD_CONST              80 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              81 ('Ti le dien tich ton thuong tren toan vung anh chup')
+                 BUILD_TUPLE              3
+
+1587             LOAD_CONST              82 ('Border complexity (Bo)')
+                 LOAD_FAST_BORROW         3 (metrics)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              83 ('border_complexity')
+                 LOAD_CONST              26 (0.0)
+                 CALL                     2
+                 LOAD_CONST              80 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              84 ('Do phuc tap va go ghe cua duong bien ton thuong')
+                 BUILD_TUPLE              3
+
+1588             LOAD_CONST              85 ('Asymmetry (Bat doi xung)')
+                 LOAD_FAST_BORROW         3 (metrics)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              86 ('asymmetry')
+                 LOAD_CONST              26 (0.0)
+                 CALL                     2
+                 LOAD_CONST              80 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              87 ('Do bat doi xung cua ton thuong qua hai truc doi xung chinh')
+                 BUILD_TUPLE              3
+
+1589             LOAD_CONST              88 ('Circularity (Do tron)')
+                 LOAD_FAST_BORROW         3 (metrics)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              89 ('circularity')
+                 LOAD_CONST              26 (0.0)
+                 CALL                     2
+                 LOAD_CONST              80 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              90 ('Do tron deu (1.0 la hinh tron hoan hao, lanh tinh)')
+                 BUILD_TUPLE              3
+
+1585             BUILD_LIST               4
+                 STORE_FAST              29 (rows)
+
+1591             LOAD_FAST_BORROW        29 (rows)
+                 GET_ITER
+        L30:     FOR_ITER                65 (to L31)
+                 UNPACK_SEQUENCE          3
+                 STORE_FAST              30 (r0)
+                 STORE_FAST              31 (r1)
+                 STORE_FAST              32 (r2)
+
+1592             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          45
+                 LOAD_SMALL_INT           7
+                 LOAD_FAST_BORROW        30 (r0)
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST              72 ('C')
+                 LOAD_CONST              91 (('border', 'align'))
+                 CALL_KW                  6
+                 POP_TOP
+
+1593             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          45
+                 LOAD_SMALL_INT           7
+                 LOAD_FAST_BORROW        31 (r1)
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST              72 ('C')
+                 LOAD_CONST              91 (('border', 'align'))
+                 CALL_KW                  6
+                 POP_TOP
+
+1594             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT         100
+                 LOAD_SMALL_INT           7
+                 LOAD_CONST              92 (' ')
+                 LOAD_FAST_BORROW        32 (r2)
+                 BINARY_OP                0 (+)
+                 LOAD_SMALL_INT           1
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST              93 (('border', 'ln'))
+                 CALL_KW                  6
+                 POP_TOP
+                 JUMP_BACKWARD           67 (to L30)
+
+1591    L31:     END_FOR
+                 POP_ITER
+
+1596             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           6
+                 CALL                     1
+                 POP_TOP
+
+1599             LOAD_FAST_BORROW         1 (visit_data)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              94 ('image_url')
+                 CALL                     1
+                 STORE_FAST              33 (image_url)
+
+1600             LOAD_FAST_BORROW         1 (visit_data)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              95 ('mask_url')
+                 CALL                     1
+                 STORE_FAST              34 (mask_url)
+
+1601             LOAD_FAST_BORROW         1 (visit_data)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST              96 ('gradcam_url')
+                 CALL                     1
+                 STORE_FAST              35 (gradcam_url)
+
+1602             LOAD_CONST              43 (None)
+                 COPY                     1
+                 STORE_FAST              36 (img_temp_path)
+                 COPY                     1
+                 STORE_FAST              37 (mask_temp_path)
+                 STORE_FAST              38 (gradcam_temp_path)
+
+1604             LOAD_CONST              97 (<code object __annotate__ at 0x000002602A43CDB0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1604>)
+                 MAKE_FUNCTION
+                 LOAD_CONST              98 (<code object _download_as_png at 0x000002602A279AB0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1604>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE  16 (annotate)
+                 STORE_FAST              39 (_download_as_png)
+
+1619             NOP
+
+1620    L32:     LOAD_FAST_BORROW        33 (image_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        9 (to L35)
+        L33:     NOT_TAKEN
+        L34:     LOAD_FAST_BORROW        39 (_download_as_png)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        33 (image_url)
+                 CALL                     1
+                 JUMP_FORWARD             1 (to L36)
+        L35:     LOAD_CONST              43 (None)
+        L36:     STORE_FAST              36 (img_temp_path)
+
+1621             LOAD_FAST_BORROW        34 (mask_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        9 (to L39)
+        L37:     NOT_TAKEN
+        L38:     LOAD_FAST_BORROW        39 (_download_as_png)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        34 (mask_url)
+                 CALL                     1
+                 JUMP_FORWARD             1 (to L40)
+        L39:     LOAD_CONST              43 (None)
+        L40:     STORE_FAST              37 (mask_temp_path)
+
+1622             LOAD_FAST_BORROW        35 (gradcam_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        9 (to L43)
+        L41:     NOT_TAKEN
+        L42:     LOAD_FAST_BORROW        39 (_download_as_png)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        35 (gradcam_url)
+                 CALL                     1
+                 JUMP_FORWARD             1 (to L44)
+        L43:     LOAD_CONST              43 (None)
+        L44:     STORE_FAST              38 (gradcam_temp_path)
+
+1624             LOAD_FAST_BORROW        36 (img_temp_path)
+                 TO_BOOL
+                 EXTENDED_ARG             1
+                 POP_JUMP_IF_FALSE      397 (to L60)
+        L45:     NOT_TAKEN
+
+1625    L46:     LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT           9
+                 CALL                     3
+                 POP_TOP
+
+1626             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          26
+                 LOAD_SMALL_INT          54
+                 LOAD_SMALL_INT          93
+                 CALL                     3
+                 POP_TOP
+
+1627    L47:     NOP
+
+1628    L48:     LOAD_FAST_BORROW        37 (mask_temp_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      158 (to L54)
+        L49:     NOT_TAKEN
+        L50:     LOAD_FAST_BORROW        38 (gradcam_temp_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      150 (to L54)
+        L51:     NOT_TAKEN
+
+1629    L52:     LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          60
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              99 ('Anh ton thuong lam sang')
+                 LOAD_CONST              72 ('C')
+                 LOAD_CONST             100 (('align',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1630             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          60
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST             101 ('Mat na phan vung (AI Mask)')
+                 LOAD_CONST              72 ('C')
+                 LOAD_CONST             100 (('align',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1631             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          60
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST             102 ('Ban do nhiet (Grad-CAM)')
+                 LOAD_CONST              72 ('C')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST             103 (('align', 'ln'))
+                 CALL_KW                  6
+                 POP_TOP
+
+1632             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 STORE_FAST              40 (y_img)
+
+1633             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               83 (image + NULL|self)
+                 LOAD_FAST_BORROW        36 (img_temp_path)
+                 LOAD_SMALL_INT          15
+                 LOAD_FAST_BORROW        40 (y_img)
+                 LOAD_SMALL_INT          55
+                 LOAD_SMALL_INT          41
+                 LOAD_CONST              70 (('x', 'y', 'w', 'h'))
+                 CALL_KW                  5
+                 POP_TOP
+
+1634             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               83 (image + NULL|self)
+                 LOAD_FAST_BORROW        37 (mask_temp_path)
+                 LOAD_SMALL_INT          75
+                 LOAD_FAST_BORROW        40 (y_img)
+                 LOAD_SMALL_INT          55
+                 LOAD_SMALL_INT          41
+                 LOAD_CONST              70 (('x', 'y', 'w', 'h'))
+                 CALL_KW                  5
+                 POP_TOP
+
+1635             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               83 (image + NULL|self)
+                 LOAD_FAST_BORROW        38 (gradcam_temp_path)
+                 LOAD_SMALL_INT         135
+                 LOAD_FAST_BORROW        40 (y_img)
+                 LOAD_SMALL_INT          55
+                 LOAD_SMALL_INT          41
+                 LOAD_CONST              70 (('x', 'y', 'w', 'h'))
+                 CALL_KW                  5
+                 POP_TOP
+
+1636             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT          45
+                 CALL                     1
+                 POP_TOP
+        L53:     JUMP_FORWARD           192 (to L60)
+
+1637    L54:     LOAD_FAST_BORROW        37 (mask_temp_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      112 (to L58)
+        L55:     NOT_TAKEN
+
+1638    L56:     LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          95
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              99 ('Anh ton thuong lam sang')
+                 LOAD_CONST              72 ('C')
+                 LOAD_CONST             100 (('align',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1639             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT          95
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST             101 ('Mat na phan vung (AI Mask)')
+                 LOAD_CONST              72 ('C')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST             103 (('align', 'ln'))
+                 CALL_KW                  6
+                 POP_TOP
+
+1640             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 STORE_FAST              40 (y_img)
+
+1641             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               83 (image + NULL|self)
+                 LOAD_FAST_BORROW        36 (img_temp_path)
+                 LOAD_SMALL_INT          20
+                 LOAD_FAST_BORROW        40 (y_img)
+                 LOAD_SMALL_INT          75
+                 LOAD_SMALL_INT          55
+                 LOAD_CONST              70 (('x', 'y', 'w', 'h'))
+                 CALL_KW                  5
+                 POP_TOP
+
+1642             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               83 (image + NULL|self)
+                 LOAD_FAST_BORROW        37 (mask_temp_path)
+                 LOAD_SMALL_INT         115
+                 LOAD_FAST_BORROW        40 (y_img)
+                 LOAD_SMALL_INT          75
+                 LOAD_SMALL_INT          55
+                 LOAD_CONST              70 (('x', 'y', 'w', 'h'))
+                 CALL_KW                  5
+                 POP_TOP
+
+1643             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT          58
+                 CALL                     1
+                 POP_TOP
+        L57:     JUMP_FORWARD            73 (to L60)
+
+1645    L58:     LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST              99 ('Anh ton thuong lam sang')
+                 LOAD_CONST              72 ('C')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST             103 (('align', 'ln'))
+                 CALL_KW                  6
+                 POP_TOP
+
+1646             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 STORE_FAST              40 (y_img)
+
+1647             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               83 (image + NULL|self)
+                 LOAD_FAST_BORROW        36 (img_temp_path)
+                 LOAD_SMALL_INT          67
+                 LOAD_FAST_BORROW        40 (y_img)
+                 LOAD_SMALL_INT          75
+                 LOAD_SMALL_INT          55
+                 LOAD_CONST              70 (('x', 'y', 'w', 'h'))
+                 CALL_KW                  5
+                 POP_TOP
+
+1648             LOAD_FAST_BORROW         2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT          58
+                 CALL                     1
+                 POP_TOP
+        L59:     NOP
+
+1653    L60:     LOAD_FAST_BORROW        36 (img_temp_path)
+                 LOAD_FAST_BORROW        37 (mask_temp_path)
+                 LOAD_FAST_BORROW        38 (gradcam_temp_path)
+                 BUILD_TUPLE              3
+                 GET_ITER
+        L61:     FOR_ITER                75 (to L66)
+                 STORE_FAST              41 (p)
+
+1654             LOAD_FAST_BORROW        41 (p)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         3 (to L62)
+                 NOT_TAKEN
+                 JUMP_BACKWARD           13 (to L61)
+        L62:     LOAD_GLOBAL             84 (os)
+                 LOAD_ATTR               86 (path)
+                 LOAD_ATTR               89 (exists + NULL|self)
+                 LOAD_FAST_BORROW        41 (p)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         3 (to L63)
+                 NOT_TAKEN
+                 JUMP_BACKWARD           52 (to L61)
+
+1655    L63:     NOP
+
+1656    L64:     LOAD_GLOBAL             84 (os)
+                 LOAD_ATTR               90 (remove)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        41 (p)
+                 CALL                     1
+                 POP_TOP
+        L65:     JUMP_BACKWARD           77 (to L61)
+
+1653    L66:     END_FOR
+                 POP_ITER
+
+1661             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                5 (add_page + NULL|self)
+                 CALL                     0
+                 POP_TOP
+
+1662             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT          15
+                 CALL                     1
+                 POP_TOP
+
+1663             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT          12
+                 CALL                     3
+                 POP_TOP
+
+1664             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          26
+                 LOAD_SMALL_INT          54
+                 LOAD_SMALL_INT          93
+                 CALL                     3
+                 POP_TOP
+
+1665             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST                2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           8
+                 LOAD_CONST             104 ('III. NHAT KY HOI THOAI Y KHOA (VQA CHAT LOG)')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1666             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               15 (line + NULL|self)
+                 LOAD_SMALL_INT          10
+                 LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 LOAD_SMALL_INT         200
+                 LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               17 (get_y + NULL|self)
+                 CALL                     0
+                 CALL                     4
+                 POP_TOP
+
+1667             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           4
+                 CALL                     1
+                 POP_TOP
+
+1669             LOAD_FAST                1 (visit_data)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST             105 ('vqa_conversations')
+                 BUILD_LIST               0
+                 CALL                     2
+                 STORE_FAST              42 (conversations)
+
+1670             LOAD_FAST               42 (conversations)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        57 (to L67)
+                 NOT_TAKEN
+
+1671             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST             106 ('I')
+                 LOAD_SMALL_INT          10
+                 CALL                     3
+                 POP_TOP
+
+1672             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT         100
+                 LOAD_SMALL_INT         100
+                 LOAD_SMALL_INT         100
+                 CALL                     3
+                 POP_TOP
+
+1673             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST                2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           6
+                 LOAD_CONST             107 ('Khong co nhat ky hoi thoai cho lan kham nay.')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+                 EXTENDED_ARG             1
+                 JUMP_FORWARD           311 (to L71)
+
+1675    L67:     LOAD_FAST               42 (conversations)
+                 GET_ITER
+        L68:     EXTENDED_ARG             1
+                 FOR_ITER               304 (to L70)
+                 STORE_FAST              43 (msg)
+
+1676             LOAD_FAST               43 (msg)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST             108 ('role')
+                 LOAD_CONST               2 ('')
+                 CALL                     2
+                 STORE_FAST              44 (role)
+
+1677             LOAD_GLOBAL             27 (_safe + NULL)
+                 LOAD_FAST               43 (msg)
+                 LOAD_ATTR               19 (get + NULL|self)
+                 LOAD_CONST             109 ('content')
+                 LOAD_CONST               2 ('')
+                 CALL                     2
+                 CALL                     1
+                 STORE_FAST              45 (content)
+
+1678             LOAD_FAST               44 (role)
+                 LOAD_CONST             110 ('user')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE      126 (to L69)
+                 NOT_TAKEN
+
+1679             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT           9
+                 CALL                     3
+                 POP_TOP
+
+1680             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          40
+                 LOAD_SMALL_INT         100
+                 LOAD_SMALL_INT         200
+                 CALL                     3
+                 POP_TOP
+
+1681             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST                2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           5
+                 LOAD_CONST             111 ('Hoi (Bac si / Benh nhan):')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1682             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               2 ('')
+                 LOAD_SMALL_INT           9
+                 CALL                     3
+                 POP_TOP
+
+1683             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 CALL                     3
+                 POP_TOP
+
+1684             LOAD_GLOBAL            101 (_multi_cell + NULL)
+                 LOAD_FAST                2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           5
+                 LOAD_FAST               45 (content)
+                 CALL                     4
+                 POP_TOP
+
+1685             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           2
+                 CALL                     1
+                 POP_TOP
+                 JUMP_BACKWARD          181 (to L68)
+
+1687    L69:     LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               3 ('B')
+                 LOAD_SMALL_INT           9
+                 CALL                     3
+                 POP_TOP
+
+1688             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          30
+                 LOAD_SMALL_INT         150
+                 LOAD_SMALL_INT          80
+                 CALL                     3
+                 POP_TOP
+
+1689             LOAD_GLOBAL             13 (_cell + NULL)
+                 LOAD_FAST                2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           5
+                 LOAD_CONST             112 ('Dap (Tro ly Da lieu AI):')
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST               5 (('ln',))
+                 CALL_KW                  5
+                 POP_TOP
+
+1690             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST               2 ('')
+                 LOAD_SMALL_INT           9
+                 CALL                     3
+                 POP_TOP
+
+1691             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 LOAD_SMALL_INT          50
+                 CALL                     3
+                 POP_TOP
+
+1692             LOAD_GLOBAL            101 (_multi_cell + NULL)
+                 LOAD_FAST                2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           5
+                 LOAD_FAST               45 (content)
+                 CALL                     4
+                 POP_TOP
+
+1693             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           4
+                 CALL                     1
+                 POP_TOP
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD          307 (to L68)
+
+1675    L70:     END_FOR
+                 POP_ITER
+
+1695    L71:     LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           5
+                 CALL                     1
+                 POP_TOP
+
+1696             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                7 (set_font + NULL|self)
+                 LOAD_CONST               1 ('helvetica')
+                 LOAD_CONST             106 ('I')
+                 LOAD_SMALL_INT           8
+                 CALL                     3
+                 POP_TOP
+
+1697             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR                9 (set_text_color + NULL|self)
+                 LOAD_SMALL_INT         128
+                 LOAD_SMALL_INT         128
+                 LOAD_SMALL_INT         128
+                 CALL                     3
+                 POP_TOP
+
+1698             LOAD_GLOBAL            101 (_multi_cell + NULL)
+                 LOAD_FAST                2 (pdf)
+                 LOAD_SMALL_INT           0
+                 LOAD_SMALL_INT           4
+
+1699             LOAD_CONST             113 ('Tuyen bo mien tru trach nhiem: Tai lieu nay duoc tao tu dong boi he thong ho tro chan doan AI. Ket qua phan tich chi mang tinh chat tham khao so bo va hoan toan khong thay the chan doan lam sang cua bac si chuyen khoa da lieu co tham quyen.')
+
+1698             CALL                     4
+                 POP_TOP
+
+1704             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR              103 (output + NULL|self)
+                 CALL                     0
+                 STORE_FAST              46 (out)
+
+1705             LOAD_GLOBAL            105 (isinstance + NULL)
+                 LOAD_FAST               46 (out)
+                 LOAD_GLOBAL            106 (bytes)
+                 CALL                     2
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        12 (to L72)
+                 NOT_TAKEN
+                 LOAD_GLOBAL            107 (bytes + NULL)
+                 LOAD_FAST               46 (out)
+                 CALL                     1
+                 RETURN_VALUE
+        L72:     LOAD_FAST               46 (out)
+                 RETURN_VALUE
+
+  --    L73:     SWAP                     2
+                 POP_TOP
+
+1545             SWAP                     3
+                 STORE_FAST              20 (_)
+                 STORE_FAST              19 (k)
+                 RERAISE                  0
+
+  --    L74:     SWAP                     2
+                 POP_TOP
+
+1546             SWAP                     3
+                 STORE_FAST              22 (v)
+                 STORE_FAST              20 (_)
+                 RERAISE                  0
+
+  --    L75:     SWAP                     2
+                 POP_TOP
+
+1547             SWAP                     3
+                 STORE_FAST              20 (_)
+                 STORE_FAST              19 (k)
+                 RERAISE                  0
+
+1561    L76:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L77)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L77:     POP_TOP
+        L78:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             7
+                 JUMP_BACKWARD_NO_INTERRUPT 1811 (to L25)
+
+  --    L79:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L80:     PUSH_EXC_INFO
+
+1568             LOAD_GLOBAL             92 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE        5 (to L82)
+                 NOT_TAKEN
+                 POP_TOP
+
+1569    L81:     POP_EXCEPT
+                 EXTENDED_ARG             6
+                 JUMP_BACKWARD_NO_INTERRUPT 1702 (to L28)
+
+1568    L82:     RERAISE                  0
+
+  --    L83:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L84:     PUSH_EXC_INFO
+
+1649             LOAD_GLOBAL             92 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE       22 (to L86)
+                 NOT_TAKEN
+                 POP_TOP
+
+1651             LOAD_FAST                2 (pdf)
+                 LOAD_ATTR               11 (ln + NULL|self)
+                 LOAD_SMALL_INT           4
+                 CALL                     1
+                 POP_TOP
+        L85:     POP_EXCEPT
+                 EXTENDED_ARG             3
+                 JUMP_BACKWARD_NO_INTERRUPT 836 (to L60)
+
+1649    L86:     RERAISE                  0
+
+  --    L87:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L88:     PUSH_EXC_INFO
+
+1657             LOAD_GLOBAL             92 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE        6 (to L90)
+                 NOT_TAKEN
+                 POP_TOP
+
+1658    L89:     POP_EXCEPT
+                 EXTENDED_ARG             3
+                 JUMP_BACKWARD          850 (to L61)
+
+1657    L90:     RERAISE                  0
+
+  --    L91:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L92:     PUSH_EXC_INFO
+
+1653             LOAD_FAST               36 (img_temp_path)
+                 LOAD_FAST               37 (mask_temp_path)
+                 LOAD_FAST               38 (gradcam_temp_path)
+                 BUILD_TUPLE              3
+                 GET_ITER
+        L93:     FOR_ITER                93 (to L104)
+                 STORE_FAST              41 (p)
+
+1654             LOAD_FAST               41 (p)
+                 TO_BOOL
+        L94:     POP_JUMP_IF_TRUE         3 (to L95)
+                 NOT_TAKEN
+                 JUMP_BACKWARD           13 (to L93)
+        L95:     LOAD_GLOBAL             84 (os)
+                 LOAD_ATTR               86 (path)
+                 LOAD_ATTR               89 (exists + NULL|self)
+                 LOAD_FAST               41 (p)
+                 CALL                     1
+                 TO_BOOL
+        L96:     POP_JUMP_IF_TRUE         3 (to L97)
+                 NOT_TAKEN
+                 JUMP_BACKWARD           52 (to L93)
+
+1655    L97:     NOP
+
+1656    L98:     LOAD_GLOBAL             84 (os)
+                 LOAD_ATTR               90 (remove)
+                 PUSH_NULL
+                 LOAD_FAST               41 (p)
+                 CALL                     1
+                 POP_TOP
+        L99:     JUMP_BACKWARD           77 (to L93)
+
+  --   L100:     PUSH_EXC_INFO
+
+1657             LOAD_GLOBAL             92 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE        5 (to L102)
+                 NOT_TAKEN
+                 POP_TOP
+
+1658   L101:     POP_EXCEPT
+                 JUMP_BACKWARD           91 (to L93)
+
+1657   L102:     RERAISE                  0
+
+  --   L103:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1653   L104:     END_FOR
+                 POP_ITER
+                 RERAISE                  0
+
+  --   L105:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+ExceptionTable:
+  L4 to L5 -> L80 [0]
+  L5 to L8 -> L73 [3]
+  L8 to L9 -> L80 [0]
+  L9 to L12 -> L74 [3]
+  L12 to L13 -> L80 [0]
+  L13 to L18 -> L75 [3]
+  L18 to L20 -> L80 [0]
+  L21 to L23 -> L80 [0]
+  L23 to L24 -> L76 [2] lasti
+  L24 to L26 -> L80 [0]
+  L27 to L28 -> L80 [0]
+  L32 to L33 -> L92 [0]
+  L34 to L37 -> L92 [0]
+  L38 to L41 -> L92 [0]
+  L42 to L45 -> L92 [0]
+  L46 to L47 -> L92 [0]
+  L48 to L49 -> L84 [0]
+  L50 to L51 -> L84 [0]
+  L52 to L53 -> L84 [0]
+  L53 to L54 -> L92 [0]
+  L54 to L55 -> L84 [0]
+  L56 to L57 -> L84 [0]
+  L57 to L58 -> L92 [0]
+  L58 to L59 -> L84 [0]
+  L59 to L60 -> L92 [0]
+  L64 to L65 -> L88 [1]
+  L73 to L76 -> L80 [0]
+  L76 to L78 -> L79 [4] lasti
+  L78 to L80 -> L80 [0]
+  L80 to L81 -> L83 [1] lasti
+  L82 to L83 -> L83 [1] lasti
+  L84 to L85 -> L87 [1] lasti
+  L85 to L86 -> L92 [0]
+  L86 to L87 -> L87 [1] lasti
+  L87 to L88 -> L92 [0]
+  L88 to L89 -> L91 [2] lasti
+  L90 to L91 -> L91 [2] lasti
+  L92 to L94 -> L105 [1] lasti
+  L95 to L96 -> L105 [1] lasti
+  L98 to L99 -> L100 [3]
+  L99 to L100 -> L105 [1] lasti
+  L100 to L101 -> L103 [4] lasti
+  L101 to L102 -> L105 [1] lasti
+  L102 to L103 -> L103 [4] lasti
+  L103 to L105 -> L105 [1] lasti
+
+Disassembly of <code object <lambda> at 0x000002602A35B4B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1531>:
+1531           RESUME                   0
+               LOAD_FAST_BORROW         0 (x)
+               LOAD_SMALL_INT           1
+               BINARY_OP               26 ([])
+               UNARY_NEGATIVE
+               RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x000002602A35B5A0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1544>:
+1544           RESUME                   0
+               LOAD_FAST_BORROW         0 (x)
+               LOAD_SMALL_INT           1
+               BINARY_OP               26 ([])
+               RETURN_VALUE
+
+Disassembly of <code object __annotate__ at 0x000002602A43CDB0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1604>:
+1604           RESUME                   0
+               LOAD_FAST_BORROW         0 (format)
+               LOAD_SMALL_INT           2
+               COMPARE_OP             132 (>)
+               POP_JUMP_IF_FALSE        3 (to L1)
+               NOT_TAKEN
+               LOAD_COMMON_CONSTANT     1 (NotImplementedError)
+               RAISE_VARARGS            1
+       L1:     LOAD_CONST               1 ('url')
+               LOAD_GLOBAL              0 (str)
+               LOAD_CONST               2 ('return')
+               LOAD_GLOBAL              2 (Optional)
+               LOAD_GLOBAL              0 (str)
+               BINARY_OP               26 ([])
+               BUILD_MAP                2
+               RETURN_VALUE
+
+Disassembly of <code object _download_as_png at 0x000002602A279AB0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1604>:
+1604            RESUME                   0
+
+1606            NOP
+
+1607    L1:     LOAD_GLOBAL              0 (requests)
+                LOAD_ATTR                2 (get)
+                PUSH_NULL
+                LOAD_FAST_BORROW         0 (url)
+                LOAD_SMALL_INT          10
+                LOAD_CONST               1 (('timeout',))
+                CALL_KW                  2
+                STORE_FAST               1 (resp)
+
+1608            LOAD_FAST_BORROW         1 (resp)
+                LOAD_ATTR                4 (status_code)
+                LOAD_SMALL_INT         200
+                COMPARE_OP             119 (bool(!=))
+                POP_JUMP_IF_FALSE        3 (to L3)
+                NOT_TAKEN
+
+1609    L2:     LOAD_CONST               2 (None)
+                RETURN_VALUE
+
+1610    L3:     LOAD_SMALL_INT           0
+                LOAD_CONST               3 (('Image',))
+                IMPORT_NAME              3 (PIL)
+                IMPORT_FROM              4 (Image)
+                STORE_FAST               2 (PILImage)
+                POP_TOP
+
+1611            LOAD_SMALL_INT           0
+                LOAD_CONST               2 (None)
+                IMPORT_NAME              5 (io)
+                STORE_FAST               3 (io)
+
+1612            LOAD_FAST_BORROW         2 (PILImage)
+                LOAD_ATTR               13 (open + NULL|self)
+                LOAD_FAST_BORROW         3 (io)
+                LOAD_ATTR               14 (BytesIO)
+                PUSH_NULL
+                LOAD_FAST_BORROW         1 (resp)
+                LOAD_ATTR               16 (content)
+                CALL                     1
+                CALL                     1
+                LOAD_ATTR               19 (convert + NULL|self)
+                LOAD_CONST               4 ('RGB')
+                CALL                     1
+                STORE_FAST               4 (img)
+
+1613            LOAD_GLOBAL             20 (tempfile)
+                LOAD_ATTR               22 (NamedTemporaryFile)
+                PUSH_NULL
+                LOAD_CONST               5 (False)
+                LOAD_CONST               6 ('.png')
+                LOAD_CONST               7 (('delete', 'suffix'))
+                CALL_KW                  2
+                COPY                     1
+                LOAD_SPECIAL             1 (__exit__)
+                SWAP                     2
+                SWAP                     3
+                LOAD_SPECIAL             0 (__enter__)
+                CALL                     0
+        L4:     STORE_FAST               5 (f)
+
+1614            LOAD_FAST_BORROW         4 (img)
+                LOAD_ATTR               25 (save + NULL|self)
+                LOAD_FAST_BORROW         5 (f)
+                LOAD_ATTR               26 (name)
+                LOAD_CONST               8 ('PNG')
+                LOAD_CONST               9 (('format',))
+                CALL_KW                  2
+                POP_TOP
+
+1615            LOAD_FAST_BORROW         5 (f)
+                LOAD_ATTR               26 (name)
+
+1613    L5:     SWAP                     3
+                SWAP                     2
+                LOAD_CONST               2 (None)
+                LOAD_CONST               2 (None)
+                LOAD_CONST               2 (None)
+                CALL                     3
+                POP_TOP
+        L6:     RETURN_VALUE
+        L7:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         2 (to L8)
+                NOT_TAKEN
+                RERAISE                  2
+        L8:     POP_TOP
+        L9:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                POP_TOP
+       L10:     LOAD_CONST               2 (None)
+                RETURN_VALUE
+
+  --   L11:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L12:     PUSH_EXC_INFO
+
+1616            LOAD_GLOBAL             28 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        5 (to L14)
+                NOT_TAKEN
+                POP_TOP
+
+1617   L13:     POP_EXCEPT
+                LOAD_CONST               2 (None)
+                RETURN_VALUE
+
+1616   L14:     RERAISE                  0
+
+  --   L15:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L12 [0]
+  L3 to L4 -> L12 [0]
+  L4 to L5 -> L7 [2] lasti
+  L5 to L6 -> L12 [0]
+  L7 to L9 -> L11 [4] lasti
+  L9 to L10 -> L12 [0]
+  L11 to L12 -> L12 [0]
+  L12 to L13 -> L15 [1] lasti
+  L14 to L15 -> L15 [1] lasti

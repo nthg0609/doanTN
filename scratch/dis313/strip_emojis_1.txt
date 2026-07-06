@@ -1,0 +1,23 @@
+2055           RESUME                   0
+
+2057           LOAD_GLOBAL              0 (re)
+               LOAD_ATTR                2 (compile)
+               PUSH_NULL
+
+2058           LOAD_CONST               1 ('[𐀀-\U0010ffff]+')
+
+2062           LOAD_GLOBAL              0 (re)
+               LOAD_ATTR                4 (UNICODE)
+
+2057           LOAD_CONST               2 (('flags',))
+               CALL_KW                  2
+               STORE_FAST               1 (emoji_pattern)
+
+2064           LOAD_FAST                1 (emoji_pattern)
+               LOAD_ATTR                7 (sub + NULL|self)
+               LOAD_CONST               3 ('')
+               LOAD_FAST                0 (text)
+               CALL                     2
+               LOAD_ATTR                9 (strip + NULL|self)
+               CALL                     0
+               RETURN_VALUE

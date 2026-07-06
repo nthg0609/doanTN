@@ -1,0 +1,134 @@
+120           RESUME                   0
+
+125           LOAD_FAST_BORROW         1 (mask)
+              POP_JUMP_IF_NONE        22 (to L1)
+              NOT_TAKEN
+              LOAD_FAST_BORROW         1 (mask)
+              LOAD_ATTR                1 (sum + NULL|self)
+              CALL                     0
+              LOAD_SMALL_INT           0
+              COMPARE_OP              88 (bool(==))
+              POP_JUMP_IF_FALSE        3 (to L2)
+              NOT_TAKEN
+
+126   L1:     BUILD_LIST               0
+              RETURN_VALUE
+
+129   L2:     LOAD_FAST_BORROW         1 (mask)
+              LOAD_ATTR                2 (ndim)
+              LOAD_SMALL_INT           2
+              COMPARE_OP             119 (bool(!=))
+              POP_JUMP_IF_FALSE       40 (to L3)
+              NOT_TAKEN
+
+130           LOAD_FAST_BORROW         1 (mask)
+              LOAD_CONST               8 ((slice(None, None, None), slice(None, None, None), 0))
+              BINARY_OP               26 ([])
+              LOAD_ATTR                5 (astype + NULL|self)
+              LOAD_GLOBAL              6 (np)
+              LOAD_ATTR                8 (uint8)
+              CALL                     1
+              STORE_FAST               2 (mask_gray)
+              JUMP_FORWARD            31 (to L4)
+
+132   L3:     LOAD_FAST_BORROW         1 (mask)
+              LOAD_ATTR                5 (astype + NULL|self)
+              LOAD_GLOBAL              6 (np)
+              LOAD_ATTR                8 (uint8)
+              CALL                     1
+              STORE_FAST               2 (mask_gray)
+
+134   L4:     LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               12 (findContours)
+              PUSH_NULL
+              LOAD_FAST_BORROW         2 (mask_gray)
+              LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               14 (RETR_EXTERNAL)
+              LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               16 (CHAIN_APPROX_SIMPLE)
+              CALL                     3
+              UNPACK_SEQUENCE          2
+              STORE_FAST_STORE_FAST   52 (contours, _)
+
+136           BUILD_LIST               0
+              STORE_FAST               5 (lesions)
+
+137           LOAD_SMALL_INT           1
+              STORE_FAST               6 (idx)
+
+139           LOAD_FAST_BORROW         3 (contours)
+              GET_ITER
+      L5:     FOR_ITER                95 (to L7)
+              STORE_FAST               7 (ctr)
+
+140           LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               18 (contourArea)
+              PUSH_NULL
+              LOAD_FAST_BORROW         7 (ctr)
+              CALL                     1
+              STORE_FAST               8 (area)
+
+141           LOAD_FAST_BORROW         8 (area)
+              LOAD_SMALL_INT         150
+              COMPARE_OP             188 (bool(>=))
+              POP_JUMP_IF_TRUE         3 (to L6)
+              NOT_TAKEN
+              JUMP_BACKWARD           34 (to L5)
+
+142   L6:     LOAD_GLOBAL             10 (cv2)
+              LOAD_ATTR               20 (boundingRect)
+              PUSH_NULL
+              LOAD_FAST_BORROW         7 (ctr)
+              CALL                     1
+              UNPACK_SEQUENCE          4
+              STORE_FAST_STORE_FAST  154 (x, y)
+              STORE_FAST_STORE_FAST  188 (w, h)
+
+143           LOAD_FAST_BORROW         5 (lesions)
+              LOAD_ATTR               23 (append + NULL|self)
+
+144           LOAD_CONST               1 ('id')
+              LOAD_FAST_BORROW         6 (idx)
+
+145           LOAD_CONST               2 ('bbox')
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 154 (x, y)
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 188 (w, h)
+              BUILD_TUPLE              4
+
+146           LOAD_CONST               3 ('contour')
+              LOAD_FAST_BORROW         7 (ctr)
+
+147           LOAD_CONST               4 ('area')
+              LOAD_FAST_BORROW         8 (area)
+
+143           BUILD_MAP                4
+              CALL                     1
+              POP_TOP
+
+149           LOAD_FAST_BORROW         6 (idx)
+              LOAD_SMALL_INT           1
+              BINARY_OP               13 (+=)
+              STORE_FAST               6 (idx)
+              JUMP_BACKWARD           97 (to L5)
+
+139   L7:     END_FOR
+              POP_ITER
+
+152           LOAD_GLOBAL             25 (sorted + NULL)
+              LOAD_FAST_BORROW         5 (lesions)
+              LOAD_CONST               5 (<code object <lambda> at 0x000002602A35A5B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 152>)
+              MAKE_FUNCTION
+              LOAD_CONST               6 (True)
+              LOAD_CONST               7 (('key', 'reverse'))
+              CALL_KW                  3
+              STORE_FAST               5 (lesions)
+
+153           LOAD_FAST_BORROW         5 (lesions)
+              RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x000002602A35A5B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 152>:
+152           RESUME                   0
+              LOAD_FAST_BORROW         0 (x)
+              LOAD_CONST               0 ('area')
+              BINARY_OP               26 ([])
+              RETURN_VALUE

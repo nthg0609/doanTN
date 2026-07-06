@@ -1,0 +1,646 @@
+ 197             RESUME                   0
+
+ 198             LOAD_FAST_BORROW         0 (audio_file)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         3 (to L1)
+                 NOT_TAKEN
+
+ 199             LOAD_CONST               0 ('')
+                 RETURN_VALUE
+
+ 201     L1:     LOAD_CONST               1 (None)
+                 STORE_FAST               1 (tmp_audio_path)
+
+ 202             NOP
+
+ 204     L2:     LOAD_GLOBAL              0 (tempfile)
+                 LOAD_ATTR                2 (NamedTemporaryFile)
+                 PUSH_NULL
+                 LOAD_CONST               2 (False)
+                 LOAD_CONST               3 ('.wav')
+                 LOAD_CONST               4 (('delete', 'suffix'))
+                 CALL_KW                  2
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+         L3:     STORE_FAST               2 (tmp_audio)
+
+ 205             LOAD_FAST_BORROW         2 (tmp_audio)
+                 LOAD_ATTR                5 (write + NULL|self)
+                 LOAD_FAST_BORROW         0 (audio_file)
+                 LOAD_ATTR                7 (read + NULL|self)
+                 CALL                     0
+                 CALL                     1
+                 POP_TOP
+
+ 206             LOAD_FAST_BORROW         2 (tmp_audio)
+                 LOAD_ATTR                8 (name)
+                 STORE_FAST               1 (tmp_audio_path)
+
+ 204     L4:     LOAD_CONST               1 (None)
+                 LOAD_CONST               1 (None)
+                 LOAD_CONST               1 (None)
+                 CALL                     3
+                 POP_TOP
+
+ 209     L5:     NOP
+
+ 210     L6:     LOAD_SMALL_INT           0
+                 LOAD_CONST               1 (None)
+                 IMPORT_NAME              5 (speech_recognition)
+                 STORE_FAST               3 (sr)
+
+ 211             LOAD_FAST_BORROW         3 (sr)
+                 LOAD_ATTR               13 (Recognizer + NULL|self)
+                 CALL                     0
+                 STORE_FAST               4 (r)
+
+ 212             LOAD_FAST_BORROW         3 (sr)
+                 LOAD_ATTR               15 (AudioFile + NULL|self)
+                 LOAD_FAST_BORROW         1 (tmp_audio_path)
+                 CALL                     1
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+         L7:     STORE_FAST               5 (source)
+
+ 213             LOAD_FAST_BORROW         4 (r)
+                 LOAD_ATTR               17 (record + NULL|self)
+                 LOAD_FAST_BORROW         5 (source)
+                 CALL                     1
+                 STORE_FAST               6 (audio_data)
+
+ 214             LOAD_FAST_BORROW         4 (r)
+                 LOAD_ATTR               19 (recognize_google + NULL|self)
+                 LOAD_FAST_BORROW         6 (audio_data)
+                 LOAD_CONST               5 ('vi-VN')
+                 LOAD_CONST               6 (('language',))
+                 CALL_KW                  2
+                 STORE_FAST               7 (text)
+
+ 215             LOAD_FAST_BORROW         7 (text)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       97 (to L18)
+                 NOT_TAKEN
+
+ 216             LOAD_FAST_BORROW         7 (text)
+                 LOAD_ATTR               21 (strip + NULL|self)
+                 CALL                     0
+
+ 212     L8:     SWAP                     3
+                 SWAP                     2
+                 LOAD_CONST               1 (None)
+                 LOAD_CONST               1 (None)
+                 LOAD_CONST               1 (None)
+                 CALL                     3
+                 POP_TOP
+
+ 246     L9:     NOP
+
+ 247    L10:     LOAD_FAST_BORROW         1 (tmp_audio_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       62 (to L17)
+        L11:     NOT_TAKEN
+        L12:     LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               24 (path)
+                 LOAD_ATTR               27 (exists + NULL|self)
+                 LOAD_FAST_BORROW         1 (tmp_audio_path)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       24 (to L16)
+        L13:     NOT_TAKEN
+
+ 248    L14:     LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               28 (remove)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (tmp_audio_path)
+                 CALL                     1
+                 POP_TOP
+        L15:     RETURN_VALUE
+
+ 247    L16:     RETURN_VALUE
+        L17:     RETURN_VALUE
+
+ 215    L18:     NOP
+
+ 212    L19:     LOAD_CONST               1 (None)
+                 LOAD_CONST               1 (None)
+                 LOAD_CONST               1 (None)
+                 CALL                     3
+                 POP_TOP
+
+ 221    L20:     LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               34 (getenv)
+                 PUSH_NULL
+                 LOAD_CONST               9 ('OPENAI_API_KEY')
+                 CALL                     1
+                 STORE_FAST               9 (api_key)
+
+ 222             LOAD_FAST                9 (api_key)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      208 (to L37)
+        L21:     NOT_TAKEN
+
+ 223             NOP
+
+ 224    L22:     LOAD_SMALL_INT           0
+                 LOAD_CONST              10 (('OpenAI',))
+                 IMPORT_NAME             18 (openai)
+                 IMPORT_FROM             19 (OpenAI)
+                 STORE_FAST              10 (OpenAI)
+                 POP_TOP
+
+ 225             LOAD_FAST               10 (OpenAI)
+                 PUSH_NULL
+                 LOAD_FAST                9 (api_key)
+                 LOAD_CONST              11 (('api_key',))
+                 CALL_KW                  1
+                 STORE_FAST              11 (client)
+
+ 226             LOAD_GLOBAL             41 (open + NULL)
+                 LOAD_FAST                1 (tmp_audio_path)
+                 LOAD_CONST              12 ('rb')
+                 CALL                     2
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L23:     STORE_FAST               6 (audio_data)
+
+ 227             LOAD_FAST               11 (client)
+                 LOAD_ATTR               42 (audio)
+                 LOAD_ATTR               44 (transcriptions)
+                 LOAD_ATTR               47 (create + NULL|self)
+
+ 228             LOAD_CONST              13 ('whisper-1')
+
+ 229             LOAD_FAST                6 (audio_data)
+
+ 230             LOAD_CONST              14 ('vi')
+
+ 227             LOAD_CONST              15 (('model', 'file', 'language'))
+                 CALL_KW                  3
+                 STORE_FAST              12 (transcription)
+
+ 226    L24:     LOAD_CONST               1 (None)
+                 LOAD_CONST               1 (None)
+                 LOAD_CONST               1 (None)
+                 CALL                     3
+                 POP_TOP
+
+ 232    L25:     LOAD_FAST_CHECK         12 (transcription)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      115 (to L37)
+        L26:     NOT_TAKEN
+        L27:     LOAD_FAST               12 (transcription)
+                 LOAD_ATTR               48 (text)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       97 (to L37)
+        L28:     NOT_TAKEN
+
+ 233    L29:     LOAD_FAST               12 (transcription)
+                 LOAD_ATTR               48 (text)
+                 LOAD_ATTR               21 (strip + NULL|self)
+                 CALL                     0
+
+ 246    L30:     NOP
+
+ 247    L31:     LOAD_FAST                1 (tmp_audio_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       62 (to L36)
+                 NOT_TAKEN
+                 LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               24 (path)
+                 LOAD_ATTR               27 (exists + NULL|self)
+                 LOAD_FAST                1 (tmp_audio_path)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       24 (to L35)
+        L32:     NOT_TAKEN
+
+ 248    L33:     LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               28 (remove)
+                 PUSH_NULL
+                 LOAD_FAST                1 (tmp_audio_path)
+                 CALL                     1
+                 POP_TOP
+        L34:     RETURN_VALUE
+
+ 247    L35:     RETURN_VALUE
+        L36:     RETURN_VALUE
+
+ 238    L37:     LOAD_GLOBAL             51 (get_whisper_pipeline + NULL)
+                 CALL                     0
+                 STORE_FAST              14 (pipe)
+
+ 239             LOAD_FAST               14 (pipe)
+                 PUSH_NULL
+                 LOAD_FAST                1 (tmp_audio_path)
+                 LOAD_CONST              18 ('language')
+                 LOAD_CONST              19 ('vietnamese')
+                 BUILD_MAP                1
+                 LOAD_CONST              20 (('generate_kwargs',))
+                 CALL_KW                  2
+                 STORE_FAST              15 (result)
+
+ 240             LOAD_FAST               15 (result)
+                 LOAD_ATTR               53 (get + NULL|self)
+                 LOAD_CONST              21 ('text')
+                 LOAD_CONST               0 ('')
+                 CALL                     2
+                 STORE_FAST              12 (transcription)
+
+ 241             LOAD_FAST               12 (transcription)
+                 LOAD_ATTR               21 (strip + NULL|self)
+                 CALL                     0
+
+ 246    L38:     NOP
+
+ 247    L39:     LOAD_FAST                1 (tmp_audio_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       62 (to L44)
+                 NOT_TAKEN
+                 LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               24 (path)
+                 LOAD_ATTR               27 (exists + NULL|self)
+                 LOAD_FAST                1 (tmp_audio_path)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       24 (to L43)
+        L40:     NOT_TAKEN
+
+ 248    L41:     LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               28 (remove)
+                 PUSH_NULL
+                 LOAD_FAST                1 (tmp_audio_path)
+                 CALL                     1
+                 POP_TOP
+        L42:     RETURN_VALUE
+
+ 247    L43:     RETURN_VALUE
+        L44:     RETURN_VALUE
+
+ 204    L45:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L46)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L46:     POP_TOP
+        L47:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             2
+                 JUMP_BACKWARD_NO_INTERRUPT 576 (to L5)
+
+  --    L48:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L49:     PUSH_EXC_INFO
+
+ 249             LOAD_GLOBAL             30 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE        4 (to L51)
+                 NOT_TAKEN
+                 POP_TOP
+
+ 250    L50:     POP_EXCEPT
+                 RETURN_VALUE
+
+ 249    L51:     RERAISE                  0
+
+  --    L52:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+ 212    L53:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L54)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L54:     POP_TOP
+        L55:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+        L56:     EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 417 (to L20)
+
+  --    L57:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L58:     PUSH_EXC_INFO
+
+ 217             LOAD_GLOBAL             30 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE       27 (to L62)
+                 NOT_TAKEN
+                 STORE_FAST               8 (google_err)
+
+ 218    L59:     LOAD_GLOBAL             33 (print + NULL)
+                 LOAD_CONST               7 ('Google Speech Recognition error: ')
+                 LOAD_FAST                8 (google_err)
+                 FORMAT_SIMPLE
+                 LOAD_CONST               8 ('. Fallback to Whisper...')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+        L60:     POP_EXCEPT
+                 LOAD_CONST               1 (None)
+                 STORE_FAST               8 (google_err)
+                 DELETE_FAST              8 (google_err)
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 452 (to L20)
+
+  --    L61:     LOAD_CONST               1 (None)
+                 STORE_FAST               8 (google_err)
+                 DELETE_FAST              8 (google_err)
+                 RERAISE                  1
+
+ 217    L62:     RERAISE                  0
+
+  --    L63:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+ 226    L64:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L65)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L65:     POP_TOP
+        L66:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 362 (to L25)
+
+  --    L67:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L68:     PUSH_EXC_INFO
+
+ 249             LOAD_GLOBAL             30 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE        4 (to L70)
+                 NOT_TAKEN
+                 POP_TOP
+
+ 250    L69:     POP_EXCEPT
+                 RETURN_VALUE
+
+ 249    L70:     RERAISE                  0
+
+  --    L71:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L72:     PUSH_EXC_INFO
+
+ 234             LOAD_GLOBAL             30 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE       27 (to L76)
+                 NOT_TAKEN
+                 STORE_FAST              13 (api_err)
+
+ 235    L73:     LOAD_GLOBAL             33 (print + NULL)
+                 LOAD_CONST              16 ('OpenAI Whisper API error: ')
+                 LOAD_FAST               13 (api_err)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              17 ('. Fallback to local...')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+        L74:     POP_EXCEPT
+                 LOAD_CONST               1 (None)
+                 STORE_FAST              13 (api_err)
+                 DELETE_FAST             13 (api_err)
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 292 (to L37)
+
+  --    L75:     LOAD_CONST               1 (None)
+                 STORE_FAST              13 (api_err)
+                 DELETE_FAST             13 (api_err)
+                 RERAISE                  1
+
+ 234    L76:     RERAISE                  0
+
+  --    L77:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L78:     PUSH_EXC_INFO
+
+ 249             LOAD_GLOBAL             30 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE        4 (to L80)
+                 NOT_TAKEN
+                 POP_TOP
+
+ 250    L79:     POP_EXCEPT
+                 RETURN_VALUE
+
+ 249    L80:     RERAISE                  0
+
+  --    L81:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L82:     PUSH_EXC_INFO
+
+ 242             LOAD_GLOBAL             30 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE      127 (to L97)
+                 NOT_TAKEN
+                 STORE_FAST              16 (e)
+
+ 243    L83:     LOAD_GLOBAL             54 (st)
+                 LOAD_ATTR               56 (error)
+                 PUSH_NULL
+                 LOAD_CONST              22 ('Lỗi chuyển giọng nói thành văn bản: ')
+                 LOAD_FAST               16 (e)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     1
+                 POP_TOP
+
+ 244    L84:     POP_EXCEPT
+                 LOAD_CONST               1 (None)
+                 STORE_FAST              16 (e)
+                 DELETE_FAST             16 (e)
+
+ 246    L85:     NOP
+
+ 247    L86:     LOAD_FAST                1 (tmp_audio_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       64 (to L91)
+                 NOT_TAKEN
+                 LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               24 (path)
+                 LOAD_ATTR               27 (exists + NULL|self)
+                 LOAD_FAST                1 (tmp_audio_path)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       25 (to L90)
+        L87:     NOT_TAKEN
+
+ 248    L88:     LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               28 (remove)
+                 PUSH_NULL
+                 LOAD_FAST                1 (tmp_audio_path)
+                 CALL                     1
+                 POP_TOP
+        L89:     LOAD_CONST               0 ('')
+                 RETURN_VALUE
+
+ 247    L90:     LOAD_CONST               0 ('')
+                 RETURN_VALUE
+        L91:     LOAD_CONST               0 ('')
+                 RETURN_VALUE
+
+  --    L92:     PUSH_EXC_INFO
+
+ 249             LOAD_GLOBAL             30 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE        5 (to L94)
+                 NOT_TAKEN
+                 POP_TOP
+
+ 250    L93:     POP_EXCEPT
+                 LOAD_CONST               0 ('')
+                 RETURN_VALUE
+
+ 249    L94:     RERAISE                  0
+
+  --    L95:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L96:     LOAD_CONST               1 (None)
+                 STORE_FAST              16 (e)
+                 DELETE_FAST             16 (e)
+                 RERAISE                  1
+
+ 242    L97:     RERAISE                  0
+
+  --    L98:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L99:     PUSH_EXC_INFO
+
+ 246   L100:     NOP
+
+ 247   L101:     LOAD_FAST                1 (tmp_audio_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       62 (to L106)
+                 NOT_TAKEN
+                 LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               24 (path)
+                 LOAD_ATTR               27 (exists + NULL|self)
+                 LOAD_FAST                1 (tmp_audio_path)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       24 (to L105)
+       L102:     NOT_TAKEN
+
+ 248   L103:     LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               28 (remove)
+                 PUSH_NULL
+                 LOAD_FAST                1 (tmp_audio_path)
+                 CALL                     1
+                 POP_TOP
+       L104:     RERAISE                  0
+
+ 247   L105:     RERAISE                  0
+       L106:     RERAISE                  0
+
+  --   L107:     PUSH_EXC_INFO
+
+ 249             LOAD_GLOBAL             30 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE        4 (to L109)
+                 NOT_TAKEN
+                 POP_TOP
+
+ 250   L108:     POP_EXCEPT
+                 RERAISE                  0
+
+ 249   L109:     RERAISE                  0
+
+  --   L110:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L111:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+ExceptionTable:
+  L2 to L3 -> L82 [0]
+  L3 to L4 -> L45 [2] lasti
+  L4 to L5 -> L82 [0]
+  L6 to L7 -> L58 [0]
+  L7 to L8 -> L53 [2] lasti
+  L8 to L9 -> L58 [0]
+  L10 to L11 -> L49 [1]
+  L12 to L13 -> L49 [1]
+  L14 to L15 -> L49 [1]
+  L19 to L20 -> L58 [0]
+  L20 to L21 -> L82 [0]
+  L22 to L23 -> L72 [0]
+  L23 to L24 -> L64 [2] lasti
+  L24 to L26 -> L72 [0]
+  L27 to L28 -> L72 [0]
+  L29 to L30 -> L72 [0]
+  L31 to L32 -> L68 [1]
+  L33 to L34 -> L68 [1]
+  L37 to L38 -> L82 [0]
+  L39 to L40 -> L78 [1]
+  L41 to L42 -> L78 [1]
+  L45 to L47 -> L48 [4] lasti
+  L47 to L49 -> L82 [0]
+  L49 to L50 -> L52 [2] lasti
+  L51 to L52 -> L52 [2] lasti
+  L53 to L55 -> L57 [4] lasti
+  L55 to L56 -> L58 [0]
+  L56 to L57 -> L82 [0]
+  L57 to L58 -> L58 [0]
+  L58 to L59 -> L63 [1] lasti
+  L59 to L60 -> L61 [1] lasti
+  L60 to L61 -> L82 [0]
+  L61 to L63 -> L63 [1] lasti
+  L63 to L64 -> L82 [0]
+  L64 to L66 -> L67 [4] lasti
+  L66 to L68 -> L72 [0]
+  L68 to L69 -> L71 [2] lasti
+  L70 to L71 -> L71 [2] lasti
+  L72 to L73 -> L77 [1] lasti
+  L73 to L74 -> L75 [1] lasti
+  L74 to L75 -> L82 [0]
+  L75 to L77 -> L77 [1] lasti
+  L77 to L78 -> L82 [0]
+  L78 to L79 -> L81 [2] lasti
+  L80 to L81 -> L81 [2] lasti
+  L82 to L83 -> L98 [1] lasti
+  L83 to L84 -> L96 [1] lasti
+  L84 to L85 -> L99 [0]
+  L86 to L87 -> L92 [0]
+  L88 to L89 -> L92 [0]
+  L92 to L93 -> L95 [1] lasti
+  L94 to L95 -> L95 [1] lasti
+  L96 to L98 -> L98 [1] lasti
+  L98 to L99 -> L99 [0]
+  L99 to L100 -> L111 [1] lasti
+  L101 to L102 -> L107 [2]
+  L103 to L104 -> L107 [2]
+  L104 to L107 -> L111 [1] lasti
+  L107 to L108 -> L110 [3] lasti
+  L108 to L109 -> L111 [1] lasti
+  L109 to L110 -> L110 [3] lasti
+  L110 to L111 -> L111 [1] lasti

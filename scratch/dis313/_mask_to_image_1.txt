@@ -1,0 +1,66 @@
+667           RESUME                   0
+
+668           LOAD_FAST                0 (mask)
+              POP_JUMP_IF_NOT_NONE     1 (to L1)
+
+669           RETURN_CONST             0 (None)
+
+670   L1:     LOAD_FAST                0 (mask)
+              LOAD_ATTR                0 (ndim)
+              LOAD_CONST               1 (2)
+              COMPARE_OP             119 (bool(!=))
+              POP_JUMP_IF_FALSE       12 (to L2)
+
+671           LOAD_FAST                0 (mask)
+              LOAD_CONST               0 (None)
+              LOAD_CONST               0 (None)
+              BUILD_SLICE              2
+              LOAD_CONST               0 (None)
+              LOAD_CONST               0 (None)
+              BUILD_SLICE              2
+              LOAD_CONST               2 (0)
+              BUILD_TUPLE              3
+              BINARY_SUBSCR
+              STORE_FAST               0 (mask)
+
+672   L2:     LOAD_FAST                0 (mask)
+              LOAD_ATTR                2 (shape)
+              LOAD_FAST                1 (target_shape)
+              COMPARE_OP             119 (bool(!=))
+              POP_JUMP_IF_FALSE       73 (to L3)
+
+673           LOAD_GLOBAL              4 (cv2)
+              LOAD_ATTR                6 (resize)
+              PUSH_NULL
+
+674           LOAD_FAST                0 (mask)
+              LOAD_ATTR                9 (astype + NULL|self)
+              LOAD_GLOBAL             10 (np)
+              LOAD_ATTR               12 (uint8)
+              CALL                     1
+
+675           LOAD_FAST                1 (target_shape)
+              LOAD_CONST               3 (1)
+              BINARY_SUBSCR
+              LOAD_FAST                1 (target_shape)
+              LOAD_CONST               2 (0)
+              BINARY_SUBSCR
+              BUILD_TUPLE              2
+
+676           LOAD_GLOBAL              4 (cv2)
+              LOAD_ATTR               14 (INTER_NEAREST)
+
+673           LOAD_CONST               4 (('interpolation',))
+              CALL_KW                  3
+              STORE_FAST               0 (mask)
+
+678   L3:     LOAD_FAST                0 (mask)
+              LOAD_CONST               2 (0)
+              COMPARE_OP             132 (>)
+              LOAD_ATTR                9 (astype + NULL|self)
+              LOAD_GLOBAL             10 (np)
+              LOAD_ATTR               12 (uint8)
+              CALL                     1
+              LOAD_CONST               5 (255)
+              BINARY_OP                5 (*)
+              RETURN_VALUE

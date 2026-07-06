@@ -1,0 +1,57 @@
+  --           COPY_FREE_VARS           2
+
+2754           RESUME                   0
+               LOAD_DEREF               1 (is_english)
+               TO_BOOL
+               POP_JUMP_IF_TRUE        72 (to L1)
+               NOT_TAKEN
+               LOAD_CONST               0 ('Lần ')
+               LOAD_GLOBAL              1 (len + NULL)
+               LOAD_DEREF               2 (visits)
+               CALL                     1
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               10 (-)
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               2 ('created_at')
+               CALL                     1
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               3 ('location')
+               CALL                     1
+               FORMAT_SIMPLE
+               BUILD_STRING             6
+               RETURN_VALUE
+       L1:     LOAD_CONST               4 ('Visit ')
+               LOAD_GLOBAL              1 (len + NULL)
+               LOAD_DEREF               2 (visits)
+               CALL                     1
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               10 (-)
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               2 ('created_at')
+               CALL                     1
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               3 ('location')
+               CALL                     1
+               FORMAT_SIMPLE
+               BUILD_STRING             6
+               RETURN_VALUE

@@ -1,0 +1,134 @@
+1475           RESUME                   0
+               LOAD_NAME                0 (__name__)
+               STORE_NAME               1 (__module__)
+               LOAD_CONST               0 ('MedicalPDF')
+               STORE_NAME               2 (__qualname__)
+               LOAD_CONST               1 (1475)
+               STORE_NAME               3 (__firstlineno__)
+
+1476           LOAD_CONST               2 (<code object header at 0x000001813F009230, file "D:\DoAn_DaLieu\app_streamlit.py", line 1476>)
+               MAKE_FUNCTION
+               STORE_NAME               4 (header)
+
+1486           LOAD_CONST               3 (<code object footer at 0x000001813F280990, file "D:\DoAn_DaLieu\app_streamlit.py", line 1486>)
+               MAKE_FUNCTION
+               STORE_NAME               5 (footer)
+               LOAD_CONST               4 (())
+               STORE_NAME               6 (__static_attributes__)
+               RETURN_CONST             5 (None)
+
+Disassembly of <code object header at 0x000001813F009230, file "D:\DoAn_DaLieu\app_streamlit.py", line 1476>:
+1476           RESUME                   0
+
+1477           LOAD_FAST                0 (self)
+               LOAD_ATTR                1 (set_fill_color + NULL|self)
+               LOAD_CONST               1 (26)
+               LOAD_CONST               2 (54)
+               LOAD_CONST               3 (93)
+               CALL                     3
+               POP_TOP
+
+1478           LOAD_FAST                0 (self)
+               LOAD_ATTR                3 (rect + NULL|self)
+               LOAD_CONST               4 (0)
+               LOAD_CONST               4 (0)
+               LOAD_CONST               5 (210)
+               LOAD_CONST               6 (35)
+               LOAD_CONST               7 ('F')
+               CALL                     5
+               POP_TOP
+
+1479           LOAD_FAST                0 (self)
+               LOAD_ATTR                5 (set_text_color + NULL|self)
+               LOAD_CONST               8 (255)
+               LOAD_CONST               8 (255)
+               LOAD_CONST               8 (255)
+               CALL                     3
+               POP_TOP
+
+1480           LOAD_FAST                0 (self)
+               LOAD_ATTR                7 (set_font + NULL|self)
+               LOAD_CONST               9 ('helvetica')
+               LOAD_CONST              10 ('B')
+               LOAD_CONST              11 (16)
+               CALL                     3
+               POP_TOP
+
+1481           LOAD_FAST                0 (self)
+               LOAD_ATTR                9 (cell + NULL|self)
+               LOAD_CONST               4 (0)
+               LOAD_CONST              12 (10)
+               LOAD_CONST              13 ('BAO CAO CHAN DOAN Y KHOA DA LIEU')
+               LOAD_CONST              14 (True)
+               LOAD_CONST              15 ('C')
+               LOAD_CONST              16 (('ln', 'align'))
+               CALL_KW                  5
+               POP_TOP
+
+1482           LOAD_FAST                0 (self)
+               LOAD_ATTR                7 (set_font + NULL|self)
+               LOAD_CONST               9 ('helvetica')
+               LOAD_CONST              17 ('')
+               LOAD_CONST              12 (10)
+               CALL                     3
+               POP_TOP
+
+1483           LOAD_FAST                0 (self)
+               LOAD_ATTR                9 (cell + NULL|self)
+               LOAD_CONST               4 (0)
+               LOAD_CONST              18 (5)
+               LOAD_CONST              19 ('He thong sang loc so bo tich hop Hoc sau & VQA')
+               LOAD_CONST              14 (True)
+               LOAD_CONST              15 ('C')
+               LOAD_CONST              16 (('ln', 'align'))
+               CALL_KW                  5
+               POP_TOP
+
+1484           LOAD_FAST                0 (self)
+               LOAD_ATTR               11 (ln + NULL|self)
+               LOAD_CONST              12 (10)
+               CALL                     1
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+Disassembly of <code object footer at 0x000001813F280990, file "D:\DoAn_DaLieu\app_streamlit.py", line 1486>:
+1486           RESUME                   0
+
+1487           LOAD_FAST                0 (self)
+               LOAD_ATTR                1 (set_y + NULL|self)
+               LOAD_CONST               1 (-15)
+               CALL                     1
+               POP_TOP
+
+1488           LOAD_FAST                0 (self)
+               LOAD_ATTR                3 (set_font + NULL|self)
+               LOAD_CONST               2 ('helvetica')
+               LOAD_CONST               3 ('I')
+               LOAD_CONST               4 (8)
+               CALL                     3
+               POP_TOP
+
+1489           LOAD_FAST                0 (self)
+               LOAD_ATTR                5 (set_text_color + NULL|self)
+               LOAD_CONST               5 (128)
+               LOAD_CONST               5 (128)
+               LOAD_CONST               5 (128)
+               CALL                     3
+               POP_TOP
+
+1490           LOAD_FAST                0 (self)
+               LOAD_ATTR                7 (cell + NULL|self)
+               LOAD_CONST               6 (0)
+               LOAD_CONST               7 (10)
+               LOAD_CONST               8 ('Trang ')
+               LOAD_FAST                0 (self)
+               LOAD_ATTR                9 (page_no + NULL|self)
+               CALL                     0
+               FORMAT_SIMPLE
+               LOAD_CONST               9 ('/{nb} | Tai lieu y te bao mat')
+               BUILD_STRING             3
+               LOAD_CONST              10 ('C')
+               LOAD_CONST              11 (('align',))
+               CALL_KW                  4
+               POP_TOP
+               RETURN_CONST             0 (None)

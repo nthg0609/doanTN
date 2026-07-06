@@ -1,10 +1,12 @@
-"""Streamlit Multi-modal Medical EHR Dashboard — Hybrid VQA v2.0
-Nâng cấp: Fusion Prompt, Safety Gate UI, LLM Logging, Plotly Charts, ABCD Metrics.
+"""Streamlit Multi-modal Medical EHR Dashboard — Professional Medical EHR v3.2
+Quy trình: Image/DICOM upload -> Safety Gate -> Segmentation -> Classification ->
+           ABCD Metrics -> VQA Streaming -> EHR Cloud Sync -> PDF Export.
 """
 
 import json
 import os
 import io
+import re
 import tempfile
 import base64
 import requests
@@ -15,9 +17,11 @@ from pathlib import Path
 import cv2
 import numpy as np
 import streamlit as st
-from PIL import Image
+import streamlit.components.v1 as stc_v1
+from PIL import Image, ImageDraw
 from dotenv import load_dotenv
 import plotly.graph_objects as go
+from streamlit_drawable_canvas import st_canvas
 
 import google.cloud.firestore as gcp_firestore
 from google.oauth2 import service_account
@@ -27,9 +31,26 @@ try:
 except Exception:
     OpenAI = None
 
+# ── Khai báo voice component inline ───────────────────────────────────────────
+_VOICE_FRONTEND = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "voice_component", "frontend"
+)
+if os.path.isdir(_VOICE_FRONTEND):
+    try:
+        _voice_input_fc = stc_v1.declare_component("derma_voice_input", path=_VOICE_FRONTEND)
+        VOICE_AVAILABLE = True
+    except Exception:
+        _voice_input_fc = None
+        VOICE_AVAILABLE = False
+else:
+    _voice_input_fc = None
+    VOICE_AVAILABLE = False
+
 load_dotenv()
 
-# ── Hằng số hệ thống ──────────────────────────────────────────────────────────
+# ==============================================================================
+# HẰNG SỐ HỆ THỐNG
+# ==============================================================================
 IMGBB_API_KEY = "159bc5d50210a5104a5c1b1018368f75"
 
 LOG_FILE_PATH = Path("5_Results/system_logs.log")
@@ -48,77 +69,96 @@ DIAGNOSIS_DICTIONARY: Dict[str, str] = {
     "VASC":  "Tổn thương mạch máu",
 }
 
-# Các lớp bệnh ác tính / tiền ác tính cần cảnh báo nếu xuất hiện trong Top-3
-MALIGNANT_CLASSES: list = ["MEL", "BCC", "AKIEC"]
-BENIGN_CLASSES:    list = ["BKL", "NV", "DF", "VASC"]
-# Ngưỡng xác suất hiển thị cảnh báo lâm sàng ngị ác tính
+MALIGNANT_CLASSES: List[str] = ["MEL", "BCC", "AKIEC"]
+BENIGN_CLASSES:    List[str] = ["BKL", "NV", "DF", "VASC"]
 MALIGNANT_ALERT_THRESHOLD: float = 0.15
 
 TRIAGE_REASON_VI: Dict[str, str] = {
-    "empty_or_low_confidence_mask":  "Không phát hiện được vùng tổn thương rõ ràng trong ảnh",
-    "area_ratio_out_of_bounds":      "Tỉ lệ diện tích tổn thương nằm ngoài ngưỡng hợp lệ",
+    "empty_or_low_confidence_mask":    "Không phát hiện được vùng tổn thương rõ ràng trong ảnh",
+    "area_ratio_out_of_bounds":        "Tỉ lệ diện tích tổn thương nằm ngoài ngưỡng hợp lệ",
     "border_complexity_out_of_bounds": "Độ phức tạp bờ quá cao — có thể do nhiễu ảnh",
-    "classification_unavailable":   "Mô hình phân loại không khả dụng",
-    "low_classification_confidence": "Độ tin cậy phân loại thấp hơn ngưỡng an toàn (τ_c)",
-    "image_load_failed":             "Không thể đọc file ảnh",
+    "classification_unavailable":      "Mô hình phân loại không khả dụng",
+    "low_classification_confidence":   "Độ tin cậy phân loại thấp hơn ngưỡng an toàn (tau_c)",
+    "image_load_failed":               "Không thể đọc file ảnh",
 }
 
-MEDICAL_DISCLAIMER = (
-    "⚠️ **TUYÊN BỐ MIỄN TRỪ TRÁCH NHIỆM:** Hệ thống này chỉ cấu thành một "
-    "công cụ hỗ trợ sàng lọc sơ bộ bằng công nghệ AI, hoàn toàn **không thay thế** "
-    "cho các chẩn đoán y khoa chuyên môn của bác sĩ da liễu."
-)
+BODY_LOCATIONS: List[str] = [
+    "--- Chọn Vị trí tổn thương ---", "Lưng", "Ngực / Bụng", "Cánh tay",
+    "Bàn tay", "Đùi", "Cẳng chân", "Bàn chân", "Đầu / Mặt",
+    "Cổ", "Vai", "Mông / Bẹn", "Vị trí khác",
+]
 
-# ── Tiện ích ──────────────────────────────────────────────────────────────────
+VIETNAM_PROVINCES: List[str] = [
+    "--- Chọn Tỉnh/Thành ---", "Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
+    "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bạc Liêu", "Bắc Ninh", "Bến Tre",
+    "Bình Định", "Bình Dương", "Bình Phước", "Bình Thuận", "Cà Mau", "Cao Bằng", "Đắk Lắk",
+    "Đắk Nông", "Điện Biên", "Đồng Nai", "Đồng Tháp", "Gia Lai", "Hà Giang", "Hà Nam", "Hà Tĩnh",
+    "Hải Dương", "Hậu Giang", "Hòa Bình", "Hưng Yên", "Khánh Hòa", "Kiên Giang", "Kon Tum",
+    "Lai Châu", "Lâm Đồng", "Lạng Sơn", "Lào Cai", "Long An", "Nam Định", "Nghệ An", "Ninh Bình",
+    "Ninh Thuận", "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi", "Quảng Ninh",
+    "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh", "Thái Bình", "Thái Nguyên", "Thanh Hóa",
+    "Thừa Thiên Huế", "Tiền Giang", "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái",
+    "Tỉnh/Thành khác",
+]
+
+VQA_MODE_OPTIONS: List[str] = [
+    "Trực tuyến — OpenAI GPT-4o-mini",
+    "Nội bộ — CPU (LLM local)",
+    "Nội bộ — Ollama",
+]
+
+PRESET_QUESTIONS: List[str] = [
+    "Bệnh này có triệu chứng lâm sàng gì?",
+    "Phác đồ chăm sóc vùng da tổn thương này?",
+    "Giải thích chỉ số ABCD bất thường.",
+    "Định hướng sinh thiết và xét nghiệm tiếp theo.",
+]
+
+# ==============================================================================
+# TIỆN ÍCH
+# ==============================================================================
 def get_vietnamese_diagnosis(pred_label: str) -> str:
     return DIAGNOSIS_DICTIONARY.get(pred_label, "Bệnh lý da liễu khác")
 
 
 # ==============================================================================
-# MODULE LOG HỆ THỐNG (Dev-only, ẩn hoàn toàn khỏi UI)
+# MODULE LOG HỆ THỐNG
 # ==============================================================================
 class _NumpySafeEncoder(json.JSONEncoder):
-    """Custom JSON encoder để xử lý numpy scalar/array không thể serialize bình thường."""
     def default(self, obj):
         try:
-            import numpy as np
-            if isinstance(obj, (np.integer,)):
-                return int(obj)
-            if isinstance(obj, (np.floating,)):
-                return float(obj)
-            if isinstance(obj, np.ndarray):
-                return obj.tolist()
-        except ImportError:
+            if isinstance(obj, (np.integer,)):  return int(obj)
+            if isinstance(obj, (np.floating,)): return float(obj)
+            if isinstance(obj, np.ndarray):     return obj.tolist()
+        except Exception:
             pass
         return super().default(obj)
 
 
 def write_dev_log(data: Dict[str, Any], action_type: str) -> None:
-    """Ghi gói JSON thô (bao gồm LLM Prompt & Response) vào file log cục bộ."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_entry = {
-        "action_time": timestamp,
+        "action_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "action_type": action_type,
-        "payload": data,
+        "payload":     data,
     }
     with open(LOG_FILE_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(log_entry, ensure_ascii=False, cls=_NumpySafeEncoder) + "\n")
 
 
 # ==============================================================================
-# MODULE CLOUD STORAGE (ImgBB + Firestore)
+# CLOUD STORAGE
 # ==============================================================================
 def upload_image_to_imgbb(local_image_path: str) -> Optional[str]:
-    """Tải ảnh lên ImgBB, trả về URL vĩnh viễn."""
     try:
-        with open(local_image_path, "rb") as file:
-            url = "https://api.imgbb.com/1/upload"
-            payload = {"key": IMGBB_API_KEY, "image": base64.b64encode(file.read())}
-            res = requests.post(url, payload)
+        with open(local_image_path, "rb") as f:
+            res = requests.post(
+                "https://api.imgbb.com/1/upload",
+                {"key": IMGBB_API_KEY, "image": base64.b64encode(f.read())},
+            )
             if res.status_code == 200:
                 return res.json()["data"]["url"]
     except Exception as e:
-        st.error(f"❌ Lỗi tải ảnh lên ImgBB: {e}")
+        st.error(f"Lỗi tải ảnh lên ImgBB: {e}")
     return None
 
 
@@ -129,7 +169,7 @@ def check_patient_exists(patient_name: str) -> bool:
         cred_path = "gcp-credentials.json"
         if os.path.exists(cred_path):
             creds = service_account.Credentials.from_service_account_file(cred_path)
-            db = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
+            db    = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
             doc_id = "".join(patient_name.strip().upper().split())
             return db.collection("medical_records").document(doc_id).get().exists
     except Exception:
@@ -142,39 +182,34 @@ def save_medical_record_to_gcp(
     patient_info: Dict[str, Any],
     visit_data: Dict[str, Any],
 ) -> bool:
-    """Lưu hồ sơ EHR lên Firestore: .update() cho bệnh nhân cũ, .set() cho mới."""
     try:
         cred_path = "gcp-credentials.json"
         if os.path.exists(cred_path):
-            creds = service_account.Credentials.from_service_account_file(cred_path)
-            db = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
+            creds  = service_account.Credentials.from_service_account_file(cred_path)
+            db     = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
             doc_id = "".join(patient_name.strip().upper().split())
-            doc_ref = db.collection("medical_records").document(doc_id)
-            doc_snap = doc_ref.get()
-            now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            if doc_snap.exists:
-                existing_visits = doc_snap.to_dict().get("visits", [])
-                existing_visits.append(visit_data)
-                doc_ref.update({
-                    "patient_info": patient_info,
-                    "updated_at": now_str,
-                    "visits": existing_visits,
-                })
+            ref    = db.collection("medical_records").document(doc_id)
+            snap   = ref.get()
+            now    = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            if snap.exists:
+                visits = snap.to_dict().get("visits", [])
+                visits.append(visit_data)
+                ref.update({"patient_info": patient_info, "updated_at": now, "visits": visits})
             else:
-                doc_ref.set({
-                    "patient_id": doc_id,
+                ref.set({
+                    "patient_id":   doc_id,
                     "patient_info": patient_info,
-                    "created_at": now_str,
-                    "updated_at": now_str,
-                    "visits": [visit_data],
+                    "created_at":   now,
+                    "updated_at":   now,
+                    "visits":       [visit_data],
                 })
-            write_dev_log({"patient_id": doc_id, "visit": visit_data}, action_type="SAVE_OR_UPDATE_RECORD")
+            write_dev_log({"patient_id": doc_id, "visit": visit_data}, "SAVE_OR_UPDATE_RECORD")
             return True
         else:
-            st.error("❌ Không tìm thấy file gcp-credentials.json!")
+            st.error("Không tìm thấy file gcp-credentials.json!")
             return False
     except Exception as e:
-        st.error(f"❌ Lỗi ghi dữ liệu lên Cloud Firestore: {e}")
+        st.error(f"Lỗi ghi dữ liệu lên Cloud Firestore: {e}")
     return False
 
 
@@ -184,8 +219,8 @@ def fetch_all_medical_records() -> List[Dict[str, Any]]:
         cred_path = "gcp-credentials.json"
         if os.path.exists(cred_path):
             creds = service_account.Credentials.from_service_account_file(cred_path)
-            db = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
-            docs = db.collection("medical_records").order_by(
+            db    = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
+            docs  = db.collection("medical_records").order_by(
                 "updated_at", direction=gcp_firestore.Query.DESCENDING
             ).stream()
             for doc in docs:
@@ -196,7 +231,7 @@ def fetch_all_medical_records() -> List[Dict[str, Any]]:
 
 
 # ==============================================================================
-# MODULE PIPELINE
+# PIPELINE
 # ==============================================================================
 @st.cache_resource
 def get_pipeline(min_conf: float):
@@ -222,904 +257,1458 @@ def _mask_to_image(mask: Optional[np.ndarray], target_shape) -> Optional[np.ndar
 
 
 # ==============================================================================
-# MODULE VQA ENGINE — Fusion Prompt Architecture
+# MODULE ĐA TỔN THƯƠNG
 # ==============================================================================
-def _build_fusion_system_prompt(cv_context: Dict[str, Any]) -> str:
-    """
-    Xây dựng System Prompt theo kiến trúc 3 vùng:
-      [IDENTITY] → [CV_CONTEXT] → [GUARDRAIL_RULES]
-    CV context được nhúng cứng (hard-coded) vào System, không phải User message.
-    """
+def detect_multiple_lesions(img_rgb: np.ndarray, mask: np.ndarray) -> List[Dict[str, Any]]:
+    if mask is None or mask.sum() == 0:
+        return []
+    mg = (mask[:, :, 0] if mask.ndim != 2 else mask).astype(np.uint8)
+    contours, _ = cv2.findContours(mg, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    lesions = []
+    for idx, ctr in enumerate(contours, start=1):
+        area = cv2.contourArea(ctr)
+        if area >= 150:
+            x, y, w, h = cv2.boundingRect(ctr)
+            lesions.append({"id": idx, "bbox": (x, y, w, h), "contour": ctr, "area": area})
+    return sorted(lesions, key=lambda x: x["area"], reverse=True)
+
+
+def draw_lesions_overlay(img_rgb: np.ndarray, lesions: List[Dict[str, Any]]) -> np.ndarray:
+    out = img_rgb.copy()
+    for les in lesions:
+        x, y, w, h = les["bbox"]
+        cv2.rectangle(out, (x, y), (x + w, y + h), (56, 161, 105), 3)
+        label = f"Nốt {les['id']}"
+        (lw, lh), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+        cv2.rectangle(out, (x, y - lh - 10), (x + lw, y), (56, 161, 105), -1)
+        cv2.putText(out, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+    return out
+
+
+# ==============================================================================
+# MODULE DICOM
+# ==============================================================================
+def load_dicom(file_obj) -> tuple:
+    tmp_path = None
+    try:
+        import pydicom
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".dcm") as tmp:
+            tmp.write(file_obj.read())
+            tmp_path = tmp.name
+        ds  = pydicom.dcmread(tmp_path)
+        arr = ds.pixel_array.astype(float)
+        if arr.ndim == 2:
+            arr = np.stack([arr] * 3, axis=-1)
+        arr = ((arr - arr.min()) / max(arr.max() - arr.min(), 1) * 255).astype(np.uint8)
+        img  = Image.fromarray(arr[:, :, :3]).convert("RGB")
+        meta = {
+            "patient_name": str(getattr(ds, "PatientName", "")),
+            "patient_age":  str(getattr(ds, "PatientAge",  "")),
+            "patient_sex":  str(getattr(ds, "PatientSex",  "")),
+        }
+        return img, meta
+    except Exception as e:
+        return None, {}
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            try: os.remove(tmp_path)
+            except Exception: pass
+
+
+# ==============================================================================
+# VQA ENGINE — Fusion Prompt + Stream
+# ==============================================================================
+def _build_system_prompt(cv_context: Dict[str, Any]) -> str:
     pred    = cv_context.get("prediction", "N/A")
     vi_name = get_vietnamese_diagnosis(pred)
     conf    = float(cv_context.get("confidence", 0.0))
     metrics = cv_context.get("metrics", {})
     probs   = cv_context.get("probabilities", {})
-
     prob_lines = "\n".join(
-        f"    • {k} ({get_vietnamese_diagnosis(k)}): {v:.4f}"
+        f"    - {k} ({get_vietnamese_diagnosis(k)}): {v:.4f}"
         for k, v in sorted(probs.items(), key=lambda x: -x[1])
     )
+    return f"""[IDENTITY]
+Bạn là Trợ lý Da liễu AI — hệ thống hỗ trợ sàng lọc y tế tích hợp mô hình Computer Vision và LLM.
+Tư vấn dựa HOÀN TOÀN trên dữ liệu CV được cung cấp, không được bịa đặt số liệu.
 
-    system_prompt = f"""[IDENTITY]
-Bạn là Trợ lý Da liễu AI — một hệ thống hỗ trợ sàng lọc y tế tích hợp mô hình Thị giác Máy tính (CV) và Mô hình Ngôn ngữ Lớn (LLM). Bạn tư vấn dựa HOÀN TOÀN trên dữ liệu CV được cung cấp bên dưới, không được bịa đặt số liệu.
-
-[CV_CONTEXT — DỮ LIỆU CHẮC CHẮN TỪ MÔ HÌNH CV]
-Kết quả phân loại mô hình chuyên biệt EfficientNet-B1 + CBAM Attention:
-  • Nhãn dự đoán cao nhất : {pred} → {vi_name}
-  • Độ tin cậy            : {conf:.4f} ({conf*100:.1f}%)
+[CV_CONTEXT]
+Mô hình EfficientNet-B1 + CBAM Attention:
+  Nhãn dự đoán cao nhất : {pred} — {vi_name}
+  Độ tin cậy            : {conf:.4f} ({conf*100:.1f}%)
 
 Phân phối xác suất đầy đủ 7 nhãn bệnh lý (ISIC):
 {prob_lines}
 
-Chỉ số hình học tổn thương (DeepLabV3+ Segmentation):
-  • Tỉ lệ diện tích (Area ratio)      : {metrics.get('area_ratio', 0.0):.4f}
-  • Độ phức tạp bờ (Border complexity): {metrics.get('border_complexity', 0.0):.4f}
-  • Bất đối xứng (Asymmetry score)    : {metrics.get('asymmetry', 0.0):.4f}  [0=đối xứng, 1=bất đối xứng]
-  • Độ tròn (Circularity)             : {metrics.get('circularity', 0.0):.4f}  [0=không tròn, 1=tròn đều]
+Chỉ số hình học (DeepLabV3+ Segmentation):
+  Area ratio        : {metrics.get('area_ratio', 0.0):.4f}
+  Border complexity : {metrics.get('border_complexity', 0.0):.4f}
+  Asymmetry         : {metrics.get('asymmetry', 0.0):.4f}  [0=đối xứng, 1=bất đối xứng]
+  Circularity       : {metrics.get('circularity', 0.0):.4f}  [0=không tròn, 1=tròn đều]
 
-[GUARDRAIL_RULES — QUY TẮC BẮT BUỘC TUYỆT ĐỐI]
-
-ĐƯỢC PHÉP:
-  ✅ Giải thích cơ chế bệnh sinh, mô tả triệu chứng lâm sàng phổ biến của nhãn bệnh trên.
-  ✅ Hướng dẫn chăm sóc da không dùng thuốc (làm sạch, tránh nắng, dưỡng ẩm, bảo vệ).
-  ✅ Phân nhóm thuốc tổng quát (ví dụ: "nhóm kháng nấm bôi tại chỗ", "nhóm corticosteroid bôi ngoài").
-  ✅ Giải thích ý nghĩa các chỉ số hình học CV ở trên khi người dùng hỏi.
-  ✅ Luôn khuyên người dùng đến gặp bác sĩ da liễu chuyên khoa để được chẩn đoán chính xác.
-
-QUY TẮC GIẢI THÍCH TIẾN TRIỂN & HẬU QUẢ BỆNH (CLINICAL PATHOLOGY PROGRESSION RULES):
-  Khi người dùng hỏi về tiến triển, biến chứng hoặc hậu quả của bệnh, hãy dựa vào NHÃN DỰ ĐOÁN CAO NHẤT ({pred}) từ mô hình CV để phản hồi chính xác:
-  - Nếu nhãn dự đoán là LÀNH TÍNH (BKL, NV, VASC, DF):
-    • Phải khẳng định rõ đây là tổn thương bản chất LÀNH TÍNH, không có khả năng tự biến đổi hoặc phát triển thành ung thư.
-    • Làm rõ các ảnh hưởng chỉ dừng lại ở mặt thẩm mỹ, kích ứng tại chỗ (như cọ xát quần áo, ngứa nhẹ), hoặc tâm lý lo lắng.
-    • Nhấn mạnh nguy cơ lớn nhất là "nhầm lẫn" (misdiagnosis) — tự chẩn đoán nhầm một tổn thương ác tính thực sự thành nốt lành tính, dẫn đến chủ quan không đi khám.
-  - Nếu nhãn dự đoán là TIỀN ÁC TÍNH hoặc ÁC TÍNH (AKIEC, BCC, MEL):
-    • Giải thích thận trọng, khách quan về nguy cơ tiến triển nếu không can thiệp (ví dụ: AKIEC có thể tiến triển thành ung thư biểu mô tế bào vảy xâm lấn; BCC xâm lấn phá hủy mô tại chỗ; MEL có thể di căn xa).
-    • Tránh dùng từ ngữ gây hoảng loạn cực đoan cho bệnh nhân, nhưng phải nhấn mạnh tầm quan trọng của việc đi khám bác sĩ, sinh thiết và điều trị y khoa kịp thời để kiểm soát bệnh.
-
-TUYỆT ĐỐI CẤM — MEDICATION GUARDRAIL:
-  🚫 KHÔNG được nêu tên bất kỳ biệt dược cụ thể nào (Amoxicillin, Tretinoin, Mometasone, Hydrocortisone, Clotrimazole, Acyclovir, v.v.)
-  🚫 KHÔNG được nêu liều lượng (mg, ml, %, IU, lần/ngày, tuần/lần).
-  🚫 KHÔNG được nêu thời gian dùng thuốc (7 ngày, 2 tuần, 1 tháng).
-  🚫 KHÔNG được đề xuất thuốc kể cả khi người dùng đặt câu hỏi dạng "ví dụ", "giả sử", "trường hợp giả định".
-  🚫 KHÔNG được xác nhận hay phủ nhận một loại thuốc cụ thể người dùng tự đề xuất.
-  → Nếu bị hỏi về tên thuốc cụ thể: Lịch sự từ chối, giải thích lý do y đức, và hướng dẫn gặp bác sĩ.
-
-ĐỊNH DẠNG PHẢN HỒI:
-  - Ngôn ngữ: Tiếng Việt, rõ ràng, chuyên nghiệp, dễ hiểu với bệnh nhân.
-  - Độ dài: Tối đa 400 từ mỗi câu trả lời. Nếu câu hỏi phức tạp, chia thành đề mục ngắn.
-  - Kết thúc mỗi câu trả lời bằng nhắc nhở đến khám bác sĩ da liễu.
+[GUARDRAIL_RULES]
+ĐƯỢC PHÉP: Giải thích cơ chế bệnh sinh, mô tả triệu chứng, hướng dẫn chăm sóc da không dùng thuốc,
+  phân nhóm thuốc tổng quát, giải thích ý nghĩa chỉ số ABCD, khuyến nghị gặp bác sĩ.
+TUYỆT ĐỐI CẤM: Tên biệt dược cụ thể, liều lượng, thời gian dùng thuốc.
+ĐỊNH DẠNG: Tiếng Việt, rõ ràng, chuyên nghiệp, tối đa 400 từ, kết thúc bằng khuyến nghị gặp bác sĩ.
 """
-    return system_prompt
 
 
 def _fallback_response(question: str, result: Dict[str, Any]) -> str:
     cls = result.get("classification") or {}
     return (
-        f'Bạn hỏi: "{question}". '
-        f'Mô hình dự đoán: {cls.get("prediction", "N/A")} '
-        f'({float(cls.get("confidence", 0.0)):.3f}). '
+        f'Câu hỏi: "{question}". '
+        f'Dự đoán: {cls.get("prediction", "N/A")} ({float(cls.get("confidence", 0.0)):.3f}). '
         "Vui lòng tham khảo ý kiến bác sĩ da liễu."
     )
 
 
-def generate_vqa_response(
-    question: str,
-    result: Dict[str, Any],
-    api_key: Optional[str],
-    history: Optional[List[Dict[str, str]]] = None,
-) -> str:
-    """
-    Luồng Fusion VQA chính:
-      1. Safety Gate Check — Chặn LLM nếu status == triage
-      2. Build CV context dict
-      3. Build System Prompt với CV context nhúng cứng
-      4. Build message list: [system, *history_sans_last_user, user_question]
-      5. Gọi LLM API
-      6. Ghi log đầy đủ System Prompt + User message + Raw Response
-      7. Return response
-    """
-    # ── BƯỚC 1: Safety Gate Check ─────────────────────────────────────────────
-    if result.get("status") == "triage":
-        triage_reason_raw = result.get("triage_reason", "unknown")
-        triage_reason_vi  = TRIAGE_REASON_VI.get(triage_reason_raw, triage_reason_raw)
-        return (
-            f"🚨 **Safety Gate đã kích hoạt** — Hệ thống không thể đưa ra tư vấn vì:\n\n"
-            f"> _{triage_reason_vi}_\n\n"
-            "Vui lòng chụp lại ảnh tổn thương với ánh sáng tốt hơn, hoặc liên hệ trực tiếp "
-            "với bác sĩ da liễu để được thăm khám chính xác."
-        )
-
-    # ── BƯỚC 2: Build CV context ───────────────────────────────────────────────
-    cls_data = result.get("classification") or {}
-    cv_context = {
-        "prediction":    cls_data.get("prediction", "N/A"),
-        "confidence":    float(cls_data.get("confidence", 0.0)),
-        "probabilities": cls_data.get("probabilities", {}),
-        "metrics":       result.get("metrics", {}),
-    }
-
-    # ── BƯỚC 3: Build System Prompt ───────────────────────────────────────────
-    system_prompt = _build_fusion_system_prompt(cv_context)
-
-    # ── BƯỚC 4: Build message list ────────────────────────────────────────────
-    history = history or []
-    # Loại bỏ tin nhắn user vừa append (sẽ được thêm riêng bên dưới để tránh duplicate)
-    valid_history = [
-        {"role": msg["role"], "content": msg["content"]}
-        for msg in history
-        if msg.get("role") in ("user", "assistant") and msg.get("content")
-    ]
-    # Bỏ tin nhắn user cuối cùng vì nó là câu hỏi hiện tại, sẽ truyền riêng
-    if valid_history and valid_history[-1]["role"] == "user":
-        valid_history = valid_history[:-1]
-
-    messages = [
-        {"role": "system", "content": system_prompt},
-        *valid_history,
-        {"role": "user",   "content": question},
-    ]
-
-    # ── BƯỚC 5: Gọi LLM ───────────────────────────────────────────────────────
-    api_key = api_key or os.getenv("OPENAI_API_KEY")
-    if OpenAI is None or not api_key:
-        return _fallback_response(question, result)
-
-    raw_response = ""
-    try:
-        client = OpenAI(api_key=api_key)
-        resp = client.chat.completions.create(
-            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-            temperature=0.2,
-            max_tokens=800,
-            messages=messages,
-        )
-        raw_response = resp.choices[0].message.content or ""
-    except Exception as exc:
-        write_dev_log({"error": str(exc), "question": question}, action_type="LLM_ERROR")
-        return _fallback_response(question, result)
-
-    # ── BƯỚC 6: Ghi log đầy đủ ───────────────────────────────────────────────
-    write_dev_log(
-        {
-            "system_prompt":  system_prompt,
-            "user_message":   question,
-            "chat_history_len": len(valid_history),
-            "raw_response":   raw_response,
-            "cv_context":     cv_context,
-        },
-        action_type="LLM_VQA_EXCHANGE",
-    )
-
-    return raw_response
-
-
 def generate_vqa_response_stream(
     question: str,
-    result: Dict[str, Any],
-    api_key: Optional[str],
-    history: Optional[List[Dict[str, str]]] = None,
+    result:   Dict[str, Any],
+    api_key:  Optional[str],
+    history:  Optional[List[Dict[str, str]]] = None,
 ):
-    """
-    Luồng Fusion VQA chính (phiên bản Generator / Stream):
-      1. Safety Gate Check — Chặn LLM nếu status == triage
-      2. Build CV context dict
-      3. Build System Prompt với CV context nhúng cứng
-      4. Build message list: [system, *history_sans_last_user, user_question]
-      5. Gọi LLM API với stream=True
-      6. Yield từng chunk phản hồi
-      7. Ghi log đầy đủ System Prompt + User message + Raw Response sau khi hoàn tất
-    """
-    # ── BƯỚC 1: Safety Gate Check ─────────────────────────────────────────────
     if result.get("status") == "triage":
-        triage_reason_raw = result.get("triage_reason", "unknown")
-        triage_reason_vi  = TRIAGE_REASON_VI.get(triage_reason_raw, triage_reason_raw)
-        fallback = (
-            f"🚨 **Safety Gate đã kích hoạt** — Hệ thống không thể đưa ra tư vấn vì:\n\n"
-            f"> _{triage_reason_vi}_\n\n"
-            "Vui lòng chụp lại ảnh tổn thương với ánh sáng tốt hơn, hoặc liên hệ trực tiếp "
-            "với bác sĩ da liễu để được thăm khám chính xác."
+        reason_vi = TRIAGE_REASON_VI.get(result.get("triage_reason", ""), result.get("triage_reason", ""))
+        yield (
+            f"Safety Gate đã kích hoạt — Hệ thống không thể đưa ra tư vấn vì:\n\n"
+            f"> {reason_vi}\n\n"
+            "Vui lòng chụp lại ảnh tổn thương với ánh sáng tốt hơn, "
+            "hoặc liên hệ trực tiếp với bác sĩ da liễu để được thăm khám chính xác."
         )
-        for char in fallback:
-            yield char
         return
 
-    # ── BƯỚC 2: Build CV context ───────────────────────────────────────────────
-    cls_data = result.get("classification") or {}
+    cls_data   = result.get("classification") or {}
     cv_context = {
-        "prediction":    cls_data.get("prediction", "N/A"),
+        "prediction":    cls_data.get("prediction",   "N/A"),
         "confidence":    float(cls_data.get("confidence", 0.0)),
         "probabilities": cls_data.get("probabilities", {}),
         "metrics":       result.get("metrics", {}),
     }
-
-    # ── BƯỚC 3: Build System Prompt ───────────────────────────────────────────
-    system_prompt = _build_fusion_system_prompt(cv_context)
-
-    # ── BƯỚC 4: Build message list ────────────────────────────────────────────
-    history = history or []
-    valid_history = [
-        {"role": msg["role"], "content": msg["content"]}
-        for msg in history
-        if msg.get("role") in ("user", "assistant") and msg.get("content")
+    system_prompt = _build_system_prompt(cv_context)
+    history       = history or []
+    valid_hist    = [
+        {"role": m["role"], "content": m["content"]}
+        for m in history
+        if m.get("role") in ("user", "assistant") and m.get("content")
     ]
-    if valid_history and valid_history[-1]["role"] == "user":
-        valid_history = valid_history[:-1]
+    if valid_hist and valid_hist[-1]["role"] == "user":
+        valid_hist = valid_hist[:-1]
 
     messages = [
         {"role": "system", "content": system_prompt},
-        *valid_history,
+        *valid_hist,
         {"role": "user",   "content": question},
     ]
 
-    # ── BƯỚC 5: Gọi LLM với stream=True ───────────────────────────────────────
     api_key = api_key or os.getenv("OPENAI_API_KEY")
     if OpenAI is None or not api_key:
-        fallback = _fallback_response(question, result)
-        for char in fallback:
-            yield char
+        yield _fallback_response(question, result)
         return
 
-    raw_response_list = []
+    raw_parts: List[str] = []
     try:
-        client = OpenAI(api_key=api_key, timeout=15.0)
-        resp = client.chat.completions.create(
-            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-            temperature=0.2,
-            max_tokens=800,
-            messages=messages,
-            stream=True,
+        client = OpenAI(api_key=api_key)
+        resp   = client.chat.completions.create(
+            model      = os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            temperature= 0.2,
+            max_tokens = 800,
+            messages   = messages,
+            stream     = True,
         )
         for chunk in resp:
-            if len(chunk.choices) > 0:
+            if chunk.choices and chunk.choices[0].delta.content:
                 content = chunk.choices[0].delta.content
-                if content:
-                    raw_response_list.append(content)
-                    yield content
+                raw_parts.append(content)
+                yield content
     except Exception as exc:
-        write_dev_log({"error": str(exc), "question": question}, action_type="LLM_ERROR")
-        fallback = _fallback_response(question, result)
-        for char in fallback:
-            yield char
+        write_dev_log({"error": str(exc), "question": question}, "LLM_ERROR")
+        yield _fallback_response(question, result)
         return
 
-    # ── BƯỚC 6: Ghi log đầy đủ ───────────────────────────────────────────────
-    raw_response = "".join(raw_response_list)
-    write_dev_log(
-        {
-            "system_prompt":  system_prompt,
-            "user_message":   question,
-            "chat_history_len": len(valid_history),
-            "raw_response":   raw_response,
-            "cv_context":     cv_context,
-        },
-        action_type="LLM_VQA_EXCHANGE",
-    )
+    write_dev_log({
+        "system_prompt":    system_prompt,
+        "user_message":     question,
+        "raw_response":     "".join(raw_parts),
+        "cv_context":       cv_context,
+        "chat_history_len": len(valid_hist),
+    }, "LLM_VQA_EXCHANGE")
 
 
 # ==============================================================================
-# MODULE VISUALIZATION
+# VISUALIZATION
 # ==============================================================================
-def render_probability_chart(probabilities: Dict[str, float], patient_name: str = "", timestamp: str = "") -> None:
-    """
-    Vẽ Plotly Horizontal Bar Chart cho phân phối xác suất 7 nhãn.
-    Đồng thời lưu ảnh PNG vào CHART_SAVE_DIR để dùng cho báo cáo.
-    """
+def render_probability_chart(
+    probabilities: Dict[str, float],
+    patient_name:  str = "",
+    timestamp:     str = "",
+) -> None:
     if not probabilities:
         return
 
-    labels_vi = [f"{k}<br><sub>{get_vietnamese_diagnosis(k)}</sub>" for k in probabilities.keys()]
-    values    = list(probabilities.values())
-    keys      = list(probabilities.keys())
+    keys   = list(probabilities.keys())
+    values = list(probabilities.values())
+    labels = [f"{k}<br><sub>{get_vietnamese_diagnosis(k)}</sub>" for k in keys]
 
-    # Màu gradient: xanh lá → vàng → đỏ theo giá trị xác suất
     colors = []
-    for v in values:
-        r = int(255 * min(1.0, v * 2))
-        g = int(255 * min(1.0, 2.0 - v * 2))
-        colors.append(f"rgba({r},{g},60,0.85)")
+    for k, v in zip(keys, values):
+        if k in MALIGNANT_CLASSES:
+            r = min(255, int(180 + 75 * v))
+            g = max(0,   int(80  - 80 * v))
+            b = 60
+        else:
+            r = 60
+            g = min(200, int(140 + 60 * v))
+            b = min(180, int(100 + 80 * v))
+        colors.append(f"rgba({r},{g},{b},0.88)")
 
     fig = go.Figure()
     fig.add_trace(go.Bar(
-        x=values,
-        y=labels_vi,
-        orientation="h",
-        marker=dict(color=colors, line=dict(color="rgba(255,255,255,0.3)", width=1)),
-        text=[f"{v:.3f}" for v in values],
-        textposition="outside",
-        textfont=dict(size=11, color="white"),
+        x=values, y=labels, orientation="h",
+        marker=dict(color=colors, line=dict(color="rgba(255,255,255,0.15)", width=1)),
+        text=[f"{v:.3f}" for v in values], textposition="outside",
+        textfont=dict(size=11, color="#cbd5e1"),
         hovertemplate="<b>%{y}</b><br>Xác suất: %{x:.4f}<extra></extra>",
     ))
 
     top_key = max(probabilities, key=probabilities.get)
     top_val = probabilities[top_key]
-
     fig.update_layout(
         title=dict(
-            text=f"📊 Phân phối Xác suất Bệnh lý<br><sup>Dự đoán cao nhất: <b>{top_key}</b> — {top_val:.2%}</sup>",
-            font=dict(size=14, color="white"),
-            x=0.5,
+            text=(f"Phân phối Xác suất Bệnh lý<br>"
+                  f"<sup>Dự đoán cao nhất: <b>{top_key}</b> — {top_val:.2%}</sup>"),
+            font=dict(size=13, color="#e2e8f0"), x=0.5,
         ),
-        xaxis=dict(
-            title="Xác suất",
-            range=[0, 1.1],
-            tickformat=".0%",
-            gridcolor="rgba(255,255,255,0.1)",
-            color="white",
-        ),
-        yaxis=dict(
-            autorange="reversed",
-            color="white",
-            tickfont=dict(size=10),
-        ),
-        plot_bgcolor="rgba(17,25,40,0.9)",
-        paper_bgcolor="rgba(17,25,40,0.9)",
-        font=dict(color="white"),
-        margin=dict(l=10, r=60, t=80, b=40),
+        xaxis=dict(title="Xác suất", range=[0, 1.18],
+                   tickformat=".0%", gridcolor="rgba(255,255,255,0.08)", color="#94a3b8"),
+        yaxis=dict(autorange="reversed", color="#94a3b8", tickfont=dict(size=10)),
+        plot_bgcolor ="rgba(15,23,42,0.92)",
+        paper_bgcolor="rgba(15,23,42,0.92)",
+        font=dict(color="#e2e8f0"),
+        margin=dict(l=10, r=65, t=80, b=40),
         height=320,
     )
+    st.plotly_chart(fig, use_container_width=True)
 
-    st.plotly_chart(fig, use_column_width=True)
-
-    # ── Lưu PNG báo cáo ───────────────────────────────────────────────────────
     try:
-        ts_str = timestamp or datetime.now().strftime("%Y%m%d_%H%M%S")
-        # Sanitize timestamp and patient name to be safe for filenames (no slashes, colons, or invalid chars)
-        ts_clean = ts_str.replace("/", "").replace("\\", "").replace(":", "").replace(" ", "_")
-        safe_name = "".join(c for c in patient_name.strip().upper() if c.isalnum() or c in ("-", "_")) or "UNKNOWN"
-        png_filename = CHART_SAVE_DIR / f"prob_chart_{safe_name}_{ts_clean}.png"
-
-        # Dùng kaleido (nếu có) hoặc fallback sang matplotlib
+        ts_clean  = (timestamp or datetime.now().strftime("%Y%m%d_%H%M%S"))\
+                    .replace("/", "").replace("\\", "").replace(":", "").replace(" ", "_")
+        safe_name = "".join(c for c in patient_name.upper() if c.isalnum() or c in "-_") or "UNKNOWN"
+        png_path  = CHART_SAVE_DIR / f"prob_{safe_name}_{ts_clean}.png"
         try:
-            img_bytes = fig.to_image(format="png", width=800, height=400, scale=2)
-            with open(png_filename, "wb") as f:
-                f.write(img_bytes)
+            with open(png_path, "wb") as f:
+                f.write(fig.to_image(format="png", width=800, height=400, scale=2))
         except Exception:
-            # Fallback: matplotlib bar chart đơn giản
-            import matplotlib
-            matplotlib.use("Agg")
-            import matplotlib.pyplot as plt
-            fig_mpl, ax = plt.subplots(figsize=(10, 5), facecolor="#111928")
-            ax.set_facecolor("#111928")
-            sorted_items = sorted(probabilities.items(), key=lambda x: -x[1])
-            k_labels = [f"{k}\n{get_vietnamese_diagnosis(k)}" for k, _ in sorted_items]
-            k_values = [v for _, v in sorted_items]
-            bar_colors = [
-                (min(1.0, v * 2), min(1.0, 2.0 - v * 2), 0.2)
-                for v in k_values
-            ]
-            bars = ax.barh(k_labels, k_values, color=bar_colors)
-            ax.set_xlim(0, 1.1)
-            ax.set_xlabel("Xác suất", color="white")
-            ax.set_title(f"Phân phối Xác suất — {safe_name} — {ts_str}", color="white")
-            ax.tick_params(colors="white")
-            for spine in ax.spines.values():
-                spine.set_edgecolor("white")
-            for bar, val in zip(bars, k_values):
-                ax.text(val + 0.01, bar.get_y() + bar.get_height() / 2,
-                        f"{val:.3f}", va="center", color="white", fontsize=9)
+            import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
+            fig_m, ax = plt.subplots(figsize=(10, 5), facecolor="#0f172a")
+            ax.set_facecolor("#0f172a")
+            items = sorted(probabilities.items(), key=lambda x: -x[1])
+            lbls  = [f"{k}\n{get_vietnamese_diagnosis(k)}" for k, _ in items]
+            vals  = [v for _, v in items]
+            clrs  = ["#dc2626" if k in MALIGNANT_CLASSES else "#2563eb" for k, _ in items]
+            ax.barh(lbls, vals, color=clrs)
+            ax.set_xlim(0, 1.1); ax.tick_params(colors="white")
+            for sp in ax.spines.values(): sp.set_edgecolor("#334155")
             plt.tight_layout()
-            plt.savefig(png_filename, dpi=150, bbox_inches="tight",
-                        facecolor="#111928")
-            plt.close(fig_mpl)
-
-        st.caption(f"📁 Đã lưu biểu đồ báo cáo: `{png_filename}`")
-    except Exception as save_err:
-        st.caption(f"_(Không lưu được PNG: {save_err})_")
+            plt.savefig(png_path, dpi=150, bbox_inches="tight", facecolor="#0f172a")
+            plt.close(fig_m)
+    except Exception:
+        pass
 
 
 def render_radar_chart(metrics: Dict[str, Any]) -> None:
-    """Vẽ Radar Chart 4 chỉ số hình học ABCD chuẩn hóa."""
-    area        = float(metrics.get("area_ratio", 0.0))
-    border_raw  = float(metrics.get("border_complexity", 0.0))
-    asymmetry   = float(metrics.get("asymmetry", 0.0))
-    circularity = float(metrics.get("circularity", 0.0))
-
-    # Chuẩn hóa border_complexity về [0,1] (max ref = 8.0 theo safety gate)
-    border_norm = min(border_raw / 8.0, 1.0)
-    # Chuẩn hóa area_ratio về [0,1] (max ref = 0.75)
-    area_norm   = min(area / 0.75, 1.0)
-
-    categories  = ["Diện tích<br>(Area ratio)", "Độ phức tạp bờ<br>(Border)", "Bất đối xứng<br>(Asymmetry)", "Độ tròn<br>(Circularity)"]
-    values_norm = [area_norm, border_norm, asymmetry, circularity]
-    values_norm_closed = values_norm + [values_norm[0]]
-    categories_closed  = categories  + [categories[0]]
+    area  = min(float(metrics.get("area_ratio",        0.0)) / 0.75, 1.0)
+    bord  = min(float(metrics.get("border_complexity", 0.0)) / 8.0,  1.0)
+    asym  = float(metrics.get("asymmetry",   0.0))
+    circ  = float(metrics.get("circularity", 0.0))
+    cats  = ["Diện tích<br>(Area)", "Phức tạp bờ<br>(Border)",
+             "Bất đối xứng<br>(Asymmetry)", "Độ tròn<br>(Circularity)"]
+    vals  = [area, bord, asym, circ]
+    vals += [vals[0]]; cats += [cats[0]]
 
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(
-        r=values_norm_closed,
-        theta=categories_closed,
-        fill="toself",
-        fillcolor="rgba(99,179,237,0.2)",
-        line=dict(color="rgba(99,179,237,0.9)", width=2),
-        name="Chỉ số ABCD",
+        r=vals, theta=cats, fill="toself",
+        fillcolor="rgba(59,130,246,0.15)",
+        line=dict(color="rgba(96,165,250,0.9)", width=2),
     ))
     fig.update_layout(
         polar=dict(
-            bgcolor="rgba(17,25,40,0.8)",
-            radialaxis=dict(visible=True, range=[0, 1], color="white", gridcolor="rgba(255,255,255,0.15)"),
-            angularaxis=dict(color="white", gridcolor="rgba(255,255,255,0.15)"),
+            bgcolor="rgba(15,23,42,0.8)",
+            radialaxis=dict(visible=True, range=[0, 1],
+                            color="#64748b", gridcolor="rgba(255,255,255,0.1)"),
+            angularaxis=dict(color="#64748b", gridcolor="rgba(255,255,255,0.1)"),
         ),
-        paper_bgcolor="rgba(17,25,40,0.9)",
-        font=dict(color="white", size=10),
+        paper_bgcolor="rgba(15,23,42,0.9)",
+        font=dict(color="#e2e8f0", size=10),
         showlegend=False,
         margin=dict(l=40, r=40, t=30, b=30),
         height=280,
     )
-    st.plotly_chart(fig, use_column_width=True)
+    st.plotly_chart(fig, use_container_width=True)
 
 
 # ==============================================================================
-# GIAO DIỆN DASHBOARD BÁC SĨ (EHR Timeline)
+# PDF GENERATION
+# ==============================================================================
+def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]:
+    try:
+        from fpdf import FPDF
+        import datetime
+        from app_streamlit import get_vietnamese_diagnosis
+        
+        pdf = FPDF()
+        pdf.add_page()
+        
+        # Load Unicode font DejaVu để hiển thị Tiếng Việt đầy đủ
+        font_path = "fonts/DejaVuSans.ttf"
+        font_bold_path = "fonts/DejaVuSans-Bold.ttf"
+        font_italic_path = "fonts/DejaVuSans-Oblique.ttf"
+        
+        pdf.add_font("DejaVu", "", font_path)
+        pdf.add_font("DejaVu", "B", font_bold_path)
+        pdf.add_font("DejaVu", "I", font_italic_path)
+        
+        # 1. Vẽ đường viền trang trí ở trên cùng (Medical Blue Accent)
+        pdf.set_fill_color(37, 99, 235)  # #2563eb
+        pdf.rect(15, 10, 180, 3, "F")
+        
+        pdf.ln(5)
+        # 2. Tiêu đề thương hiệu y khoa
+        pdf.set_font("DejaVu", "B", 15)
+        pdf.set_text_color(30, 58, 138)  # Deep Medical Blue
+        pdf.cell(0, 10, "HỆ THỐNG EHR BỆNH ÁN ĐIỆN TỬ MULTI-VISIT AI-DERMA", new_x="LMARGIN", new_y="NEXT", align="C")
+        
+        pdf.set_font("DejaVu", "", 9)
+        pdf.set_text_color(100, 116, 139)  # Slate
+        pdf.cell(0, 5, "Trung tâm Phân tích Định lượng AI & Hỗ trợ Lâm sàng VQA", new_x="LMARGIN", new_y="NEXT", align="C")
+        
+        pdf.ln(5)
+        pdf.set_draw_color(226, 232, 240)  # #e2e8f0
+        pdf.line(15, 38, 195, 38)
+        
+        # Tiêu đề báo cáo
+        pdf.ln(5)
+        pdf.set_font("DejaVu", "B", 13)
+        pdf.set_text_color(30, 41, 59)
+        pdf.cell(0, 8, "PHIẾU KẾT QUẢ PHÂN TÍCH VÀ CHẨN ĐOÁN HÌNH ẢNH DA LIỄU", new_x="LMARGIN", new_y="NEXT", align="C")
+        pdf.ln(4)
+        
+        # --- PHẦN I: THÔNG TIN HÀNH CHÍNH ---
+        pdf.set_font("DejaVu", "B", 10)
+        pdf.set_text_color(37, 99, 235)
+        pdf.cell(0, 6, "I. THÔNG TIN HÀNH CHÍNH BỆNH NHÂN", new_x="LMARGIN", new_y="NEXT")
+        
+        # Thiết lập bảng thông tin
+        pdf.set_font("DejaVu", "", 9)
+        pdf.set_text_color(30, 41, 59)
+        pdf.set_draw_color(203, 213, 225)
+        pdf.set_fill_color(248, 250, 252)  # Nền nhạt
+        
+        # Dòng 1: Họ tên + Giới tính
+        pdf.cell(30, 7, " Họ tên bệnh nhân", border=1, fill=True)
+        pdf.set_font("DejaVu", "B", 9)
+        pdf.cell(70, 7, f" {patient_info.get('name', 'N/A').upper()}", border=1)
+        pdf.set_font("DejaVu", "", 9)
+        pdf.cell(30, 7, " Giới tính / Tuổi", border=1, fill=True)
+        pdf.cell(50, 7, f" {patient_info.get('gender', 'N/A')} / {patient_info.get('age', 'N/A')} tuổi", border=1)
+        pdf.ln(7)
+        
+        # Dòng 2: Quê quán + Vị trí tổn thương
+        pdf.cell(30, 7, " Quê quán", border=1, fill=True)
+        pdf.cell(70, 7, f" {patient_info.get('hometown', 'N/A')}", border=1)
+        pdf.cell(30, 7, " Vị trí tổn thương", border=1, fill=True)
+        pdf.cell(50, 7, f" {patient_info.get('location', 'N/A')}", border=1)
+        pdf.ln(10)
+        
+        # --- PHẦN II: PHÂN TÍCH ĐỊNH LƯỢNG AI ---
+        pdf.set_font("DejaVu", "B", 10)
+        pdf.set_text_color(37, 99, 235)
+        pdf.cell(0, 6, "II. KẾT QUẢ ĐỊNH LƯỢNG HÌNH ẢNH (AI EXTRACTED METRICS)", new_x="LMARGIN", new_y="NEXT")
+        
+        # Header bảng AI
+        pdf.set_font("DejaVu", "B", 9)
+        pdf.set_text_color(255, 255, 255)
+        pdf.set_fill_color(30, 58, 138)  # Deep Blue Header
+        pdf.cell(70, 7, " Chỉ số đánh giá", border=1, fill=True)
+        pdf.cell(40, 7, " Giá trị phân tích", border=1, fill=True, align="C")
+        pdf.cell(70, 7, " Đánh giá lâm sàng", border=1, fill=True)
+        pdf.ln(7)
+        
+        pdf.set_text_color(30, 41, 59)
+        ai = visit_data.get("ai_extracted_metrics", {})
+        
+        raw_pred = ai.get("prediction", "N/A")
+        vi_pred = get_vietnamese_diagnosis(raw_pred)
+        conf = ai.get("confidence", 0.0)
+        
+        metrics = [
+            ("Chẩn đoán bệnh lý lý thuyết", f"{vi_pred}", f"Độ tin cậy: {conf:.1%}"),
+            ("Tỉ lệ diện tích (Area ratio)", f"{ai.get('area_ratio', 0.0):.4f}", "Chiếm tỷ lệ diện tích trên vùng ảnh"),
+            ("Độ bất đối xứng (Asymmetry)", f"{ai.get('asymmetry', 0.0):.4f}", "Đánh giá cấu trúc đối xứng tổn thương"),
+            ("Độ tròn hình học (Circularity)", f"{ai.get('circularity', 0.0):.4f}", "Đo lường hình thái rìa tổn thương"),
+            ("Độ phức tạp viền (Border complexity)", f"{ai.get('border_complexity', 0.0):.4f}", "Độ lồi lõm của viền ngoài")
+        ]
+        
+        for idx, (label, val, comment) in enumerate(metrics):
+            pdf.set_fill_color(248, 250, 252) if idx % 2 == 0 else pdf.set_fill_color(255, 255, 255)
+            pdf.cell(70, 7, f" {label}", border=1, fill=True)
+            pdf.cell(40, 7, f" {val}", border=1, fill=True, align="C")
+            pdf.cell(70, 7, f" {comment}", border=1, fill=True)
+            pdf.ln(7)
+            
+        pdf.ln(5)
+        
+        # --- PHẦN III: KHUYẾN NGHỊ LÂM SÀNG ---
+        pdf.set_font("DejaVu", "B", 10)
+        pdf.set_text_color(37, 99, 235)
+        pdf.cell(0, 6, "III. KHUYẾN NGHỊ & ĐỊNH HƯỚNG LÂM SÀNG", new_x="LMARGIN", new_y="NEXT")
+        
+        pdf.set_font("DejaVu", "", 9.5)
+        pdf.set_text_color(30, 41, 59)
+        pdf.set_fill_color(239, 246, 255) # Light blue box
+        pdf.set_draw_color(191, 219, 254)
+        
+        if "melanoma" in raw_pred.lower():
+            adv = (
+                "Phát hiện dấu hiệu nguy cơ cao của Ung thư hắc tố ác tính (Melanoma). Khuyến nghị chuyển tiếp bệnh nhân "
+                "đến chuyên khoa phẫu thuật tạo hình/da liễu khẩn cấp để thực hiện sinh thiết toàn bộ tổn thương và xét nghiệm "
+                "mô bệnh học chẩn đoán xác định. Bệnh nhân tuyệt đối không gãi, nặn vùng da tổn thương."
+            )
+        elif "carcinoma" in raw_pred.lower():
+            adv = (
+                "Phát hiện dấu hiệu nghi ngờ Ung thư biểu mô tế bào đáy/tế bào vảy. Khuyến nghị chỉ định bệnh nhân soi da chuyên sâu "
+                "và lên kế hoạch hội chẩn phẫu thuật cắt bỏ bờ an toàn. Theo dõi sát tiến triển tổn thương vùng xung quanh."
+            )
+        else:
+            adv = (
+                "Phân tích hình thái cho thấy tổn thương có khả năng cao là lành tính thông thường (Nevi/Lành tính). "
+                "Khuyến nghị tiếp tục tự theo dõi tại nhà, chụp ảnh kiểm tra sự thay đổi kích thước, màu sắc định kỳ mỗi 6 tháng. "
+                "Liên hệ bác sĩ nếu có bất kỳ hiện tượng ngứa, loét hoặc chảy máu bất thường."
+            )
+            
+        pdf.multi_cell(180, 5, adv, border=1, fill=True)
+        pdf.ln(5)
+        
+        # --- CHỮ KÝ BÁC SĨ ---
+        pdf.ln(5)
+        pdf.set_font("DejaVu", "I", 9.5)
+        now_str = datetime.datetime.now().strftime("Hà Nội, ngày %d tháng %m năm %Y")
+        pdf.cell(180, 5, now_str, new_x="LMARGIN", new_y="NEXT", align="R")
+        pdf.ln(2)
+        pdf.set_font("DejaVu", "B", 9.5)
+        pdf.cell(180, 5, "Bác sĩ chẩn đoán hình ảnh", new_x="LMARGIN", new_y="NEXT", align="R")
+        pdf.set_font("DejaVu", "", 8.5)
+        pdf.set_text_color(100, 116, 139)
+        pdf.cell(180, 5, "(Ký và ghi rõ họ tên)", new_x="LMARGIN", new_y="NEXT", align="R")
+        
+        # Disclaimer ở dưới cùng
+        pdf.set_y(-25)
+        pdf.set_font("DejaVu", "I", 8)
+        pdf.set_text_color(239, 68, 68)  # Red warning
+        dis = (
+            "* TUYÊN BỐ MIỄN TRỪ: Hệ thống AI này chỉ đóng vai trò hỗ trợ sàng lọc lâm sàng sơ bộ dựa trên học máy. "
+            "Kết quả phân tích không thể thay thế quyết định chẩn đoán y khoa chuyên môn của bác sĩ da liễu có thẩm quyền."
+        )
+        pdf.multi_cell(180, 4, dis, align="C")
+        
+        return bytes(pdf.output())
+    except Exception as e:
+        st.warning(f"Không tạo được PDF: {e}")
+        return None
+    except Exception as e:
+        st.warning(f"Không tạo được PDF: {e}")
+        return None
+
+
+# ==============================================================================
+# CSS — Clean, Professional Medical EHR (no comments, no dashes)
+# ==============================================================================
+def _inject_custom_css() -> None:
+    st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+    html, body, [class*="css"], [class*="st-"] {
+        font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif !important;
+    }
+    .ehr-disclaimer {
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
+        padding: 10px 16px;
+        margin-bottom: 12px;
+        font-size: 0.81rem;
+        color: #fca5a5;
+        font-weight: 500;
+    }
+    .ehr-page-title {
+        font-size: 1.55rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin: 0 0 2px 0;
+    }
+    .ehr-page-sub {
+        font-size: 0.83rem;
+        color: #64748b;
+        margin: 0 0 14px 0;
+    }
+    .triage-banner {
+        background: rgba(239, 68, 68, 0.1);
+        border: 2px solid rgba(239, 68, 68, 0.5);
+        border-radius: 10px;
+        padding: 12px 18px;
+        text-align: center;
+        font-size: 0.92rem;
+        color: #fca5a5;
+        font-weight: 600;
+        margin: 10px 0;
+    }
+    .success-banner {
+        background: rgba(34, 197, 94, 0.08);
+        border: 1.5px solid rgba(34, 197, 94, 0.4);
+        border-radius: 8px;
+        padding: 10px 16px;
+        color: #4ade80;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin: 8px 0;
+    }
+    .clinical-warn {
+        background: rgba(234, 88, 12, 0.09);
+        border: 1.5px solid rgba(234, 88, 12, 0.45);
+        border-radius: 10px;
+        padding: 10px 16px;
+        margin: 8px 0;
+        color: #fdba74;
+        font-size: 0.88rem;
+        line-height: 1.5;
+    }
+    .abcd-card {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(147, 197, 253, 0.25);
+        border-radius: 8px;
+        padding: 12px 10px;
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .abcd-card.warn {
+        background: rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.35);
+    }
+    .abcd-card .card-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 4px;
+    }
+    .abcd-card .card-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #e2e8f0;
+    }
+    .abcd-card .card-value.warn {
+        color: #f87171;
+    }
+    .abcd-card .card-sublabel {
+        font-size: 0.67rem;
+        color: #64748b;
+        margin-top: 3px;
+    }
+    .diag-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(30, 58, 138, 0.15);
+        border: 1px solid rgba(96, 165, 250, 0.25);
+        border-radius: 8px;
+        padding: 8px 14px;
+        margin: 10px 0;
+        font-size: 0.9rem;
+    }
+    .diag-badge .conf-label {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+    .conf-high { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .conf-mid  { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
+    .conf-low  { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    [data-testid="stChatMessageContent"] p {
+        margin: 0 0 2px 0 !important;
+        line-height: 1.45 !important;
+    }
+    [data-testid="stChatMessageContent"] ol,
+    [data-testid="stChatMessageContent"] ul {
+        margin: 2px 0 4px 0 !important;
+        padding-left: 16px !important;
+    }
+    [data-testid="stChatMessageContent"] li {
+        margin-bottom: 1px !important;
+        line-height: 1.4 !important;
+    }
+    [data-testid="stChatMessage"] {
+        padding: 4px 0 !important;
+    }
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0f172a 0%, #111e36 100%);
+    }
+    .sidebar-section {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #94a3b8;
+        padding: 8px 0 4px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 8px;
+    }
+    .step-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        font-size: 0.78rem;
+        color: #64748b;
+    }
+    .step-row.done { color: #4ade80; }
+    .step-row.active { color: #60a5fa; font-weight: 600; }
+    .step-dot {
+        width: 16px; height: 16px; flex-shrink: 0;
+        border-radius: 50%;
+        border: 1px solid currentColor;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.65rem; font-weight: 700;
+    }
+    .step-dot.done { background: rgba(74, 222, 128, 0.1); }
+    .voice-box {
+        background: rgba(30, 41, 59, 0.25);
+        border: 1px dashed rgba(96, 165, 250, 0.2);
+        border-radius: 8px;
+        padding: 8px;
+        margin: 6px 0;
+    }
+    .voice-box-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #60a5fa;
+        margin-bottom: 4px;
+    }
+    [data-testid="stTabs"] [role="tab"] {
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+    div[data-testid="stAppViewContainer"] { opacity: 1 !important; filter: none !important; }
+    [data-st-mode="running"] * { opacity: 1 !important; }
+    div[data-testid="stTextInput"] input {
+        height: 50px !important;
+        font-size: 1.05rem !important;
+        border-radius: 8px !important;
+        background-color: rgba(30, 41, 59, 0.4) !important;
+        border: 1px solid rgba(147, 197, 253, 0.25) !important;
+    }
+    div[data-testid="stHorizontalBlock"] div[data-testid="column"]:last-child button {
+        height: 50px !important;
+        font-size: 1.45rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        background-color: #2563eb !important;
+        color: white !important;
+        margin-top: 0 !important;
+        border: none !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
+# ==============================================================================
+# DOCTOR DASHBOARD (EHR Timeline)
 # ==============================================================================
 def render_doctor_dashboard() -> None:
-    st.header("📂 Hệ thống Tra cứu Hồ sơ Bệnh án Điện tử (Đa mốc thời gian)")
-    st.info("Hỗ trợ hiển thị lịch sử tiến triển lâm sàng đa phương thức (nhiều ảnh ở các thời điểm khác nhau).")
+    st.header("Hệ thống Tra cứu Hồ sơ Bệnh án Điện tử (EHR Multi-visit Timeline)")
+    st.caption("Hỗ trợ hiển thị lịch sử tiến triển lâm sàng đa phương thức qua các mốc thời gian.")
 
     all_records = fetch_all_medical_records()
     if not all_records:
-        st.warning("📭 Hiện tại kho lưu trữ đám mây chưa có dữ liệu bệnh án nào hợp lệ.")
+        st.warning("Hiện tại chưa có dữ liệu bệnh án nào trong kho lưu trữ đám mây.")
         return
 
-    patient_options: Dict[str, Dict[str, Any]] = {}
+    options: Dict[str, Dict[str, Any]] = {}
     for r in all_records:
-        p_info  = r.get("patient_info", {})
-        p_name  = p_info.get("name", "Ẩn danh")
-        p_age   = p_info.get("age", "??")
-        total   = len(r.get("visits", []))
-        label   = f"👤 BN: {p_name} ({p_age} tuổi) — [{total} mốc ảnh bệnh án]"
-        patient_options[label] = r
+        pi    = r.get("patient_info", {})
+        name  = pi.get("name", "Ẩn danh")
+        total = len(r.get("visits", []))
+        label = f"BN: {name.upper()} ({pi.get('age', '??')} tuổi) — [{total} mốc khám]"
+        options[label] = r
 
-    selected_key = st.selectbox("🔍 Chọn bệnh nhân cần tra cứu:", list(patient_options.keys()))
-    if not selected_key:
+    sel = st.selectbox("Chọn bệnh nhân cần tra cứu:", list(options.keys()))
+    if not sel:
         return
 
-    record  = patient_options[selected_key]
-    p_info  = record.get("patient_info", {})
-    visits  = sorted(record.get("visits", []), key=lambda x: x.get("timestamp_id", ""), reverse=True)
+    record = options[sel]
+    pi     = record.get("patient_info", {})
+    visits = sorted(record.get("visits", []), key=lambda x: x.get("timestamp_id", ""), reverse=True)
 
-    st.markdown("---")
-    st.subheader("👤 Thông tin hành chính bệnh nhân")
-    cc1, cc2, cc3 = st.columns(3)
-    cc1.markdown(f"**Họ và tên:** `{p_info.get('name', '').upper()}`")
-    cc2.markdown(f"**Tuổi lâm sàng:** `{p_info.get('age', 'N/A')}`")
-    cc3.markdown(f"**Địa chỉ thường trú:** `{p_info.get('hometown', 'N/A')}`")
-    st.markdown("---")
-    st.subheader("📅 Biên niên sử hình ảnh & Chẩn đoán qua các thời kỳ")
+    st.divider()
+    st.subheader("Thông tin hành chính bệnh nhân")
+    ca, cb, cc = st.columns(3)
+    ca.markdown(f"**Họ tên:** `{pi.get('name', '').upper()}`")
+    cb.markdown(f"**Tuổi:** `{pi.get('age', 'N/A')}` — **Giới tính:** `{pi.get('gender', 'N/A')}`")
+    cc.markdown(f"**Địa chỉ:** `{pi.get('hometown', 'N/A')}`")
+    st.divider()
 
+    st.subheader("Biên niên sử hình ảnh và Chẩn đoán (tất cả lần khám)")
     for idx, visit in enumerate(visits):
-        v_time      = visit.get("created_at", "N/A")
-        ai_metrics  = visit.get("ai_extracted_metrics", {})
-        image_url   = visit.get("image_url")
-        conversations = visit.get("vqa_conversations", [])
-        v_pred      = ai_metrics.get("prediction", "N/A")
-        v_vi_name   = get_vietnamese_diagnosis(v_pred)
+        v_time = visit.get("created_at", "N/A")
+        ai_m   = visit.get("ai_extracted_metrics", {})
+        img_url= visit.get("image_url")
+        convs  = visit.get("vqa_conversations", [])
+        v_pred = ai_m.get("prediction", "N/A")
+        v_vi   = get_vietnamese_diagnosis(v_pred)
 
-        with st.expander(f"📸 LẦN KHÁM THỨ {len(visits) - idx} — Ngày: {v_time}", expanded=(idx == 0)):
-            col_img, col_data = st.columns([1, 1.2])
-            with col_img:
-                if image_url:
-                    st.image(image_url, caption=f"Ảnh tổn thương: {v_time}", use_column_width=True)
+        with st.expander(f"LẦN KHÁM THỨ {len(visits) - idx} — Ngày: {v_time}", expanded=(idx == 0)):
+            c1, c2 = st.columns([1, 1.2])
+            with c1:
+                if img_url:
+                    st.image(img_url, caption=f"Ảnh tổn thương: {v_time}", use_container_width=True)
                 else:
-                    st.warning("Không có tệp ảnh cho lần khám này.")
-            with col_data:
-                st.markdown("#### 🩺 Kết quả phân tích AI")
-                conf_val = ai_metrics.get("confidence", 0.0)
+                    st.warning("Không có file ảnh cho lần khám này.")
+            with c2:
+                st.markdown("**Kết quả phân tích AI**")
                 m1, m2 = st.columns(2)
                 m1.metric("Nhãn dự đoán", v_pred)
-                m2.metric("Độ tin cậy", f"{float(conf_val) * 100:.1f}%")
-                st.markdown(
-                    f"**Giải nghĩa:** <span style='color:#63b3ed;font-weight:bold;'>{v_vi_name}</span>",
-                    unsafe_allow_html=True,
-                )
+                m2.metric("Độ tin cậy", f"{float(ai_m.get('confidence', 0.0)) * 100:.1f}%")
+                st.markdown(f"Giải nghĩa: **{v_vi}**")
                 st.markdown("**Chỉ số hình học:**")
-                st.write(f"- Area ratio: `{ai_metrics.get('area_ratio', 0.0):.4f}`")
-                st.write(f"- Border complexity: `{ai_metrics.get('border_complexity', 0.0):.4f}`")
-                st.write(f"- Asymmetry: `{ai_metrics.get('asymmetry', 0.0):.4f}`")
-                st.write(f"- Circularity: `{ai_metrics.get('circularity', 0.0):.4f}`")
+                for k, lbl in [
+                    ("area_ratio", "Area ratio"), ("border_complexity", "Border complexity"),
+                    ("asymmetry", "Asymmetry"),   ("circularity", "Circularity"),
+                ]:
+                    st.write(f"- {lbl}: `{float(ai_m.get(k, 0.0)):.4f}`")
 
-            st.markdown("##### 💬 Nhật ký tư vấn y khoa (VQA)")
-            if not conversations:
-                st.caption("Lần khám này không thực hiện hội thoại phụ.")
+            if convs:
+                st.markdown("**Nhật ký tư vấn VQA:**")
+                for m in convs:
+                    role = m.get("role", "")
+                    esc  = m.get("content", "").replace("<", "&lt;").replace(">", "&gt;")
+                    lbl  = "Bác sĩ" if role == "user" else "Trợ lý AI"
+                    bd   = "#3b82f6" if role == "user" else "#22c55e"
+                    st.markdown(
+                        f"<div style='background:rgba(0,0,0,0.2);border-left:3px solid {bd};"
+                        f"padding:5px 10px;border-radius:4px;font-size:0.84rem;margin:3px 0;'>"
+                        f"<b>{lbl}:</b> {esc}</div>",
+                        unsafe_allow_html=True,
+                    )
             else:
-                chat_html = ""
-                for msg in conversations:
-                    role    = msg.get("role", "")
-                    content = msg.get("content", "")
-                    if role == "user":
-                        chat_html += (
-                            f"<div style='background:rgba(99,179,237,0.15);border-left:3px solid #63b3ed;"
-                            f"padding:6px 10px;margin:4px 0;border-radius:4px;overflow-wrap:break-word;'>"
-                            f"<b>👤 Hỏi:</b> {content}</div>"
-                        )
-                    else:
-                        chat_html += (
-                            f"<div style='background:rgba(72,187,120,0.12);border-left:3px solid #48bb78;"
-                            f"padding:6px 10px;margin:4px 0;border-radius:4px;overflow-wrap:break-word;"
-                            f"max-height:200px;overflow-y:auto;'>"
-                            f"<b>🤖 Đáp:</b> {content}</div>"
-                        )
-                st.markdown(chat_html, unsafe_allow_html=True)
+                st.caption("Lần khám này không thực hiện hội thoại VQA.")
 
 
 # ==============================================================================
-# MAIN APPLICATION INTERFACE
+# MAIN APPLICATION
 # ==============================================================================
-def _inject_custom_css() -> None:
-    """Inject CSS kiểm soát overflow & styling cho chat VQA."""
-    st.markdown(
-        """
-        <style>
-        /* ── Disclaimer banner ── */
-        .medical-disclaimer {
-            background: linear-gradient(135deg, rgba(245,101,101,0.15), rgba(236,153,75,0.15));
-            border: 1px solid rgba(245,101,101,0.4);
-            border-radius: 8px;
-            padding: 10px 16px;
-            margin-bottom: 12px;
-            font-size: 0.82rem;
-            color: #fbd38d;
-        }
-        /* ── Chat message overflow ── */
-        [data-testid="stChatMessageContent"] p,
-        [data-testid="stChatMessageContent"] li {
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-        [data-testid="stChatMessageContent"] {
-            max-height: 420px;
-            overflow-y: auto;
-        }
-        /* ── Metric card ── */
-        [data-testid="stMetricValue"] {
-            font-size: 1.1rem !important;
-        }
-        /* ── Triage alert ── */
-        .triage-banner {
-            background: rgba(229,62,62,0.18);
-            border: 2px solid #e53e3e;
-            border-radius: 10px;
-            padding: 14px 18px;
-            text-align: center;
-            font-size: 1rem;
-            color: #feb2b2;
-        }
-        /* ── Vô hiệu hóa hiệu ứng làm mờ khi Streamlit đang rerun/running ── */
-        div[data-testid="stAppViewContainer"] {
-            opacity: 1 !important;
-            filter: none !important;
-        }
-        [data-st-mode="running"] {
-            opacity: 1 !important;
-        }
-        div.element-container {
-            opacity: 1 !important;
-        }
-        .stApp.running, [data-st-mode="running"] * {
-            opacity: 1 !important;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def main() -> None:
     st.set_page_config(
-        page_title="Dermatology VQA — Hybrid AI",
-        page_icon="🔬",
+        page_title="Dermatology EHR — AI Assistant",
+        page_icon=None,
         layout="wide",
         initial_sidebar_state="expanded",
     )
     _inject_custom_css()
 
-    # ── Fixed Disclaimer ──────────────────────────────────────────────────────
     st.markdown(
-        f"<div class='medical-disclaimer'>{MEDICAL_DISCLAIMER}</div>",
+        "<div class='ehr-disclaimer'>"
+        "TUYÊN BỐ MIỄN TRỪ TRÁCH NHIỆM: Hệ thống này chỉ là công cụ hỗ trợ sàng lọc sơ bộ bằng AI, "
+        "KHÔNG thay thế chẩn đoán y khoa chuyên môn của bác sĩ da liễu."
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("<p class='ehr-page-title'>Hệ thống Trợ lý Da liễu Đa phương thức và EHR Dashboard</p>", unsafe_allow_html=True)
+    st.markdown(
+        "<p class='ehr-page-sub'>"
+        "Tích hợp chẩn đoán hình học, lọc chất lượng ảnh chụp, tư vấn phác đồ điều trị y văn"
+        "</p>",
         unsafe_allow_html=True,
     )
 
-    st.title("🔬 Hệ thống Trợ lý Da liễu Đa phương thức & EHR Dashboard")
+    # ── Session State Init ────────────────────────────────────────────────────
+    _ss_defaults = {
+        "messages":                [],
+        "result":                  None,
+        "analysis_time":           None,
+        "saved_local_img_path":    None,
+        "last_uploaded_file_name": None,
+        "chat_input_val":          "",
+        "last_voice_text":         "",
+        "form_patient_name":       "",
+        "form_patient_id":         "",
+        "form_patient_age":        30,
+        "form_patient_gender":     "--- Chọn Giới tính ---",
+        "form_patient_hometown":   "--- Chọn Tỉnh/Thành ---",
+        "form_patient_location":   "--- Chọn Vị trí tổn thương ---",
+        "sam_point":               None,
+        "custom_mask":             None,
+        "sam_pending":             False,
+        "input_key":               0,
+        "voice_key":               0,
+        "voice_prefill":           "",
+    }
+    for k, v in _ss_defaults.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
 
-    # ── Session State Init (TRƯỚC st.tabs() để tránh race condition) ─────────
-    for key, default in [
-        ("messages", []),
-        ("result", None),
-        ("analysis_time", None),
-        ("saved_local_img_path", None),
-        ("last_uploaded_file_name", None),
-        ("form_patient_name", ""),
-        ("form_patient_age", 25),
-        ("form_patient_hometown", ""),
-    ]:
-        if key not in st.session_state:
-            st.session_state[key] = default
+    allow_to_save = True
 
-    def reset_patient_form():
-        st.session_state["form_patient_name"] = ""
-        st.session_state["form_patient_age"] = 25
-        st.session_state["form_patient_hometown"] = ""
-
-    # ── Sidebar (GLOBAL — không đặt trong context tab nào) ────────────────────
+    # ============================================================
+    # SIDEBAR
+    # ============================================================
     with st.sidebar:
-        st.header("📋 THÔNG TIN BỆNH NHÂN")
-        p_name     = st.text_input("Họ và tên bệnh nhân:", key="form_patient_name", placeholder="Nguyễn Văn A")
-        p_age      = st.number_input("Tuổi:", min_value=0, max_value=120, key="form_patient_age")
-        p_hometown = st.text_input("Quê quán / Địa chỉ:", key="form_patient_hometown", placeholder="Hà Nội")
+        _r   = st.session_state.get("result")
+        _s1  = st.session_state.get("last_uploaded_file_name") is not None
+        _s2  = _r is not None
+        _s3  = _s2 and (_r.get("status") != "triage")
+        _s4  = bool(st.session_state.get("messages"))
 
-        allow_to_save = True
+        st.markdown("<div class='sidebar-section'>Quy trình chẩn đoán</div>", unsafe_allow_html=True)
+        for num, text, done, active in [
+            ("1", "Nhận file ảnh / DICOM",       _s1, not _s1),
+            ("2", "Đánh giá chất lượng ảnh",      _s2, _s1 and not _s2),
+            ("3", "Phân tích AI + ABCD",          _s3, _s2 and not _s3),
+            ("4", "Tư vấn VQA lâm sàng",          _s4, _s3 and not _s4),
+        ]:
+            cls = "done" if done else ("active" if active else "")
+            st.markdown(
+                f"<div class='step-row {cls}'>"
+                f"<span class='step-dot {cls}'>{num}</span>"
+                f"<span>{text}</span></div>",
+                unsafe_allow_html=True,
+            )
+
+        st.markdown("<div class='sidebar-section' style='margin-top:14px;'>Thông tin bệnh nhân</div>", unsafe_allow_html=True)
+
+        p_id = st.text_input(
+            "Số định danh (CCCD / BHYT / Mã BN):",
+            key="form_patient_id",
+            placeholder="031090123456 (để trống tự sinh)",
+        )
+        p_name = st.text_input(
+            "Họ và tên bệnh nhân:",
+            key="form_patient_name",
+            placeholder="Nguyễn Văn A",
+        )
+        p_age = st.number_input("Tuổi:", min_value=0, max_value=120, key="form_patient_age")
+        p_gender = st.selectbox(
+            "Giới tính:",
+            ["--- Chọn Giới tính ---", "Nam", "Nữ", "Khác"],
+            key="form_patient_gender",
+        )
+        p_hometown = st.selectbox("Quê quán / Tỉnh thành:", VIETNAM_PROVINCES, key="form_patient_hometown")
+        p_location = st.selectbox("Vị trí tổn thương:", BODY_LOCATIONS, key="form_patient_location")
+
         if p_name.strip():
-            is_old_patient = check_patient_exists(p_name)
-            if is_old_patient:
-                st.warning(f"⚠️ PHÁT HIỆN: Bệnh nhân '{p_name.upper()}' đã có hồ sơ lịch sử.")
-                confirm_update = st.radio(
-                    "Bác sĩ có muốn cập nhật thêm mốc khám mới không?",
-                    options=["Chưa chọn", "Có, ghi nhận thêm mốc khám mới", "Không, đây là bệnh nhân khác trùng tên"],
-                    index=0,
+            is_old = check_patient_exists(p_name)
+            if is_old:
+                st.warning(f"PHÁT HIỆN: '{p_name.upper()}' đã có hồ sơ lịch sử.")
+                confirm = st.radio(
+                    "Xác nhận:",
+                    ["Chưa chọn", "Có, ghi thêm mốc khám mới", "Không, bệnh nhân khác trùng tên"],
+                    index=0, key="confirm_update",
                 )
-                if confirm_update == "Có, ghi nhận thêm mốc khám mới":
+                if confirm == "Có, ghi thêm mốc khám mới":
                     allow_to_save = True
-                    st.caption("🟢 Nút lưu đã được mở khoá.")
-                elif confirm_update == "Không, đây là bệnh nhân khác trùng tên":
+                    st.caption("Nút lưu đã mở khóa.")
+                elif confirm == "Không, bệnh nhân khác trùng tên":
                     allow_to_save = False
-                    st.error("🛑 Vui lòng thêm Mã số định danh vào tên để tạo hồ sơ riêng.")
+                    st.error("Thêm Mã số định danh vào tên để tạo hồ sơ riêng.")
                 else:
                     allow_to_save = False
-                    st.info("💡 Vui lòng tích chọn xác nhận để mở khoá nút Lưu.")
             else:
-                st.success("✨ HỒ SƠ MỚI: Sẽ tạo tài khoản hồ sơ mới.")
+                if p_name.strip():
+                    st.success("HỒ SƠ MỚI: Sẽ tạo tài khoản hồ sơ mới.")
 
-        st.button("🗑️ Reset Form", on_click=reset_patient_form)
+        def _reset_form():
+            for k in ["form_patient_name", "form_patient_id"]:
+                st.session_state[k] = ""
+            st.session_state["form_patient_age"]      = 30
+            st.session_state["form_patient_gender"]   = "--- Chọn Giới tính ---"
+            st.session_state["form_patient_hometown"] = "--- Chọn Tỉnh/Thành ---"
+            st.session_state["form_patient_location"] = "--- Chọn Vị trí tổn thương ---"
 
-        st.markdown("---")
-        st.header("⚙️ CẤU HÌNH HỆ THỐNG")
-        min_conf = st.slider("Safety gate threshold (τ_c)", 0.30, 0.95, 0.60, 0.01)
+        st.button("Reset Form", on_click=_reset_form, key="sidebar_reset_btn")
 
-    tab_diagnosis, tab_doctor = st.tabs(["🔬 Thực hiện Chẩn đoán VQA", "📂 Màn hình Xem lại của Bác sĩ"])
+        st.markdown("<div class='sidebar-section' style='margin-top:14px;'>Cấu hình hệ thống</div>", unsafe_allow_html=True)
 
-    # ── TAB 1: CHẨN ĐOÁN VQA ─────────────────────────────────────────────────
-    with tab_diagnosis:
+        min_conf  = st.slider("Ngưỡng safety gate (tau_c)", 0.30, 0.95, 0.60, 0.01,
+                              help="Ngưỡng kiểm soát chất lượng đầu vào.")
+        mal_thresh= st.slider("Độ nhạy phát hiện ác tính", 0.05, 0.50, 0.15, 0.01,
+                              help="Xác suất tối thiểu để hiện cảnh báo nguy cơ ác tính.")
+        lambda_w  = st.slider("Trọng số: Hình ảnh vs Dịch tễ", 0.0, 1.0, 0.80, 0.05,
+                              help="1.0 = chỉ dựa vào hình ảnh; 0.5 = kết hợp 50/50 với dữ liệu dịch tễ.")
 
-        # ── Upload & Image Reset ──────────────────────────────────────────────
-        uploaded = st.file_uploader("📤 Tải ảnh tổn thương da lên:", type=["jpg", "jpeg", "png"])
+        st.markdown("**Chế độ mô hình VQA:**")
+        vqa_mode = st.radio(
+            "VQA mode",
+            VQA_MODE_OPTIONS,
+            label_visibility="collapsed",
+            key="vqa_mode_radio",
+        )
+
+        with st.expander("Thông số kỹ thuật AI"):
+            st.markdown(
+                "**Phân loại:** EfficientNet-B1 + CBAM Attention  \n"
+                "**Phân đoạn:** DeepLabV3+ (ResNet-101 backbone)  \n"
+                "**VQA Online:** GPT-4o-mini (OpenAI API)  \n"
+                "**Độ trễ:** ~0.5 giây trung bình  \n"
+                "**VRAM:** ~8 192 MB  \n"
+                "**Biên ROI:** delta = 10 px"
+            )
+
+    # ============================================================
+    # TABS CHÍNH
+    # ============================================================
+    tab_diag, tab_doctor = st.tabs([
+        "Thực hiện Chẩn đoán VQA",
+        "Màn hình Xem lại của Bác sĩ",
+    ])
+
+    # ==========================================================
+    # TAB 1 — CHẨN ĐOÁN
+    # ==========================================================
+    with tab_diag:
+        st.markdown("**Tải ảnh tổn thương da (JPG / PNG / DICOM .dcm):**")
+        uploaded = st.file_uploader(
+            "Upload",
+            type=["jpg", "jpeg", "png", "dcm"],
+            label_visibility="collapsed",
+            key="main_file_uploader",
+        )
+
+        dicom_meta: Dict[str, str] = {}
+        image: Optional[Image.Image] = None
 
         if uploaded is not None:
             if st.session_state["last_uploaded_file_name"] != uploaded.name:
-                # Smart Reset: ảnh mới → xóa sạch toàn bộ state cũ
                 st.session_state["last_uploaded_file_name"] = uploaded.name
                 st.session_state["result"]                  = None
                 st.session_state["messages"]                = []
                 st.session_state["analysis_time"]           = None
                 st.session_state["saved_local_img_path"]    = None
+                st.session_state["sam_point"]               = None
+                st.session_state["custom_mask"]             = None
 
-            image   = Image.open(uploaded).convert("RGB")
+            if uploaded.name.lower().endswith(".dcm"):
+                image, dicom_meta = load_dicom(uploaded)
+                if image is None:
+                    st.error("Không thể đọc file DICOM. Vui lòng kiểm tra định dạng.")
+                else:
+                    st.markdown(
+                        f"<div class='success-banner'>Đã đọc DICOM thành công — "
+                        f"Tên: {dicom_meta.get('patient_name','')} | "
+                        f"Tuổi: {dicom_meta.get('patient_age','')} | "
+                        f"Giới tính: {dicom_meta.get('patient_sex','')}</div>",
+                        unsafe_allow_html=True,
+                    )
+                    if dicom_meta.get("patient_name"):
+                        st.session_state["form_patient_name"] = dicom_meta["patient_name"]
+                    if dicom_meta.get("patient_age"):
+                        age_match = re.search(r'\d+', dicom_meta["patient_age"])
+                        if age_match:
+                            st.session_state["form_patient_age"] = int(age_match.group())
+                    if dicom_meta.get("patient_sex"):
+                        s = dicom_meta["patient_sex"].upper()
+                        if "M" in s: st.session_state["form_patient_gender"] = "Nam"
+                        elif "F" in s: st.session_state["form_patient_gender"] = "Nữ"
+            else:
+                image = Image.open(uploaded).convert("RGB")
+
+        if image is not None:
             img_rgb = np.array(image)
+            orig_w, orig_h = image.size
 
-            col1, col2 = st.columns(2)
-            with col1:
-                st.image(image, caption="📷 Ảnh đầu vào", use_column_width=True)
+            max_display_w = 400
+            scale = min(max_display_w / orig_w, 1.0)
+            display_w = int(orig_w * scale)
+            display_h = int(orig_h * scale)
 
-            if st.button("🔍 Chạy Phân tích CV", type="primary"):
-                st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-                with st.spinner("Đang chạy Segmentation + Classification..."):
-                    tmp_dir  = tempfile.mkdtemp()
-                    tmp_path = os.path.join(tmp_dir, "input.png")
-                    image.save(tmp_path)
-                    st.session_state["saved_local_img_path"] = tmp_path
-                    result = get_pipeline(min_conf).run(tmp_path, return_mask=True)
-                    st.session_state["result"]   = result
-                    st.session_state["messages"] = []
+            st.write("")
+            seg_mode = st.radio(
+                "Chế độ phân đoạn tổn thương da (AI Segmenter Mode):",
+                [
+                    "Phân đoạn tự động (DeepLabV3+)",
+                    "Phân đoạn tương tác (SAM — Click điểm)",
+                    "Vẽ tay chỉnh sửa (Drawable Canvas)",
+                ],
+                horizontal=True,
+                key="seg_mode_radio",
+            )
+
+            # Vẽ điểm click SAM lên hình ảnh hiển thị để người dùng đối chiếu trực quan
+            display_image = image.copy()
+            if st.session_state["sam_point"] is not None:
+                draw = ImageDraw.Draw(display_image)
+                px = int(st.session_state["sam_point"][0] * scale)
+                py = int(st.session_state["sam_point"][1] * scale)
+                # Vẽ điểm đỏ tâm click
+                draw.ellipse([px-6, py-6, px+6, py+6], fill="red", outline="white", width=2)
+
+            canvas_result = None
+            if seg_mode == "Phân đoạn tương tác (SAM — Click điểm)":
+                st.info("Nhấp chuột vào đúng điểm trung tâm của vùng tổn thương trên ảnh. AI sẽ tự động cập nhật đường biên dựa trên điểm chọn.")
+                canvas_result = st_canvas(
+                    fill_color="rgba(255, 0, 0, 0.3)",
+                    stroke_width=2,
+                    background_image=display_image,
+                    update_streamlit=True,
+                    height=display_h,
+                    width=display_w,
+                    drawing_mode="point",
+                    key="canvas_sam",
+                    display_toolbar=False,
+                )
+                # Xử lý click SAM mới từ canvas
+                if canvas_result.json_data and canvas_result.json_data.get("objects"):
+                    objs = canvas_result.json_data.get("objects")
+                    last_obj = objs[-1]
+                    rx = last_obj.get("radius", 0)
+                    cx = int((last_obj.get("left", 0) + rx) / scale)
+                    cy = int((last_obj.get("top", 0) + rx) / scale)
+                    new_pt = (cx, cy)
+                    if st.session_state["sam_point"] != new_pt:
+                        st.session_state["sam_point"] = new_pt
+                        st.session_state["custom_mask"] = None
+                        st.session_state["sam_pending"] = True
+                        st.rerun()
+
+                # Chạy pipeline ngay khi có điểm SAM chờ xử lý (sau rerun canvas đã reset)
+                if st.session_state.get("sam_pending") and st.session_state["sam_point"] is not None:
+                    st.session_state["sam_pending"] = False
+                    st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                    with st.spinner("Đang chẩn đoán tương tác với điểm chọn..."):
+                        tmp_dir  = tempfile.mkdtemp()
+                        tmp_path = os.path.join(tmp_dir, "input.png")
+                        image.save(tmp_path)
+                        st.session_state["saved_local_img_path"] = tmp_path
+                        result_new = get_pipeline(min_conf).run(
+                            tmp_path,
+                            return_mask=True,
+                            age=float(p_age) if p_name.strip() else None,
+                            gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
+                            body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
+                            lambda_val=lambda_w,
+                            interactive_point=st.session_state["sam_point"]
+                        )
+                        st.session_state["result"] = result_new
+                        st.session_state["messages"] = []
+                        st.rerun()
+
+            elif seg_mode == "Vẽ tay chỉnh sửa (Drawable Canvas)":
+                st.info("Nhấn chuột và vẽ tự do để khoanh vùng tổn thương. Sau khi vẽ xong, nhấn nút Áp dụng phía dưới.")
+                canvas_result = st_canvas(
+                    fill_color="rgba(34, 197, 94, 0.3)",
+                    stroke_color="#22c55e",
+                    stroke_width=6,
+                    background_image=display_image,
+                    update_streamlit=True,
+                    height=display_h,
+                    width=display_w,
+                    drawing_mode="freedraw",
+                    key="canvas_freedraw",
+                )
+                if canvas_result.image_data is not None:
+                    mask_data = canvas_result.image_data[:, :, 3] > 0
+                    if mask_data.any():
+                        resized_mask = cv2.resize(mask_data.astype(np.uint8), (orig_w, orig_h), interpolation=cv2.INTER_NEAREST)
+                        if st.button("Áp dụng nét vẽ tay chỉnh sửa", use_container_width=True, key="apply_custom_draw"):
+                            st.session_state["custom_mask"] = resized_mask
+                            st.session_state["sam_point"] = None
+                            st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                            with st.spinner("Đang áp dụng phân đoạn vẽ tay..."):
+                                tmp_dir  = tempfile.mkdtemp()
+                                tmp_path = os.path.join(tmp_dir, "input.png")
+                                image.save(tmp_path)
+                                st.session_state["saved_local_img_path"] = tmp_path
+                                result_new = get_pipeline(min_conf).run(
+                                    tmp_path,
+                                    return_mask=True,
+                                    age=float(p_age) if p_name.strip() else None,
+                                    gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
+                                    body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
+                                    lambda_val=lambda_w,
+                                    custom_mask=st.session_state["custom_mask"]
+                                )
+                                st.session_state["result"] = result_new
+                                st.session_state["messages"] = []
+                                st.rerun()
+
+            else:
+                if st.button("Chạy Phân tích CV", type="primary", key="run_analysis_btn", use_container_width=True):
+                    st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                    st.session_state["sam_point"] = None
+                    st.session_state["custom_mask"] = None
+                    with st.spinner("Đang chạy Segmentation + Classification tự động..."):
+                        tmp_dir  = tempfile.mkdtemp()
+                        tmp_path = os.path.join(tmp_dir, "input.png")
+                        image.save(tmp_path)
+                        st.session_state["saved_local_img_path"] = tmp_path
+                        result_new = get_pipeline(min_conf).run(
+                            tmp_path,
+                            return_mask=True,
+                            age=float(p_age) if p_name.strip() else None,
+                            gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
+                            body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
+                            lambda_val=lambda_w
+                        )
+                        st.session_state["result"]   = result_new
+                        st.session_state["messages"] = []
+                        st.rerun()
 
             result = st.session_state.get("result")
 
+            # ── HIỂN THỊ SONG SONG 3 ẢNH ──────────────────────────────────────
+            mask_img_arr: Optional[np.ndarray] = None
             if result:
-                # ── Hiển thị mask ─────────────────────────────────────────────
-                mask     = result.get("segmentation_mask")
-                mask_img = _mask_to_image(mask, img_rgb.shape[:2])
-                with col2:
-                    if mask_img is not None:
-                        st.image(mask_img, caption="🎭 Mặt nạ phân vùng", clamp=True, channels="L", use_column_width=True)
+                raw_mask = result.get("segmentation_mask")
+                mask_img_arr = _mask_to_image(raw_mask, img_rgb.shape[:2])
 
+            st.write("")
+            st.markdown("**Đối chiếu hình ảnh chẩn đoán song song:**")
+            col_img1, col_img2, col_img3 = st.columns(3)
+            with col_img1:
+                # Nếu có điểm chọn SAM, hiển thị ảnh đã vẽ điểm đỏ
+                st.image(display_image, caption="Ảnh gốc đầu vào (chấm đỏ là điểm SAM chọn)", use_container_width=True)
+                if st.session_state["sam_point"] is not None:
+                    st.caption(f"Tọa độ click: X={st.session_state['sam_point'][0]}, Y={st.session_state['sam_point'][1]}")
+            with col_img2:
+                if mask_img_arr is not None:
+                    st.image(mask_img_arr, caption="Mặt nạ tổn thương (AI Segmentation)",
+                             clamp=True, channels="L", use_container_width=True)
+                else:
+                    st.info("Chưa thực hiện phân đoạn.")
+            with col_img3:
+                gradcam_arr = (result.get("gradcam_image") if result else None)
+                if isinstance(gradcam_arr, np.ndarray):
+                    st.image(gradcam_arr, caption="Bản đồ nhiệt AI (Grad-CAM)", use_container_width=True)
+                else:
+                    st.info("Chưa tạo bản đồ nhiệt.")
+
+            # -- Đa tổn thương --
+            if result and mask_img_arr is not None:
+                raw_mask_ml = result.get("segmentation_mask")
+                if raw_mask_ml is not None:
+                    lesions = detect_multiple_lesions(img_rgb, raw_mask_ml)
+                    if len(lesions) > 1:
+                        st.markdown("**Bản đồ định vị đa tổn thương (Phát hiện nhiều nốt):**")
+                        overlay_img = draw_lesions_overlay(img_rgb, lesions)
+                        st.image(overlay_img,
+                                 caption=f"Phát hiện {len(lesions)} nốt tổn thương — Chọn nốt để phân tích VQA",
+                                 use_container_width=True)
+                        st.selectbox(
+                            "Chọn nốt tổn thương để chẩn đoán và hỏi đáp VQA:",
+                            [f"Nốt {l['id']} (diện tích: {l['area']:.0f} px)" for l in lesions],
+                            key="selected_lesion_idx",
+                        )
+
+            # -- Kết quả phân tích định lượng --
+            if result:
                 metrics  = result.get("metrics", {})
                 cls      = result.get("classification") or {}
                 status   = result.get("status", "ok")
                 pred     = cls.get("prediction", "N/A")
                 vi_name  = get_vietnamese_diagnosis(pred)
-                conf_pct = float(cls.get("confidence", 0.0)) * 100
+                conf_val = float(cls.get("confidence", 0.0))
+                conf_pct = conf_val * 100
 
-                # ── Safety Gate Status Banner ─────────────────────────────────
                 if status == "triage":
-                    triage_reason_raw = result.get("triage_reason", "unknown")
-                    triage_vi = TRIAGE_REASON_VI.get(triage_reason_raw, triage_reason_raw)
+                    triage_vi = TRIAGE_REASON_VI.get(
+                        result.get("triage_reason", ""), result.get("triage_reason", "")
+                    )
                     st.markdown(
                         f"<div class='triage-banner'>"
-                        f"🚨 <b>SAFETY GATE KÍCH HOẠT</b><br>"
+                        f"SAFETY GATE KÍCH HOẠT<br>"
                         f"Lý do: <i>{triage_vi}</i><br>"
-                        f"Hệ thống VQA bị khoá — Vui lòng chụp lại ảnh hoặc chuyển ca cho bác sĩ."
+                        f"Hệ thống VQA bị khóa. Vui lòng chụp lại ảnh hoặc chuyển ca cho bác sĩ."
                         f"</div>",
                         unsafe_allow_html=True,
                     )
                 else:
-                    st.success(f"✅ Phân tích thành công — Độ tin cậy: {conf_pct:.1f}% ≥ τ_c")
-
-                # ── P0-3: Clinical Risk Warning ──────────────────────────────────────────
-                # Hiển thị cảnh báo khi nhãn chính là lành tính nhưng có nhãn ác tính ≥ ngưỡng.
-                if status == "ok" and pred in BENIGN_CLASSES:
-                    probs_early = cls.get("probabilities", {})
-                    if probs_early:
-                        max_mal_key = max(MALIGNANT_CLASSES, key=lambda k: probs_early.get(k, 0.0))
-                        max_mal_val = probs_early.get(max_mal_key, 0.0)
-                        if max_mal_val >= MALIGNANT_ALERT_THRESHOLD:
-                            vi_mal = get_vietnamese_diagnosis(max_mal_key)
-                            st.markdown(
-                                f"""
-                                <div style='background:rgba(237,137,54,0.18);border:2px solid #dd6b20;
-                                            border-radius:10px;padding:14px 18px;margin:8px 0;'>
-                                  ⚠️ <b>Cảnh báo Lâm sàng</b> — Dự đoán chính là <b>{pred}</b> (lành tính),
-                                  nhưng mô hình phát hiện xác suất <b>{max_mal_key}</b>
-                                  (<i>{vi_mal}</i>) = <b>{max_mal_val:.1%}</b>.
-                                  <br>➡️ Đề nghị tham khảo bác sĩ da liễu để loại trừ khả năng ác tính.
-                                </div>
-                                """,
-                                unsafe_allow_html=True,
-                            )
-
-                # ── Badge loại ảnh (informational) ──────────────────────────────────
-                img_type_detected = result.get("preprocess", {}).get("image_type", "dermoscopy")
-                badge_color = "#63b3ed" if img_type_detected == "dermoscopy" else "#f6ad55"
-                badge_label = "🔬 Dermoscopy" if img_type_detected == "dermoscopy" else "📱 Ảnh điện thoại (TTA)"
-                st.caption(
-                    f"<span style='color:{badge_color};font-weight:bold;'>{badge_label}</span> — "
-                    "Hệ thống tự phát hiện loại ảnh để áp dụng ngưỡng phù hợp.",
-                    unsafe_allow_html=True,
-                )
-
-                # ── 4 Metric Cards ────────────────────────────────────────────
-                st.subheader("📊 Số liệu Phân tích Định lượng")
-                c1, c2, c3, c4, c5, c6 = st.columns(6)
-                c1.metric("⏱ Thời gian", st.session_state["analysis_time"] or "—")
-                c2.metric("📐 Area ratio", f"{metrics.get('area_ratio', 0.0):.4f}")
-                c3.metric("〰️ Border", f"{metrics.get('border_complexity', 0.0):.4f}")
-                c4.metric("🔀 Asymmetry", f"{metrics.get('asymmetry', 0.0):.4f}")
-                c5.metric("⭕ Circularity", f"{metrics.get('circularity', 0.0):.4f}")
-
-                with c6:
-                    border_color = "#e53e3e" if status == "triage" else "#38a169"
                     st.markdown(
-                        f"""
-                        <div style="background:rgba(17,25,40,0.8);padding:10px;border-radius:6px;
-                                    border-left:5px solid {border_color};height:105px;">
-                            <p style="margin:0;font-size:0.78rem;color:#a0aec0;font-weight:bold;">
-                                ĐỘ TIN CẬY ({pred})</p>
-                            <h3 style="margin:2px 0;color:white;font-size:1.4rem;">{conf_pct:.1f}%</h3>
-                            <p style="margin:0;font-size:0.75rem;color:#63b3ed;font-weight:500;
-                                      line-height:1.2;overflow:hidden;text-overflow:ellipsis;
-                                      white-space:nowrap;">📌 {vi_name}</p>
-                        </div>
-                        """,
+                        f"<div class='success-banner'>"
+                        f"Phân tích thành công — Độ tin cậy: {conf_pct:.1f}%"
+                        f"</div>",
                         unsafe_allow_html=True,
                     )
 
-                # ── Probability Chart + Radar Chart ──────────────────────────
+                if status == "ok" and pred in BENIGN_CLASSES:
+                    probs_c = cls.get("probabilities", {})
+                    if probs_c:
+                        max_m_key = max(MALIGNANT_CLASSES, key=lambda k: probs_c.get(k, 0.0))
+                        max_m_val = probs_c.get(max_m_key, 0.0)
+                        if max_m_val >= mal_thresh:
+                            vi_mal = get_vietnamese_diagnosis(max_m_key)
+                            st.markdown(
+                                f"<div class='clinical-warn'>"
+                                f"Cảnh báo Lâm sàng — Dự đoán chính là <b>{pred}</b> ({vi_name}), "
+                                f"nhưng mô hình phát hiện xác suất <b>{max_m_key}</b> "
+                                f"(<i>{vi_mal}</i>) = <b>{max_m_val:.1%}</b>.<br>"
+                                f"Đề nghị tham khảo bác sĩ da liễu để loại trừ khả năng ác tính."
+                                f"</div>",
+                                unsafe_allow_html=True,
+                            )
+
+                img_type = result.get("preprocess", {}).get("image_type", "dermoscopy")
+                img_lbl  = "Dermoscopy (chuyên dụng)" if img_type == "dermoscopy" else "Ảnh điện thoại (TTA)"
+                st.caption(f"Loại ảnh phát hiện: {img_lbl} — Hệ thống áp dụng cấu hình phù hợp.")
+
+                # ABCD metrics
+                st.markdown("**Số liệu Phân tích Định lượng (ABCD)**")
+                area_v  = float(metrics.get("area_ratio",        0.0))
+                bord_v  = float(metrics.get("border_complexity", 0.0))
+                asym_v  = float(metrics.get("asymmetry",         0.0))
+                circ_v  = float(metrics.get("circularity",       0.0))
+
+                def _card(lbl, val, sub, warn=False):
+                    wc = "warn" if warn else ""
+                    vc = "warn" if warn else ""
+                    return (
+                        f"<div class='abcd-card {wc}'>"
+                        f"<div class='card-label'>{lbl}</div>"
+                        f"<div class='card-value {vc}'>{val}</div>"
+                        f"<div class='card-sublabel'>{sub}</div>"
+                        f"</div>"
+                    )
+
+                mc1, mc2, mc3, mc4, mc5 = st.columns(5)
+                mc1.markdown(_card("Thời gian", st.session_state.get("analysis_time", "—"), "Điểm lấy mẫu"), unsafe_allow_html=True)
+                mc2.markdown(_card("Area ratio",  f"{area_v:.4f}",  "Tỷ lệ diện tích"), unsafe_allow_html=True)
+                mc3.markdown(_card("Border",      f"{bord_v:.4f}",  "Độ phức tạp bờ", bord_v > 5.0), unsafe_allow_html=True)
+                mc4.markdown(_card("Asymmetry",   f"{asym_v:.4f}",  "Bất đối xứng",   asym_v > 0.7), unsafe_allow_html=True)
+                mc5.markdown(_card("Circularity", f"{circ_v:.4f}",  "Độ tròn"), unsafe_allow_html=True)
+
+                conf_cls = "conf-high" if conf_pct >= 70 else ("conf-mid" if conf_pct >= 50 else "conf-low")
+                st.markdown(
+                    f"<div class='diag-badge'>"
+                    f"<span class='conf-label {conf_cls}'>Độ tin cậy: {conf_pct:.1f}%</span>"
+                    f"<b>{pred}</b> — <i>{vi_name}</i>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
+
+                # Biểu đồ phân phối
                 probs = cls.get("probabilities", {})
                 if probs:
-                    chart_col, radar_col = st.columns([1.6, 1])
-                    with chart_col:
-                        st.markdown("##### 📈 Phân phối Xác suất 7 Nhãn Bệnh lý")
+                    col_chart, col_radar = st.columns([1.6, 1])
+                    with col_chart:
+                        st.markdown("**Phân phối Xác suất Bệnh lý**")
                         render_probability_chart(
                             probs,
                             patient_name=p_name,
                             timestamp=st.session_state.get("analysis_time", ""),
                         )
-                    with radar_col:
-                        st.markdown("##### 🕸️ Radar Chart ABCD")
+                    with col_radar:
+                        st.markdown("**Radar Chart ABCD**")
                         render_radar_chart(metrics)
 
-            # ── VQA Chat ──────────────────────────────────────────────────────
+            # ===========================================================
+            # VQA CHAT (Bố cục cuộn dọc, ô nhập cố định dưới cùng)
+            # ===========================================================
             st.divider()
-            st.subheader("💬 VQA Chat Space")
+            st.markdown("### Khu vực Tư vấn Lâm sàng (VQA)")
 
-            if st.session_state.get("partial_response"):
-                st.session_state["messages"].append({"role": "assistant", "content": st.session_state["partial_response"]})
-                st.session_state["partial_response"] = ""
+            is_triage     = result is not None and result.get("status") == "triage"
+            chat_disabled = (not bool(result)) or is_triage
 
-            for msg in st.session_state["messages"]:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"])
+            if is_triage:
+                st.markdown(
+                    "<div class='triage-banner'>"
+                    "Khung chat VQA bị khóa do chất lượng ảnh không đạt chuẩn Safety Gate."
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
 
-            # Chặn hoàn toàn chat khi triage hoặc chưa có result
-            is_triage      = result is not None and result.get("status") == "triage"
-            chat_disabled  = (not bool(result)) or is_triage
-            placeholder_txt = (
-                "⛔ Safety Gate đang kích hoạt — VQA bị khoá."
-                if is_triage else
-                "Đặt câu hỏi về tổn thương da (sau khi chạy phân tích)..."
-            )
+            # -- 1. Vùng Lịch sử hội thoại (Sử dụng làm placeholder ở trên) --
+            chat_container = st.container(height=380, border=True)
 
-            prompt = st.chat_input(placeholder_txt, disabled=chat_disabled)
-            if prompt:
-                st.session_state["messages"].append({"role": "user", "content": prompt})
-                with st.chat_message("user"):
-                    st.markdown(prompt)
+            # -- 2. Gợi ý câu hỏi nhanh (Đặt ngay dưới container chat, trên ô nhập) --
+            st.caption("Gợi ý câu hỏi lâm sàng nhanh (nhấn vào sẽ tự động gửi):")
+            preset_cols = st.columns(len(PRESET_QUESTIONS))
+            active_prompt: Optional[str] = None
 
-                with st.chat_message("assistant"):
-                    stream_gen = generate_vqa_response_stream(
-                        question=prompt,
-                        result=result,
-                        api_key=os.getenv("OPENAI_API_KEY"),
-                        history=st.session_state["messages"],
+            for i, (col, q) in enumerate(zip(preset_cols, PRESET_QUESTIONS)):
+                if col.button(q, key=f"preset_q_{i}", use_container_width=True, disabled=chat_disabled):
+                    active_prompt = q
+
+            # -- 3. Ô Nhập liệu & Voice Input --
+            voice_result = None
+            if not chat_disabled:
+                # Gọi voice component với key động để reset sau khi gửi tin
+                _vkey = st.session_state.get("voice_key", 0)
+                if VOICE_AVAILABLE and _voice_input_fc is not None:
+                    voice_result = _voice_input_fc(
+                        language="vi-VN",
+                        key=f"vqa_voice_realtime_main_{_vkey}",
                     )
-                    
-                    def stream_and_save():
-                        partial_text = ""
-                        for chunk in stream_gen:
-                            partial_text += chunk
-                            st.session_state["partial_response"] = partial_text
-                            yield chunk
-                            
-                    answer = st.write_stream(stream_and_save())
-                st.session_state["messages"].append({"role": "assistant", "content": answer})
-                st.session_state["partial_response"] = ""
-                # Không gọi st.rerun() — trang giữ nguyên sau khi stream xong.
-                # Streamlit sẽ tự rerun khi user submit câu hỏi tiếp theo qua chat_input,
-                # đảm bảo câu hỏi không bị "chớp" mất và chat_input luôn ở cuối trang.
 
-            # ── Lưu EHR ──────────────────────────────────────────────────────
+                # Ô nhập chính (Type Input) sử dụng key động để reset sau khi gửi
+                _ikey = st.session_state.get("input_key", 0)
+                col_typed, col_btn = st.columns([12, 1], gap="small")
+                with col_typed:
+                    user_typed = st.text_input(
+                        "Nhập câu hỏi:",
+                        placeholder="Nhập hoặc nói câu hỏi của bạn tại đây...",
+                        key=f"chat_textarea_vqa_{_ikey}",
+                        label_visibility="collapsed",
+                    )
+                with col_btn:
+                    send_clicked = st.button(
+                        "➤",
+                        key="send_vqa_btn",
+                        type="primary",
+                        disabled=chat_disabled,
+                        use_container_width=True,
+                    )
+                
+                # Logic xác định câu hỏi: ưu tiên gõ trực tiếp, dự phòng qua voice_result nếu trễ React state
+                if send_clicked:
+                    if user_typed.strip():
+                        active_prompt = user_typed.strip()
+                    elif voice_result and isinstance(voice_result, dict) and voice_result.get("text"):
+                        active_prompt = voice_result["text"].strip()
+                elif voice_result and isinstance(voice_result, dict) and voice_result.get("submit"):
+                    active_prompt = voice_result["text"].strip()
+
+            # -- 4. Xử lý logic tin nhắn mới trước khi render --
+            ai_stream_gen = None
+            if active_prompt and result:
+                st.session_state["messages"].append({"role": "user", "content": active_prompt})
+                ai_stream_gen = generate_vqa_response_stream(
+                    question=active_prompt,
+                    result=result,
+                    api_key=os.getenv("OPENAI_API_KEY"),
+                    history=st.session_state["messages"],
+                )
+                # Reset ô nhập và mic component: tạo các widget mới trống hoàn toàn
+                st.session_state["input_key"]     = st.session_state.get("input_key", 0) + 1
+                st.session_state["voice_key"]     = st.session_state.get("voice_key", 0) + 1
+                st.session_state["chat_input_val"] = ""
+
+            # -- 5. Vẽ toàn bộ hội thoại vào container (CHỈ GỌI MỘT LẦN DUY NHẤT) --
+            with chat_container:
+                msgs = st.session_state["messages"]
+                if not msgs and not active_prompt:
+                    st.markdown(
+                        "<div style='text-align:center;color:#64748b;font-size:0.86rem;padding:24px;'>"
+                        "Chưa có câu hỏi nào. Sử dụng gợi ý phía dưới hoặc nói/nhập câu hỏi."
+                        "</div>",
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    # Lặp vẽ tin cũ
+                    for m in msgs:
+                        with st.chat_message(m["role"]):
+                            st.markdown(m["content"])
+                    
+                    # Nếu có generator stream của AI thì vẽ tiếp câu trả lời live
+                    if ai_stream_gen is not None:
+                        with st.chat_message("assistant"):
+                            answer = st.write_stream(ai_stream_gen)
+                        st.session_state["messages"].append({"role": "assistant", "content": answer})
+                        st.rerun()
+
+            # -- Đồng bộ EHR + Xuất báo cáo --
             if result:
                 st.divider()
-                st.subheader("💾 Đồng bộ Bệnh án điện tử")
+                st.markdown("**Đồng bộ Bệnh án Điện tử (EHR) và Xuất báo cáo**")
+                col_ehr, col_pdf = st.columns(2)
 
-                if st.button(
-                    "Xác nhận & Lưu toàn bộ hồ sơ lên Google Cloud",
-                    type="secondary",
-                    disabled=not allow_to_save,
-                ):
-                    if not p_name:
-                        st.error("❌ Vui lòng điền Họ tên bệnh nhân trước.")
-                    elif not st.session_state["saved_local_img_path"]:
-                        st.error("❌ Không tìm thấy file ảnh phân tích.")
-                    else:
-                        timestamp_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-                        with st.spinner("Đang đẩy ảnh lên ImgBB..."):
-                            public_img_url = upload_image_to_imgbb(st.session_state["saved_local_img_path"])
-                        if not public_img_url:
-                            st.error("❌ Lỗi tải ảnh lên ImgBB.")
+                with col_ehr:
+                    if st.button(
+                        "Xác nhận và Lưu hồ sơ lên Google Cloud",
+                        type="secondary",
+                        disabled=not allow_to_save,
+                        key="save_ehr_main_btn",
+                    ):
+                        if not p_name.strip():
+                            st.error("Vui lòng điền Họ tên bệnh nhân trước.")
+                        elif not st.session_state["saved_local_img_path"]:
+                            st.error("Không tìm thấy file ảnh phân tích.")
                         else:
-                            patient_info = {
-                                "name":     p_name.strip(),
-                                "age":      int(p_age),
-                                "hometown": p_hometown.strip() if p_hometown else "N/A",
-                            }
-                            metrics  = result.get("metrics", {})
-                            cls      = result.get("classification") or {}
-                            visit_data = {
-                                "timestamp_id":     timestamp_id,
-                                "created_at":       st.session_state["analysis_time"],
-                                "image_url":        public_img_url,
-                                "ai_extracted_metrics": {
-                                    "status":            result.get("status"),
-                                    "area_ratio":        float(metrics.get("area_ratio", 0.0)),
-                                    "border_complexity": float(metrics.get("border_complexity", 0.0)),
-                                    "asymmetry":         float(metrics.get("asymmetry", 0.0)),
-                                    "circularity":       float(metrics.get("circularity", 0.0)),
-                                    "prediction":        cls.get("prediction", "N/A"),
-                                    "confidence":        float(cls.get("confidence", 0.0)),
-                                },
-                                "vqa_conversations": list(st.session_state["messages"]),
-                            }
-                            with st.spinner("Đang đồng bộ vào Cloud Firestore..."):
-                                if save_medical_record_to_gcp(p_name, patient_info, visit_data):
-                                    st.success(
-                                        f"🎉 Đồng bộ thành công hồ sơ bệnh nhân '{p_name.upper()}'!"
-                                    )
-                                    if (
-                                        st.session_state["saved_local_img_path"]
-                                        and os.path.exists(st.session_state["saved_local_img_path"])
-                                    ):
-                                        os.remove(st.session_state["saved_local_img_path"])
-                                        st.session_state["saved_local_img_path"] = None
+                            with st.spinner("Đang đẩy ảnh lên ImgBB..."):
+                                pub_url = upload_image_to_imgbb(st.session_state["saved_local_img_path"])
+                            if not pub_url:
+                                st.error("Lỗi tải ảnh lên ImgBB.")
+                            else:
+                                pat_info = {
+                                    "name":     p_name.strip(),
+                                    "id":       p_id.strip(),
+                                    "age":      int(p_age),
+                                    "gender":   p_gender,
+                                    "hometown": p_hometown,
+                                    "location": p_location,
+                                }
+                                m_r = result.get("metrics", {})
+                                c_r = result.get("classification") or {}
+                                v_data = {
+                                    "timestamp_id": datetime.now().strftime("%Y%m%d_%H%M%S"),
+                                    "created_at":   st.session_state["analysis_time"],
+                                    "image_url":    pub_url,
+                                    "ai_extracted_metrics": {
+                                        "status":            result.get("status"),
+                                        "prediction":        c_r.get("prediction", "N/A"),
+                                        "confidence":        float(c_r.get("confidence", 0.0)),
+                                        "area_ratio":        float(m_r.get("area_ratio",        0.0)),
+                                        "border_complexity": float(m_r.get("border_complexity", 0.0)),
+                                        "asymmetry":         float(m_r.get("asymmetry",         0.0)),
+                                        "circularity":       float(m_r.get("circularity",       0.0)),
+                                    },
+                                    "vqa_conversations": list(st.session_state["messages"]),
+                                }
+                                with st.spinner("Đang đồng bộ vào Cloud Firestore..."):
+                                    if save_medical_record_to_gcp(p_name, pat_info, v_data):
+                                        st.success(f"Đồng bộ thành công hồ sơ '{p_name.upper()}'!")
+                                        lp = st.session_state.get("saved_local_img_path")
+                                        if lp and os.path.exists(lp):
+                                            os.remove(lp)
+                                            st.session_state["saved_local_img_path"] = None
 
-    # ── TAB 2: DASHBOARD BÁC SĨ ──────────────────────────────────────────────
+                with col_pdf:
+                    if st.button("Xuất báo cáo PDF", type="secondary", key="pdf_export_btn"):
+                        pat_info_pdf = {
+                            "name": p_name.strip() or "N/A",
+                            "age":  str(p_age),
+                            "gender":   p_gender,
+                            "hometown": p_hometown,
+                            "location": p_location,
+                        }
+                        m_r = result.get("metrics", {})
+                        c_r = result.get("classification") or {}
+                        v_pdf = {"ai_extracted_metrics": {
+                            "prediction":        c_r.get("prediction", "N/A"),
+                            "confidence":        float(c_r.get("confidence", 0.0)),
+                            "area_ratio":        float(m_r.get("area_ratio",        0.0)),
+                            "border_complexity": float(m_r.get("border_complexity", 0.0)),
+                            "asymmetry":         float(m_r.get("asymmetry",         0.0)),
+                            "circularity":       float(m_r.get("circularity",       0.0)),
+                        }}
+                        pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
+                        if pdf_bytes:
+                            fname = (
+                                f"BaoCao_{(p_name or 'BenhNhan').replace(' ', '_')}"
+                                f"_{datetime.now().strftime('%Y%m%d')}.pdf"
+                            )
+                            st.download_button(
+                                "Tải xuống báo cáo PDF",
+                                data=pdf_bytes,
+                                file_name=fname,
+                                mime="application/pdf",
+                                key="pdf_dl_btn",
+                            )
+
+    # ==========================================================
+    # TAB 2 — DOCTOR DASHBOARD
+    # ==========================================================
     with tab_doctor:
         render_doctor_dashboard()
 

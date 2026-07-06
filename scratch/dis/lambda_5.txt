@@ -1,0 +1,5 @@
+1544           RESUME                   0
+               LOAD_FAST_BORROW         0 (x)
+               LOAD_SMALL_INT           1
+               BINARY_OP               26 ([])
+               RETURN_VALUE

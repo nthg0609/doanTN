@@ -1,0 +1,48 @@
+808           RESUME                   0
+              LOAD_FAST_BORROW         0 (format)
+              LOAD_SMALL_INT           2
+              COMPARE_OP             132 (>)
+              POP_JUMP_IF_FALSE        3 (to L1)
+              NOT_TAKEN
+              LOAD_COMMON_CONSTANT     1 (NotImplementedError)
+              RAISE_VARARGS            1
+      L1:     LOAD_CONST               1 ('question')
+
+809           LOAD_GLOBAL              0 (str)
+
+808           LOAD_CONST               2 ('result')
+
+810           LOAD_GLOBAL              2 (Dict)
+              LOAD_GLOBAL              0 (str)
+              LOAD_GLOBAL              4 (Any)
+              BUILD_TUPLE              2
+              BINARY_OP               26 ([])
+
+808           LOAD_CONST               3 ('api_key')
+
+811           LOAD_GLOBAL              6 (Optional)
+              LOAD_GLOBAL              0 (str)
+              BINARY_OP               26 ([])
+
+808           LOAD_CONST               4 ('history')
+
+812           LOAD_GLOBAL              6 (Optional)
+              LOAD_GLOBAL              8 (List)
+              LOAD_GLOBAL              2 (Dict)
+              LOAD_GLOBAL              0 (str)
+              LOAD_GLOBAL              0 (str)
+              BUILD_TUPLE              2
+              BINARY_OP               26 ([])
+              BINARY_OP               26 ([])
+              BINARY_OP               26 ([])
+
+808           LOAD_CONST               5 ('vqa_mode')
+
+813           LOAD_GLOBAL              0 (str)
+
+808           LOAD_CONST               6 ('local_model')
+
+814           LOAD_GLOBAL              0 (str)
+
+808           BUILD_MAP                6
+              RETURN_VALUE

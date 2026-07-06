@@ -16,6 +16,8 @@ from PIL import Image
 
 from .model_registry import ModelRegistry
 from .safety_gate import SafetyGate, SafetyGateConfig
+from .multimodal_fusion import MultimodalBayesianFusion
+from .interactive_sam import InteractiveSegmenter
 
 try:
     import sys
@@ -72,7 +74,18 @@ class UnifiedDermatologyPipeline:
         if load_models:
             self.registry.load_all()
 
-    def run(self, image_path: str, question: Optional[str] = None, return_mask: bool = False) -> Dict[str, Any]:
+    def run(
+        self,
+        image_path: str,
+        question: Optional[str] = None,
+        return_mask: bool = False,
+        age: Optional[float] = None,
+        gender: Optional[str] = None,
+        body_location: Optional[str] = None,
+        lambda_val: float = 0.85,
+        interactive_point: Optional[tuple[int, int]] = None,
+        custom_mask: Optional[np.ndarray] = None,
+    ) -> Dict[str, Any]:
         try:
             img_rgb, resolved = self._safe_load_rgb(image_path)
         except Exception as e:
@@ -85,15 +98,40 @@ class UnifiedDermatologyPipeline:
         img_type = self._detect_image_type(img_rgb, resolved)
 
         # Nhánh 1: segmentation, metrics, và mask hiển thị chỉ đọc ảnh gốc RGB.
-        # P1-2: Truyền img_type để kích hoạt TTA cho ảnh phone.
-        seg_mask, seg_info = self._segment(img_rgb, image_type=img_type)
+        if custom_mask is not None:
+            seg_mask = custom_mask
+            seg_info = {"method": "custom_drawn_canvas"}
+        # Nếu có điểm nhấp tương tác (SAM/GrabCut), chạy phân đoạn tương tác.
+        elif interactive_point is not None:
+            pt_x, pt_y = interactive_point
+            segmenter = InteractiveSegmenter()
+            seg_mask, seg_info = segmenter.segment_by_point(img_rgb, pt_x, pt_y)
+            # Nếu mặt nạ tương tác quá nhỏ (do lỗi phân đoạn hoặc click nhầm vùng da lành), dùng phân đoạn tự động
+            if int(seg_mask.sum()) < 100:
+                fallback_mask, fb_info = self._segment(img_rgb, image_type=img_type)
+                seg_mask = fallback_mask
+                seg_info = {
+                    "method": "deeplab_fallback_interactive",
+                    "reason": "interactive_mask_too_small",
+                    "original_interactive_info": seg_info
+                }
+        else:
+            # P1-2: Truyền img_type để kích hoạt TTA cho ảnh phone.
+            seg_mask, seg_info = self._segment(img_rgb, image_type=img_type)
+            
         metrics = self._get_lesion_metrics(seg_mask)
 
         # Nhánh 2: classification chạy ĐỘC LẬP trên chính ảnh gốc, không nhân mask.
         cls_result = None
         cls_confidence = None
         if self.mode in ("classification", "both"):
-            cls_result = self._classify(img_rgb)
+            cls_result = self._classify(
+                img_rgb,
+                age=age,
+                gender=gender,
+                body_location=body_location,
+                lambda_val=lambda_val
+            )
             cls_confidence = None if cls_result is None else cls_result.get("confidence")
 
         # P1-1: Pass img_type vào Safety Gate để áp dụng ngưỡng động theo loại ảnh.
@@ -114,6 +152,15 @@ class UnifiedDermatologyPipeline:
                 result["segmentation_mask"] = seg_mask
             return result
 
+        # Tính toán Grad-CAM nếu phân loại thành công
+        gradcam_img = None
+        if return_mask and cls_result and cls_result.get("prediction") != "N/A":
+            label_to_idx = {"AKIEC": 0, "BCC": 1, "BKL": 2, "DF": 3, "MEL": 4, "NV": 5, "VASC": 6}
+            pred_idx = label_to_idx.get(cls_result.get("prediction"), 0)
+            cam_heatmap = self._run_gradcam(img_rgb, pred_idx)
+            if cam_heatmap is not None:
+                gradcam_img = self._generate_gradcam_overlay(img_rgb, cam_heatmap)
+
         report = self._clinical_report(metrics, cls_result)
         result = {
             "status": "ok",
@@ -127,6 +174,8 @@ class UnifiedDermatologyPipeline:
         }
         if return_mask:
             result["segmentation_mask"] = seg_mask
+            if gradcam_img is not None:
+                result["gradcam_image"] = gradcam_img
         return result
 
     def _segment(self, img_rgb: np.ndarray, image_type: str = "dermoscopy") -> tuple[np.ndarray, Dict[str, Any]]:
@@ -197,9 +246,17 @@ class UnifiedDermatologyPipeline:
                 seg_info.update({"method": "classical_fallback", **fb_info})
         return mask, seg_info
 
-    def _classify(self, img_rgb: np.ndarray) -> Optional[Dict[str, Any]]:
+    def _classify(
+        self,
+        img_rgb: np.ndarray,
+        age: Optional[float] = None,
+        gender: Optional[str] = None,
+        body_location: Optional[str] = None,
+        lambda_val: float = 0.85,
+    ) -> Optional[Dict[str, Any]]:
         """
         Luồng Classification độc lập: Đồng bộ 100% với sanity_check_cls.py
+        Tích hợp Hợp nhất Bayes Đa phương thức (Multimodal Fusion).
         """
         cls_model = self.registry.get_classification_model()
         if cls_model is None:
@@ -222,17 +279,28 @@ class UnifiedDermatologyPipeline:
             logits = cls_model(tensor)
             probs = torch.softmax(logits, dim=1)[0].cpu().numpy()
 
-        pred_idx = int(np.argmax(probs))
-        confidence = float(probs[pred_idx])
-
         # 4. Hardcode từ điển nhãn (Chống lệch do JSON file của Registry)
         idx_to_class = {0: "AKIEC", 1: "BCC", 2: "BKL", 3: "DF", 4: "MEL", 5: "NV", 6: "VASC"}
-        label = idx_to_class.get(pred_idx, str(pred_idx))
+        raw_probs = {idx_to_class.get(i, str(i)): float(p) for i, p in enumerate(probs)}
+
+        # Hợp nhất Đa phương thức (Multimodal Late Fusion)
+        fusion = MultimodalBayesianFusion()
+        fused_probs = fusion.fuse(
+            raw_probs,
+            age=age,
+            gender=gender,
+            body_location=body_location,
+            lambda_val=lambda_val
+        )
+
+        pred_label = max(fused_probs, key=fused_probs.get)
+        confidence = fused_probs[pred_label]
 
         return {
-            "prediction": label,
+            "prediction": pred_label,
             "confidence": confidence,
-            "probabilities": {idx_to_class.get(i, str(i)): float(p) for i, p in enumerate(probs)},
+            "probabilities": fused_probs,
+            "raw_probabilities": raw_probs,
         }
 
     def _postprocess_mask(self, mask: np.ndarray) -> np.ndarray:
@@ -451,3 +519,74 @@ class UnifiedDermatologyPipeline:
             "classification": None,
             "report": report,
         }
+
+    def _run_gradcam(self, img_rgb: np.ndarray, target_class_idx: int) -> Optional[np.ndarray]:
+        """Tính toán bản đồ kích hoạt Grad-CAM trên lớp attention CBAM."""
+        cls_model = self.registry.get_classification_model()
+        if cls_model is None:
+            return None
+            
+        pil_img = Image.fromarray(img_rgb)
+        pil_img = pil_img.resize((224, 224), resample=Image.Resampling.BILINEAR)
+        arr = np.asarray(pil_img).astype(np.float32) / 255.0
+        
+        mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+        std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+        arr = (arr - mean.reshape(1, 1, 3)) / std.reshape(1, 1, 3)
+        
+        tensor = torch.from_numpy(arr).permute(2, 0, 1).unsqueeze(0).float().to(self.registry.device)
+        tensor.requires_grad = True
+        
+        activations = []
+        gradients = []
+        
+        def save_activation(module, input, output):
+            activations.append(output.detach())
+            
+        def save_gradient(module, grad_input, grad_output):
+            gradients.append(grad_output[0].detach())
+            
+        target_layer = cls_model.attention
+        h_f = target_layer.register_forward_hook(save_activation)
+        h_b = target_layer.register_full_backward_hook(save_gradient)
+        
+        try:
+            with torch.enable_grad():
+                logits = cls_model(tensor)
+                loss = logits[0, target_class_idx]
+                cls_model.zero_grad()
+                loss.backward()
+                
+            if not activations or not gradients:
+                return None
+                
+            act = activations[0]
+            grad = gradients[0]
+            
+            pooled_grad = torch.mean(grad, dim=[2, 3], keepdim=True)
+            cam = torch.sum(act * pooled_grad, dim=1).squeeze(0)
+            cam = torch.relu(cam)
+            
+            cam_max = torch.max(cam)
+            if cam_max > 0:
+                cam = cam / cam_max
+                
+            return cam.cpu().numpy()
+            
+        except Exception as e:
+            print(f"Grad-CAM error: {e}")
+            return None
+        finally:
+            h_f.remove()
+            h_b.remove()
+
+    def _generate_gradcam_overlay(self, img_rgb: np.ndarray, heatmap: np.ndarray) -> np.ndarray:
+        """Chồng bản đồ nhiệt Grad-CAM lên ảnh gốc sử dụng hệ màu Jet."""
+        heatmap_resized = cv2.resize(heatmap, (img_rgb.shape[1], img_rgb.shape[0]), interpolation=cv2.INTER_LINEAR)
+        heatmap_scaled = np.uint8(255 * heatmap_resized)
+        heatmap_colored = cv2.applyColorMap(heatmap_scaled, cv2.COLORMAP_JET)
+        heatmap_colored = cv2.cvtColor(heatmap_colored, cv2.COLOR_BGR2RGB)
+        
+        alpha = 0.45
+        overlay = cv2.addWeighted(heatmap_colored, alpha, img_rgb, 1 - alpha, 0)
+        return overlay

@@ -1,0 +1,36 @@
+ 537           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+
+ 539   L2:     FOR_ITER                28 (to L3)
+               UNPACK_SEQUENCE          2
+               STORE_FAST_STORE_FAST   18 (k, v)
+
+ 538           LOAD_CONST               0 ('    • ')
+               LOAD_FAST_BORROW         1 (k)
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' (')
+               LOAD_GLOBAL              1 (get_vietnamese_diagnosis + NULL)
+               LOAD_FAST_BORROW         1 (k)
+               CALL                     1
+               FORMAT_SIMPLE
+               LOAD_CONST               2 ('): ')
+               LOAD_FAST_BORROW         2 (v)
+               LOAD_CONST               3 ('.4f')
+               FORMAT_WITH_SPEC
+               BUILD_STRING             6
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           30 (to L2)
+
+ 539   L3:     END_FOR
+               POP_ITER
+               LOAD_CONST               4 (None)
+               RETURN_VALUE
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti

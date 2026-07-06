@@ -8,7 +8,7 @@ timm
 transformers
 scikit-learn
 tqdm
-streamlit
+streamlit==1.40.0
 matplotlib
 seaborn
 openai
@@ -19,3 +19,6 @@ google-cloud-firestore
 google-auth
 requests
 peft
+fpdf
+pydicom
+streamlit-drawable-canvas

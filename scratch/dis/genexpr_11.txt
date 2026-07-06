@@ -1,0 +1,36 @@
+  --           COPY_FREE_VARS           1
+
+3859           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+       L2:     FOR_ITER                36 (to L6)
+               STORE_FAST_LOAD_FAST    17 (msg, msg)
+               LOAD_CONST               0 ('role')
+               BINARY_OP               26 ([])
+               LOAD_CONST               1 ('user')
+               COMPARE_OP              72 (==)
+               COPY                     1
+               TO_BOOL
+               POP_JUMP_IF_FALSE       13 (to L5)
+       L3:     NOT_TAKEN
+       L4:     POP_TOP
+               LOAD_FAST_BORROW         1 (msg)
+               LOAD_CONST               2 ('content')
+               BINARY_OP               26 ([])
+               LOAD_DEREF               2 (active_prompt)
+               COMPARE_OP              72 (==)
+       L5:     YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           38 (to L2)
+       L6:     END_FOR
+               POP_ITER
+               LOAD_CONST               3 (None)
+               RETURN_VALUE
+
+  --   L7:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L3 -> L7 [0] lasti
+  L4 to L7 -> L7 [0] lasti

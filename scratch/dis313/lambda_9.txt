@@ -1,0 +1,9 @@
+  --           COPY_FREE_VARS           1
+
+3043           RESUME                   0
+               LOAD_DEREF               1 (probs_early)
+               LOAD_ATTR                1 (get + NULL|self)
+               LOAD_FAST                0 (k)
+               LOAD_CONST               1 (0.0)
+               CALL                     2
+               RETURN_VALUE

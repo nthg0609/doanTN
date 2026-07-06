@@ -7,11 +7,8 @@ import unittest.mock as mock
 sys.path.insert(0, '.')
 
 # ── Mock heavy dependencies ──────────────────────────────────────────────────
-np_mock = types.ModuleType('numpy')
-np_mock.ndarray = type
-for attr in ['array', 'zeros', 'asarray', 'clip', 'sum', 'abs', 'pi', 'sqrt', 'pad', 'flipud', 'fliplr', 'argmax']:
-    setattr(np_mock, attr, mock.MagicMock(return_value=0.5))
-sys.modules['numpy'] = np_mock
+import numpy as np
+sys.modules['numpy'] = np
 
 # Mock google namespace hierarchy
 google_mock = types.ModuleType('google')

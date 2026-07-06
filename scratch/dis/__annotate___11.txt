@@ -1,0 +1,14 @@
+378           RESUME                   0
+              LOAD_FAST_BORROW         0 (format)
+              LOAD_SMALL_INT           2
+              COMPARE_OP             132 (>)
+              POP_JUMP_IF_FALSE        3 (to L1)
+              NOT_TAKEN
+              LOAD_COMMON_CONSTANT     1 (NotImplementedError)
+              RAISE_VARARGS            1
+      L1:     LOAD_CONST               1 ('doc_id')
+              LOAD_GLOBAL              0 (str)
+              LOAD_CONST               2 ('return')
+              LOAD_GLOBAL              2 (bool)
+              BUILD_MAP                2
+              RETURN_VALUE

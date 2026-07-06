@@ -1,0 +1,447 @@
+1746            RESUME                   0
+
+1748            LOAD_GLOBAL              1 (list + NULL)
+                LOAD_GLOBAL              3 (set + NULL)
+                LOAD_CONST               1 (<code object <genexpr> at 0x000001813ED17470, file "D:\DoAn_DaLieu\app_streamlit.py", line 1748>)
+                MAKE_FUNCTION
+                LOAD_FAST                0 (visits)
+                GET_ITER
+                CALL                     0
+                CALL                     1
+                CALL                     1
+                STORE_FAST               2 (unique_locs)
+
+1750            LOAD_FAST                1 (selected_location)
+                LOAD_CONST               2 ('Tất cả vị trí')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       38 (to L1)
+                LOAD_GLOBAL              5 (len + NULL)
+                LOAD_FAST                2 (unique_locs)
+                CALL                     1
+                LOAD_CONST               3 (1)
+                COMPARE_OP             148 (bool(>))
+                POP_JUMP_IF_FALSE       23 (to L1)
+
+1751            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR                8 (info)
+                PUSH_NULL
+                LOAD_CONST               4 (' Bệnh nhân này có tổn thương ở nhiều vị trí khác nhau. Vui lòng chọn một vị trí tổn thương cụ thể từ bộ lọc bên trên để xem đồ thị tiến triển chi tiết của tổn thương đó.')
+                CALL                     1
+                POP_TOP
+
+1752            RETURN_CONST             0 (None)
+
+1754    L1:     LOAD_GLOBAL              5 (len + NULL)
+                LOAD_FAST                0 (visits)
+                CALL                     1
+                LOAD_CONST               5 (2)
+                COMPARE_OP              18 (bool(<))
+                POP_JUMP_IF_FALSE       23 (to L2)
+
+1755            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR                8 (info)
+                PUSH_NULL
+                LOAD_CONST               6 (' Cần ít nhất 2 mốc khám của cùng một tổn thương để vẽ biểu đồ theo dõi tiến triển lâm sàng.')
+                CALL                     1
+                POP_TOP
+
+1756            RETURN_CONST             0 (None)
+
+1759    L2:     LOAD_GLOBAL             11 (sorted + NULL)
+                LOAD_FAST                0 (visits)
+                LOAD_CONST               7 (<code object <lambda> at 0x000001813EFDF870, file "D:\DoAn_DaLieu\app_streamlit.py", line 1759>)
+                MAKE_FUNCTION
+                LOAD_CONST               8 (('key',))
+                CALL_KW                  2
+                STORE_FAST               3 (sorted_visits)
+
+1761            BUILD_LIST               0
+                STORE_FAST               4 (dates)
+
+1762            BUILD_LIST               0
+                STORE_FAST               5 (area_ratios)
+
+1763            BUILD_LIST               0
+                STORE_FAST               6 (borders)
+
+1764            BUILD_LIST               0
+                STORE_FAST               7 (asymmetries)
+
+1765            BUILD_LIST               0
+                STORE_FAST               8 (circularities)
+
+1766            BUILD_LIST               0
+                STORE_FAST               9 (confidences)
+
+1767            BUILD_LIST               0
+                STORE_FAST              10 (predictions)
+
+1769            LOAD_FAST                3 (sorted_visits)
+                GET_ITER
+        L3:     EXTENDED_ARG             1
+                FOR_ITER               341 (to L6)
+                STORE_FAST              11 (v)
+
+1770            LOAD_FAST               11 (v)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST               9 ('created_at')
+                LOAD_CONST              10 ('N/A')
+                CALL                     2
+                STORE_FAST              12 (v_time)
+
+1771            NOP
+
+1772    L4:     LOAD_GLOBAL             14 (datetime)
+                LOAD_ATTR               16 (strptime)
+                PUSH_NULL
+                LOAD_FAST               12 (v_time)
+                LOAD_CONST              11 ('%Y/%m/%d %H:%M:%S')
+                CALL                     2
+                STORE_FAST              13 (dt)
+
+1773            LOAD_FAST               13 (dt)
+                LOAD_ATTR               19 (strftime + NULL|self)
+                LOAD_CONST              12 ('%d/%m %H:%M')
+                CALL                     1
+                STORE_FAST              14 (short_time)
+
+1777    L5:     LOAD_FAST                4 (dates)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_FAST               14 (short_time)
+                CALL                     1
+                POP_TOP
+
+1779            LOAD_FAST               11 (v)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              13 ('ai_extracted_metrics')
+                BUILD_MAP                0
+                CALL                     2
+                STORE_FAST              15 (metrics)
+
+1780            LOAD_FAST                5 (area_ratios)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST               15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              14 ('area_ratio')
+                LOAD_CONST              15 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1781            LOAD_FAST                6 (borders)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST               15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              16 ('border_complexity')
+                LOAD_CONST              15 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1782            LOAD_FAST                7 (asymmetries)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST               15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              17 ('asymmetry')
+                LOAD_CONST              15 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1783            LOAD_FAST                8 (circularities)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST               15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              18 ('circularity')
+                LOAD_CONST              15 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1785            LOAD_FAST                9 (confidences)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST               15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              19 ('confidence')
+                LOAD_CONST              15 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1786            LOAD_FAST               10 (predictions)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_FAST               15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              20 ('prediction')
+                LOAD_CONST              10 ('N/A')
+                CALL                     2
+                CALL                     1
+                POP_TOP
+                EXTENDED_ARG             1
+                JUMP_BACKWARD          344 (to L3)
+
+1769    L6:     END_FOR
+                POP_TOP
+
+1788            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               26 (subheader)
+                PUSH_NULL
+                LOAD_CONST              21 (' Đồ thị Tiến triển Lâm sàng theo Thời gian')
+                CALL                     1
+                POP_TOP
+
+1790            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               28 (tabs)
+                PUSH_NULL
+                BUILD_LIST               0
+                LOAD_CONST              22 ((' Diện tích & Độ phức tạp bờ', ' Đối xứng & Độ tròn', ' Độ tin cậy Chẩn đoán'))
+                LIST_EXTEND              1
+                CALL                     1
+                STORE_FAST              16 (chart_tabs)
+
+1792            LOAD_FAST               16 (chart_tabs)
+                LOAD_CONST              23 (0)
+                BINARY_SUBSCR
+                BEFORE_WITH
+        L7:     POP_TOP
+
+1793            LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               32 (Figure)
+                PUSH_NULL
+                CALL                     0
+                STORE_FAST              17 (fig1)
+
+1829            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               34 (plotly_chart)
+                PUSH_NULL
+                LOAD_FAST               17 (fig1)
+                LOAD_CONST              24 (True)
+                LOAD_CONST              25 (('use_container_width',))
+                CALL_KW                  2
+                POP_TOP
+
+1792    L8:     LOAD_CONST               0 (None)
+                LOAD_CONST               0 (None)
+                LOAD_CONST               0 (None)
+                CALL                     2
+                POP_TOP
+
+1831    L9:     LOAD_FAST               16 (chart_tabs)
+                LOAD_CONST               3 (1)
+                BINARY_SUBSCR
+                BEFORE_WITH
+       L10:     POP_TOP
+
+1832            LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               32 (Figure)
+                PUSH_NULL
+                CALL                     0
+                STORE_FAST              18 (fig2)
+
+1856            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               34 (plotly_chart)
+                PUSH_NULL
+                LOAD_FAST               18 (fig2)
+                LOAD_CONST              24 (True)
+                LOAD_CONST              25 (('use_container_width',))
+                CALL_KW                  2
+                POP_TOP
+
+1831   L11:     LOAD_CONST               0 (None)
+                LOAD_CONST               0 (None)
+                LOAD_CONST               0 (None)
+                CALL                     2
+                POP_TOP
+
+1858   L12:     LOAD_FAST               16 (chart_tabs)
+                LOAD_CONST               5 (2)
+                BINARY_SUBSCR
+                BEFORE_WITH
+       L13:     POP_TOP
+
+1859            LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               32 (Figure)
+                PUSH_NULL
+                CALL                     0
+                STORE_FAST              19 (fig3)
+
+1860            LOAD_GLOBAL             37 (zip + NULL)
+                LOAD_FAST_LOAD_FAST    169 (predictions, confidences)
+                CALL                     2
+                GET_ITER
+                LOAD_FAST_AND_CLEAR     20 (p)
+                LOAD_FAST_AND_CLEAR     21 (c)
+                SWAP                     3
+       L14:     BUILD_LIST               0
+                SWAP                     2
+                GET_ITER
+       L15:     FOR_ITER                15 (to L16)
+                UNPACK_SEQUENCE          2
+                STORE_FAST              20 (p)
+                STORE_FAST              21 (c)
+                LOAD_FAST               20 (p)
+                FORMAT_SIMPLE
+                LOAD_CONST              26 (' (')
+                LOAD_FAST               21 (c)
+                LOAD_CONST              27 ('.1%')
+                FORMAT_WITH_SPEC
+                LOAD_CONST              28 (')')
+                BUILD_STRING             4
+                LIST_APPEND              2
+                JUMP_BACKWARD           17 (to L15)
+       L16:     END_FOR
+                POP_TOP
+       L17:     STORE_FAST              22 (text_labels)
+                STORE_FAST              20 (p)
+                STORE_FAST              21 (c)
+
+1877            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               34 (plotly_chart)
+                PUSH_NULL
+                LOAD_FAST               19 (fig3)
+                LOAD_CONST              24 (True)
+                LOAD_CONST              25 (('use_container_width',))
+                CALL_KW                  2
+                POP_TOP
+
+1858   L18:     LOAD_CONST               0 (None)
+                LOAD_CONST               0 (None)
+                LOAD_CONST               0 (None)
+                CALL                     2
+                POP_TOP
+                RETURN_CONST             0 (None)
+
+  --   L19:     PUSH_EXC_INFO
+
+1774            LOAD_GLOBAL             20 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        6 (to L21)
+                POP_TOP
+
+1775            LOAD_FAST               12 (v_time)
+                STORE_FAST              14 (short_time)
+       L20:     POP_EXCEPT
+                EXTENDED_ARG             2
+                JUMP_BACKWARD_NO_INTERRUPT 552 (to L5)
+
+1774   L21:     RERAISE                  0
+
+  --   L22:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+
+1792   L23:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         1 (to L24)
+                RERAISE                  2
+       L24:     POP_TOP
+       L25:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                JUMP_BACKWARD_NO_INTERRUPT 185 (to L9)
+
+  --   L26:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+
+1831   L27:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         1 (to L28)
+                RERAISE                  2
+       L28:     POP_TOP
+       L29:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                JUMP_BACKWARD_NO_INTERRUPT 146 (to L12)
+
+  --   L30:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L31:     SWAP                     2
+                POP_TOP
+
+1860            SWAP                     3
+                STORE_FAST              21 (c)
+                STORE_FAST              20 (p)
+                RERAISE                  0
+
+1858   L32:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         1 (to L33)
+                RERAISE                  2
+       L33:     POP_TOP
+       L34:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                RETURN_CONST             0 (None)
+
+  --   L35:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L4 to L5 -> L19 [1]
+  L7 to L8 -> L23 [1] lasti
+  L10 to L11 -> L27 [1] lasti
+  L13 to L14 -> L32 [1] lasti
+  L14 to L17 -> L31 [4]
+  L17 to L18 -> L32 [1] lasti
+  L19 to L20 -> L22 [2] lasti
+  L21 to L22 -> L22 [2] lasti
+  L23 to L25 -> L26 [3] lasti
+  L27 to L29 -> L30 [3] lasti
+  L31 to L32 -> L32 [1] lasti
+  L32 to L34 -> L35 [3] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813ED17470, file "D:\DoAn_DaLieu\app_streamlit.py", line 1748>:
+1748           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                60 (to L3)
+               STORE_FAST               1 (v)
+               LOAD_GLOBAL              1 (str + NULL)
+               LOAD_FAST                1 (v)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               0 ('location')
+               LOAD_CONST               1 ('Không rõ')
+               CALL                     2
+               CALL                     1
+               LOAD_ATTR                5 (strip + NULL|self)
+               CALL                     0
+               LOAD_ATTR                7 (capitalize + NULL|self)
+               CALL                     0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           62 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             2 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <lambda> at 0x000001813EFDF870, file "D:\DoAn_DaLieu\app_streamlit.py", line 1759>:
+1759           RESUME                   0
+               LOAD_FAST                0 (x)
+               LOAD_ATTR                1 (get + NULL|self)
+               LOAD_CONST               1 ('timestamp_id')
+               LOAD_CONST               2 ('')
+               CALL                     2
+               RETURN_VALUE

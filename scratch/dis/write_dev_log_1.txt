@@ -1,0 +1,79 @@
+ 334           RESUME                   0
+
+ 336           LOAD_GLOBAL              0 (datetime)
+               LOAD_ATTR                2 (now)
+               PUSH_NULL
+               CALL                     0
+               LOAD_ATTR                5 (strftime + NULL|self)
+               LOAD_CONST               1 ('%Y-%m-%d %H:%M:%S')
+               CALL                     1
+               STORE_FAST               2 (timestamp)
+
+ 338           LOAD_CONST               2 ('action_time')
+               LOAD_FAST_BORROW         2 (timestamp)
+
+ 339           LOAD_CONST               3 ('action_type')
+               LOAD_FAST_BORROW         1 (action_type)
+
+ 340           LOAD_CONST               4 ('payload')
+               LOAD_FAST_BORROW         0 (data)
+
+ 337           BUILD_MAP                3
+               STORE_FAST               3 (log_entry)
+
+ 342           LOAD_GLOBAL              7 (open + NULL)
+               LOAD_GLOBAL              8 (LOG_FILE_PATH)
+               LOAD_CONST               5 ('a')
+               LOAD_CONST               6 ('utf-8')
+               LOAD_CONST               7 (('encoding',))
+               CALL_KW                  3
+               COPY                     1
+               LOAD_SPECIAL             1 (__exit__)
+               SWAP                     2
+               SWAP                     3
+               LOAD_SPECIAL             0 (__enter__)
+               CALL                     0
+       L1:     STORE_FAST               4 (f)
+
+ 343           LOAD_FAST_BORROW         4 (f)
+               LOAD_ATTR               11 (write + NULL|self)
+               LOAD_GLOBAL             12 (json)
+               LOAD_ATTR               14 (dumps)
+               PUSH_NULL
+               LOAD_FAST_BORROW         3 (log_entry)
+               LOAD_CONST               8 (False)
+               LOAD_GLOBAL             16 (_NumpySafeEncoder)
+               LOAD_CONST               9 (('ensure_ascii', 'cls'))
+               CALL_KW                  3
+               LOAD_CONST              10 ('\n')
+               BINARY_OP                0 (+)
+               CALL                     1
+               POP_TOP
+
+ 342   L2:     LOAD_CONST              11 (None)
+               LOAD_CONST              11 (None)
+               LOAD_CONST              11 (None)
+               CALL                     3
+               POP_TOP
+               LOAD_CONST              11 (None)
+               RETURN_VALUE
+       L3:     PUSH_EXC_INFO
+               WITH_EXCEPT_START
+               TO_BOOL
+               POP_JUMP_IF_TRUE         2 (to L4)
+               NOT_TAKEN
+               RERAISE                  2
+       L4:     POP_TOP
+       L5:     POP_EXCEPT
+               POP_TOP
+               POP_TOP
+               POP_TOP
+               LOAD_CONST              11 (None)
+               RETURN_VALUE
+
+  --   L6:     COPY                     3
+               POP_EXCEPT
+               RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L3 [2] lasti
+  L3 to L5 -> L6 [4] lasti

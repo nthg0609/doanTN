@@ -1,0 +1,113 @@
+ 466            RESUME                   0
+
+ 467            BUILD_LIST               0
+                STORE_FAST               0 (records)
+
+ 468            NOP
+
+ 469    L1:     LOAD_CONST               0 ('gcp-credentials.json')
+                STORE_FAST               1 (cred_path)
+
+ 470            LOAD_GLOBAL              0 (os)
+                LOAD_ATTR                2 (path)
+                LOAD_ATTR                5 (exists + NULL|self)
+                LOAD_FAST_BORROW         1 (cred_path)
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_FALSE      202 (to L7)
+        L2:     NOT_TAKEN
+
+ 471    L3:     LOAD_GLOBAL              6 (service_account)
+                LOAD_ATTR                8 (Credentials)
+                LOAD_ATTR               11 (from_service_account_file + NULL|self)
+                LOAD_FAST_BORROW         1 (cred_path)
+                CALL                     1
+                STORE_FAST               2 (creds)
+
+ 472            LOAD_GLOBAL             12 (gcp_firestore)
+                LOAD_ATTR               14 (Client)
+                PUSH_NULL
+                LOAD_FAST_BORROW_LOAD_FAST_BORROW 34 (creds, creds)
+                LOAD_ATTR               16 (project_id)
+                LOAD_CONST               1 ('(default)')
+                LOAD_CONST               2 (('credentials', 'project', 'database'))
+                CALL_KW                  3
+                STORE_FAST               3 (db)
+
+ 473            LOAD_FAST_BORROW         3 (db)
+                LOAD_ATTR               19 (collection + NULL|self)
+                LOAD_CONST               3 ('medical_records')
+                CALL                     1
+                LOAD_ATTR               21 (order_by + NULL|self)
+
+ 474            LOAD_CONST               4 ('updated_at')
+                LOAD_GLOBAL             12 (gcp_firestore)
+                LOAD_ATTR               22 (Query)
+                LOAD_ATTR               24 (DESCENDING)
+
+ 473            LOAD_CONST               5 (('direction',))
+                CALL_KW                  2
+
+ 475            LOAD_ATTR               27 (stream + NULL|self)
+                CALL                     0
+
+ 473            STORE_FAST               4 (docs)
+
+ 476            LOAD_FAST_BORROW         4 (docs)
+                GET_ITER
+        L4:     FOR_ITER                58 (to L6)
+                STORE_FAST               5 (doc)
+
+ 477            LOAD_FAST_BORROW         5 (doc)
+                LOAD_ATTR               29 (to_dict + NULL|self)
+                CALL                     0
+                STORE_FAST               6 (data)
+
+ 478            LOAD_CONST               6 ('patient_id')
+                LOAD_FAST_BORROW         6 (data)
+                CONTAINS_OP              1 (not in)
+                POP_JUMP_IF_FALSE       16 (to L5)
+                NOT_TAKEN
+
+ 479            LOAD_FAST_BORROW         5 (doc)
+                LOAD_ATTR               30 (id)
+                LOAD_FAST_BORROW         6 (data)
+                LOAD_CONST               6 ('patient_id')
+                STORE_SUBSCR
+
+ 480    L5:     LOAD_FAST_BORROW         0 (records)
+                LOAD_ATTR               33 (append + NULL|self)
+                LOAD_FAST_BORROW         6 (data)
+                CALL                     1
+                POP_TOP
+                JUMP_BACKWARD           60 (to L4)
+
+ 476    L6:     END_FOR
+                POP_ITER
+
+ 483    L7:     LOAD_FAST_BORROW         0 (records)
+                RETURN_VALUE
+
+  --    L8:     PUSH_EXC_INFO
+
+ 481            LOAD_GLOBAL             34 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        5 (to L10)
+                NOT_TAKEN
+                POP_TOP
+
+ 482    L9:     POP_EXCEPT
+
+ 483            LOAD_FAST                0 (records)
+                RETURN_VALUE
+
+ 481   L10:     RERAISE                  0
+
+  --   L11:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L8 [0]
+  L3 to L7 -> L8 [0]
+  L8 to L9 -> L11 [1] lasti
+  L10 to L11 -> L11 [1] lasti

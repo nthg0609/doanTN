@@ -1,0 +1,68 @@
+2806            RESUME                   0
+
+2807            NOP
+
+2808    L1:     LOAD_GLOBAL              1 (float + NULL)
+                LOAD_FAST_BORROW         0 (val_a)
+                CALL                     1
+                STORE_FAST               0 (val_a)
+
+2809            LOAD_GLOBAL              1 (float + NULL)
+                LOAD_FAST_BORROW         1 (val_b)
+                CALL                     1
+                STORE_FAST               1 (val_b)
+
+2810            LOAD_FAST_BORROW         0 (val_a)
+                LOAD_SMALL_INT           0
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       12 (to L5)
+                NOT_TAKEN
+
+2811            LOAD_FAST_BORROW         1 (val_b)
+                LOAD_SMALL_INT           0
+                COMPARE_OP             148 (bool(>))
+                POP_JUMP_IF_FALSE        3 (to L3)
+                NOT_TAKEN
+                LOAD_CONST               1 ('+100%')
+        L2:     RETURN_VALUE
+        L3:     LOAD_CONST               2 ('0%')
+        L4:     RETURN_VALUE
+
+2812    L5:     LOAD_FAST_BORROW_LOAD_FAST_BORROW 16 (val_b, val_a)
+                BINARY_OP               10 (-)
+                LOAD_FAST_BORROW         0 (val_a)
+                BINARY_OP               11 (/)
+                LOAD_SMALL_INT         100
+                BINARY_OP                5 (*)
+                STORE_FAST               2 (diff)
+
+2813            LOAD_FAST_BORROW         2 (diff)
+                LOAD_CONST               3 ('+.1f')
+                FORMAT_WITH_SPEC
+                LOAD_CONST               4 ('%')
+                BUILD_STRING             2
+        L6:     RETURN_VALUE
+
+  --    L7:     PUSH_EXC_INFO
+
+2814            LOAD_GLOBAL              2 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        5 (to L9)
+                NOT_TAKEN
+                POP_TOP
+
+2815    L8:     POP_EXCEPT
+                LOAD_CONST               5 ('—')
+                RETURN_VALUE
+
+2814    L9:     RERAISE                  0
+
+  --   L10:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L7 [0]
+  L3 to L4 -> L7 [0]
+  L5 to L6 -> L7 [0]
+  L7 to L8 -> L10 [1] lasti
+  L9 to L10 -> L10 [1] lasti

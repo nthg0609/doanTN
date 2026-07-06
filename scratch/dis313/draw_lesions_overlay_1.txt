@@ -1,0 +1,63 @@
+325           RESUME                   0
+
+329           LOAD_FAST                0 (img_rgb)
+              LOAD_ATTR                1 (copy + NULL|self)
+              CALL                     0
+              STORE_FAST               2 (annotated)
+
+330           LOAD_FAST                1 (lesions)
+              GET_ITER
+      L1:     FOR_ITER                96 (to L2)
+              STORE_FAST               3 (les)
+
+331           LOAD_FAST                3 (les)
+              LOAD_CONST               1 ('bbox')
+              BINARY_SUBSCR
+              UNPACK_SEQUENCE          4
+              STORE_FAST_STORE_FAST   69 (x, y)
+              STORE_FAST_STORE_FAST  103 (w, h)
+
+333           LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR                4 (rectangle)
+              PUSH_NULL
+              LOAD_FAST_LOAD_FAST     36 (annotated, x)
+              LOAD_FAST                5 (y)
+              BUILD_TUPLE              2
+              LOAD_FAST_LOAD_FAST     70 (x, w)
+              BINARY_OP                0 (+)
+              LOAD_FAST_LOAD_FAST     87 (y, h)
+              BINARY_OP                0 (+)
+              BUILD_TUPLE              2
+              LOAD_CONST               2 ((56, 161, 105))
+              LOAD_CONST               3 (3)
+              CALL                     5
+              POP_TOP
+
+335           LOAD_CONST               4 ('Not ')
+              LOAD_FAST                3 (les)
+              LOAD_CONST               5 ('id')
+              BINARY_SUBSCR
+              FORMAT_SIMPLE
+              BUILD_STRING             2
+              STORE_FAST               8 (label)
+
+336           LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR                6 (getTextSize)
+              PUSH_NULL
+              LOAD_FAST                8 (label)
+              LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR                8 (FONT_HERSHEY_SIMPLEX)
+              LOAD_CONST               6 (0.7)
+              LOAD_CONST               7 (2)
+              CALL                     4
+              UNPACK_SEQUENCE          2
+              UNPACK_SEQUENCE          2
+              STORE_FAST_STORE_FAST  154 (label_w, label_h)
+              STORE_FAST              11 (baseline)
+              JUMP_BACKWARD           98 (to L1)
+
+330   L2:     END_FOR
+              POP_TOP
+
+339           LOAD_FAST                2 (annotated)
+              RETURN_VALUE

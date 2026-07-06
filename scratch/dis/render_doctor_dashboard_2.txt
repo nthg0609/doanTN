@@ -1,0 +1,3419 @@
+  --             MAKE_CELL              110 (is_english)
+                 MAKE_CELL              111 (visits)
+
+2700             RESUME                   0
+
+2702             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (session_state)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               0 ('language_select')
+                 LOAD_CONST               1 ('Tiếng Việt')
+                 CALL                     2
+                 STORE_FAST               0 (lang)
+
+2703             LOAD_GLOBAL              6 (TRANSLATIONS)
+                 LOAD_FAST_BORROW         0 (lang)
+                 BINARY_OP               26 ([])
+                 STORE_FAST               1 (t)
+
+2704             LOAD_FAST_BORROW         0 (lang)
+                 LOAD_CONST               2 ('English')
+                 COMPARE_OP              72 (==)
+                 STORE_DEREF            110 (is_english)
+
+2706             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                8 (header)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST               3 ('doctor_dashboard_header')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2707             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST               4 ("<div style='margin-bottom:12px;'>")
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST               5 ('doctor_dashboard_info')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST               6 ('</div>')
+                 BUILD_STRING             3
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST               8 (('unsafe_allow_html',))
+                 CALL_KW                  2
+                 POP_TOP
+
+2709             LOAD_GLOBAL             13 (fetch_all_medical_records + NULL)
+                 CALL                     0
+                 STORE_FAST               2 (all_records)
+
+2710             LOAD_FAST_BORROW         2 (all_records)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        25 (to L1)
+                 NOT_TAKEN
+
+2711             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               14 (warning)
+                 PUSH_NULL
+                 LOAD_CONST               9 ('Hiện tại kho lưu trữ đám mây chưa có dữ liệu bệnh án nào hợp lệ.')
+                 CALL                     1
+                 POP_TOP
+
+2712             LOAD_CONST              10 (None)
+                 RETURN_VALUE
+
+2714     L1:     BUILD_MAP                0
+                 STORE_FAST               3 (patient_options)
+
+2715             LOAD_FAST_BORROW         2 (all_records)
+                 GET_ITER
+         L2:     FOR_ITER               144 (to L5)
+                 STORE_FAST               4 (r)
+
+2716             LOAD_FAST_BORROW         4 (r)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              11 ('patient_info')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST               5 (p_info)
+
+2717             LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              12 ('name')
+                 LOAD_CONST              13 ('Ẩn danh')
+                 CALL                     2
+                 STORE_FAST               6 (p_name)
+
+2718             LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              14 ('age')
+                 LOAD_CONST              15 ('??')
+                 CALL                     2
+                 STORE_FAST               7 (p_age)
+
+2719             LOAD_FAST_BORROW         4 (r)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              16 ('patient_id')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 STORE_FAST               8 (p_id)
+
+2720             LOAD_GLOBAL             17 (len + NULL)
+                 LOAD_FAST_BORROW         4 (r)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              18 ('visits')
+                 BUILD_LIST               0
+                 CALL                     2
+                 CALL                     1
+                 STORE_FAST               9 (total)
+
+2721             LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        16 (to L3)
+                 NOT_TAKEN
+                 LOAD_CONST              19 ('BN: ')
+                 LOAD_FAST_BORROW         6 (p_name)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              20 (' (')
+                 LOAD_FAST_BORROW         7 (p_age)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              21 (' tuổi) | ID: ')
+                 LOAD_FAST_BORROW         8 (p_id)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              22 (' — [')
+                 LOAD_FAST_BORROW         9 (total)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              23 (' lượt khám]')
+                 BUILD_STRING             9
+                 JUMP_FORWARD            14 (to L4)
+         L3:     LOAD_CONST              24 ('Patient: ')
+                 LOAD_FAST_BORROW         6 (p_name)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              20 (' (')
+                 LOAD_FAST_BORROW         7 (p_age)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              25 (' yo) | ID: ')
+                 LOAD_FAST_BORROW         8 (p_id)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              22 (' — [')
+                 LOAD_FAST_BORROW         9 (total)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              26 (' visits]')
+                 BUILD_STRING             9
+         L4:     STORE_FAST              10 (label)
+
+2722             LOAD_FAST_BORROW_LOAD_FAST_BORROW 67 (r, patient_options)
+                 LOAD_FAST_BORROW        10 (label)
+                 STORE_SUBSCR
+                 JUMP_BACKWARD          146 (to L2)
+
+2715     L5:     END_FOR
+                 POP_ITER
+
+2724             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               18 (selectbox)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              27 ('select_patient')
+                 BINARY_OP               26 ([])
+                 LOAD_GLOBAL             21 (list + NULL)
+                 LOAD_FAST_BORROW         3 (patient_options)
+                 LOAD_ATTR               23 (keys + NULL|self)
+                 CALL                     0
+                 CALL                     1
+                 CALL                     2
+                 STORE_FAST              11 (selected_key)
+
+2725             LOAD_FAST_BORROW        11 (selected_key)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         3 (to L6)
+                 NOT_TAKEN
+
+2726             LOAD_CONST              10 (None)
+                 RETURN_VALUE
+
+2728     L6:     LOAD_FAST_BORROW_LOAD_FAST_BORROW 59 (patient_options, selected_key)
+                 BINARY_OP               26 ([])
+                 STORE_FAST              12 (record)
+
+2729             LOAD_FAST_BORROW        12 (record)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              11 ('patient_info')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST               5 (p_info)
+
+2730             LOAD_FAST_BORROW        12 (record)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              16 ('patient_id')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 STORE_FAST               8 (p_id)
+
+2731             LOAD_GLOBAL             25 (sorted + NULL)
+                 LOAD_FAST_BORROW        12 (record)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              18 ('visits')
+                 BUILD_LIST               0
+                 CALL                     2
+                 LOAD_CONST              28 (<code object <lambda> at 0x000002602A3F6E30, file "D:\DoAn_DaLieu\app_streamlit.py", line 2731>)
+                 MAKE_FUNCTION
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST              29 (('key', 'reverse'))
+                 CALL_KW                  3
+                 STORE_DEREF            111 (visits)
+
+2733             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+2734             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (subheader)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              31 ('patient_admin_info')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2735             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               28 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           3
+                 CALL                     1
+                 UNPACK_SEQUENCE          3
+                 STORE_FAST_STORE_FAST  222 (cc1, cc2)
+                 STORE_FAST              15 (cc3)
+
+2736             LOAD_FAST_BORROW        13 (cc1)
+                 LOAD_ATTR               11 (markdown + NULL|self)
+                 LOAD_CONST              32 ('**')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              33 ('patient_full_name')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST              34 ('** `')
+                 LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              12 ('name')
+                 LOAD_CONST              35 ('')
+                 CALL                     2
+                 LOAD_ATTR               31 (upper + NULL|self)
+                 CALL                     0
+                 FORMAT_SIMPLE
+                 LOAD_CONST              36 ('`')
+                 BUILD_STRING             5
+                 CALL                     1
+                 POP_TOP
+
+2737             LOAD_FAST_BORROW        14 (cc2)
+                 LOAD_ATTR               11 (markdown + NULL|self)
+                 LOAD_CONST              32 ('**')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              37 ('patient_age_val')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST              34 ('** `')
+                 LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              14 ('age')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 LOAD_CONST              36 ('`')
+                 BUILD_STRING             5
+                 CALL                     1
+                 POP_TOP
+
+2738             LOAD_FAST_BORROW        15 (cc3)
+                 LOAD_ATTR               11 (markdown + NULL|self)
+                 LOAD_CONST              32 ('**')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              38 ('patient_hometown_val')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST              34 ('** `')
+                 LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              39 ('hometown')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 LOAD_CONST              36 ('`')
+                 BUILD_STRING             5
+                 CALL                     1
+                 POP_TOP
+
+2740             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+2743             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               32 (checkbox)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              40 ('comparison_mode_label')
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              41 ('doctor_comparison_mode')
+                 LOAD_CONST              42 (('key',))
+                 CALL_KW                  2
+                 STORE_FAST              16 (comparison_mode)
+
+2745             LOAD_FAST_BORROW        16 (comparison_mode)
+                 TO_BOOL
+                 EXTENDED_ARG             8
+                 POP_JUMP_IF_FALSE     2067 (to L55)
+                 NOT_TAKEN
+
+2746             LOAD_GLOBAL             17 (len + NULL)
+                 LOAD_DEREF             111 (visits)
+                 CALL                     1
+                 LOAD_SMALL_INT           2
+                 COMPARE_OP              18 (bool(<))
+                 POP_JUMP_IF_FALSE       32 (to L7)
+                 NOT_TAKEN
+
+2747             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               34 (info)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              43 ('comparison_insufficient')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+                 EXTENDED_ARG            16
+                 JUMP_FORWARD          4282 (to L118)
+
+2749     L7:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               28 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              17 (col_v1)
+                 STORE_FAST              18 (col_v2)
+
+2750             LOAD_FAST_BORROW        17 (col_v1)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+         L8:     POP_TOP
+
+2751             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               18 (selectbox)
+                 PUSH_NULL
+
+2752             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              44 ('comparison_select_a')
+                 BINARY_OP               26 ([])
+
+2753             LOAD_GLOBAL             37 (range + NULL)
+                 LOAD_GLOBAL             17 (len + NULL)
+                 LOAD_DEREF             111 (visits)
+                 CALL                     1
+                 CALL                     1
+
+2754             LOAD_FAST_BORROW       110 (is_english)
+                 LOAD_FAST_BORROW       111 (visits)
+                 BUILD_TUPLE              2
+                 LOAD_CONST              45 (<code object <lambda> at 0x000002602A33E630, file "D:\DoAn_DaLieu\app_streamlit.py", line 2754>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+
+2751             LOAD_CONST              46 (('format_func',))
+                 CALL_KW                  3
+                 STORE_FAST              19 (v1_idx)
+
+2756             LOAD_DEREF             111 (visits)
+                 LOAD_FAST_BORROW        19 (v1_idx)
+                 BINARY_OP               26 ([])
+                 STORE_FAST              20 (visit_a)
+
+2750     L9:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2757    L10:     LOAD_FAST_BORROW        18 (col_v2)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L11:     POP_TOP
+
+2758             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               18 (selectbox)
+                 PUSH_NULL
+
+2759             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              47 ('comparison_select_b')
+                 BINARY_OP               26 ([])
+
+2760             LOAD_GLOBAL             37 (range + NULL)
+                 LOAD_GLOBAL             17 (len + NULL)
+                 LOAD_DEREF             111 (visits)
+                 CALL                     1
+                 CALL                     1
+
+2761             LOAD_GLOBAL             39 (min + NULL)
+                 LOAD_SMALL_INT           1
+                 LOAD_GLOBAL             17 (len + NULL)
+                 LOAD_DEREF             111 (visits)
+                 CALL                     1
+                 LOAD_SMALL_INT           1
+                 BINARY_OP               10 (-)
+                 CALL                     2
+
+2762             LOAD_FAST_BORROW       110 (is_english)
+                 LOAD_FAST_BORROW       111 (visits)
+                 BUILD_TUPLE              2
+                 LOAD_CONST              48 (<code object <lambda> at 0x000002602A33EA30, file "D:\DoAn_DaLieu\app_streamlit.py", line 2762>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+
+2758             LOAD_CONST              49 (('index', 'format_func'))
+                 CALL_KW                  4
+                 STORE_FAST              21 (v2_idx)
+
+2764             LOAD_DEREF             111 (visits)
+                 LOAD_FAST_BORROW        21 (v2_idx)
+                 BINARY_OP               26 ([])
+                 STORE_FAST              22 (visit_b)
+
+2757    L12:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2766    L13:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+2769             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               28 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              23 (col_c1)
+                 STORE_FAST              24 (col_c2)
+
+2770             LOAD_FAST               23 (col_c1)
+                 LOAD_FAST_CHECK         20 (visit_a)
+                 LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         3 (to L14)
+                 NOT_TAKEN
+                 LOAD_CONST              50 ('Mốc A')
+                 JUMP_FORWARD             1 (to L15)
+        L14:     LOAD_CONST              51 ('Point A')
+        L15:     BUILD_TUPLE              3
+                 LOAD_FAST               24 (col_c2)
+                 LOAD_FAST_CHECK         22 (visit_b)
+                 LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         3 (to L16)
+                 NOT_TAKEN
+                 LOAD_CONST              52 ('Mốc B')
+                 JUMP_FORWARD             1 (to L17)
+        L16:     LOAD_CONST              53 ('Point B')
+        L17:     BUILD_TUPLE              3
+                 BUILD_TUPLE              2
+                 GET_ITER
+        L18:     EXTENDED_ARG             2
+                 FOR_ITER               632 (to L42)
+                 UNPACK_SEQUENCE          3
+                 STORE_FAST              25 (col)
+                 STORE_FAST              26 (vis_data)
+                 STORE_FAST              27 (label_name)
+
+2771             LOAD_FAST               25 (col)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L19:     POP_TOP
+
+2772             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              54 ('##### ')
+                 LOAD_FAST_BORROW        27 (label_name)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              20 (' (')
+                 LOAD_FAST_BORROW        26 (vis_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 FORMAT_SIMPLE
+                 LOAD_CONST              56 (')')
+                 BUILD_STRING             5
+                 CALL                     1
+                 POP_TOP
+
+2773             LOAD_FAST_BORROW        26 (vis_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              57 ('ai_extracted_metrics')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST              28 (ai_metrics)
+
+2774             LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              58 ('prediction')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 STORE_FAST              29 (v_pred)
+
+2775             LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        12 (to L20)
+                 NOT_TAKEN
+                 LOAD_GLOBAL             41 (get_vietnamese_diagnosis + NULL)
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 CALL                     1
+                 JUMP_FORWARD            21 (to L21)
+        L20:     LOAD_GLOBAL             42 (DIAGNOSIS_DICTIONARY_EN)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 CALL                     2
+        L21:     STORE_FAST              30 (v_vi_name)
+
+2776             LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              59 ('confidence')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              31 (v_conf)
+
+2778             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               44 (write)
+                 PUSH_NULL
+                 LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        21 (to L24)
+        L22:     NOT_TAKEN
+        L23:     LOAD_CONST              61 ('Vị trí: ')
+                 LOAD_FAST_BORROW        26 (vis_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              62 ('location')
+                 CALL                     1
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 JUMP_FORWARD            19 (to L25)
+        L24:     LOAD_CONST              63 ('Location: ')
+                 LOAD_FAST_BORROW        26 (vis_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              62 ('location')
+                 CALL                     1
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+        L25:     CALL                     1
+                 POP_TOP
+
+2779             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               44 (write)
+                 PUSH_NULL
+                 LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        14 (to L28)
+        L26:     NOT_TAKEN
+        L27:     LOAD_CONST              64 ('Dự đoán: ')
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              65 (' - ')
+                 LOAD_FAST_BORROW        30 (v_vi_name)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              20 (' (')
+                 LOAD_FAST_BORROW        31 (v_conf)
+                 LOAD_CONST              66 ('.1%')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              56 (')')
+                 BUILD_STRING             7
+                 JUMP_FORWARD            12 (to L29)
+        L28:     LOAD_CONST              67 ('Prediction: ')
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              65 (' - ')
+                 LOAD_FAST_BORROW        30 (v_vi_name)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              20 (' (')
+                 LOAD_FAST_BORROW        31 (v_conf)
+                 LOAD_CONST              66 ('.1%')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              56 (')')
+                 BUILD_STRING             7
+        L29:     CALL                     1
+                 POP_TOP
+
+2781             LOAD_FAST_BORROW        26 (vis_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              68 ('image_url')
+                 CALL                     1
+                 STORE_FAST              32 (img_url)
+
+2782             LOAD_FAST_BORROW        26 (vis_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              69 ('mask_url')
+                 CALL                     1
+                 STORE_FAST              33 (mask_url)
+
+2783             LOAD_FAST_BORROW        26 (vis_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              70 ('gradcam_url')
+                 CALL                     1
+                 STORE_FAST              34 (grad_url)
+
+2785             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               46 (tabs)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              71 ('tab_img')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              72 ('tab_mask')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              73 ('tab_grad')
+                 BINARY_OP               26 ([])
+                 BUILD_LIST               3
+                 CALL                     1
+                 UNPACK_SEQUENCE          3
+                 STORE_FAST              35 (tab_a)
+                 STORE_FAST              36 (tab_b)
+                 STORE_FAST              37 (tab_c)
+
+2786             LOAD_FAST               35 (tab_a)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L30:     POP_TOP
+
+2787             LOAD_FAST_BORROW        32 (img_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L31)
+                 NOT_TAKEN
+
+2788             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               48 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        32 (img_url)
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST              74 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            29 (to L32)
+
+2790    L31:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               50 (caption)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              75 ('no_orig_img')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2786    L32:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2791    L33:     LOAD_FAST               36 (tab_b)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L34:     POP_TOP
+
+2792             LOAD_FAST_BORROW        33 (mask_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L35)
+                 NOT_TAKEN
+
+2793             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               48 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        33 (mask_url)
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST              74 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            29 (to L36)
+
+2795    L35:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               50 (caption)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              76 ('no_mask_img')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2791    L36:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2796    L37:     LOAD_FAST               37 (tab_c)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L38:     POP_TOP
+
+2797             LOAD_FAST_BORROW        34 (grad_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L39)
+                 NOT_TAKEN
+
+2798             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               48 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        34 (grad_url)
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST              74 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            29 (to L40)
+
+2800    L39:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               50 (caption)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              77 ('no_grad_img')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2796    L40:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2771    L41:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+                 EXTENDED_ARG             2
+                 JUMP_BACKWARD          635 (to L18)
+
+2770    L42:     END_FOR
+                 POP_ITER
+
+2803             LOAD_FAST_BORROW        20 (visit_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              57 ('ai_extracted_metrics')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST              38 (metrics_a)
+
+2804             LOAD_FAST_BORROW        22 (visit_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              57 ('ai_extracted_metrics')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST              39 (metrics_b)
+
+2806             LOAD_CONST              78 (<code object calc_diff_pct at 0x000002602A345CB0, file "D:\DoAn_DaLieu\app_streamlit.py", line 2806>)
+                 MAKE_FUNCTION
+                 STORE_FAST              40 (calc_diff_pct)
+
+2817             LOAD_CONST              79 (<code object calc_diff_val at 0x000002602A3C1A70, file "D:\DoAn_DaLieu\app_streamlit.py", line 2817>)
+                 MAKE_FUNCTION
+                 STORE_FAST              41 (calc_diff_val)
+
+2826             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+2827             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (subheader)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              80 ('comparison_table_title')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2830             LOAD_FAST_BORROW        38 (metrics_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              81 ('area_ratio')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              42 (area_a)
+
+2831             LOAD_FAST_BORROW        39 (metrics_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              81 ('area_ratio')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              43 (area_b)
+
+2832             LOAD_FAST_BORROW        40 (calc_diff_pct)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        42 (area_a)
+                 LOAD_FAST_BORROW        43 (area_b)
+                 CALL                     2
+                 STORE_FAST              44 (area_diff_pct)
+
+2833             LOAD_FAST_BORROW        41 (calc_diff_val)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        42 (area_a)
+                 LOAD_FAST_BORROW        43 (area_b)
+                 CALL                     2
+                 STORE_FAST              45 (area_diff_val)
+
+2834             LOAD_FAST_BORROW        43 (area_b)
+                 LOAD_FAST_BORROW        42 (area_a)
+                 COMPARE_OP             148 (bool(>))
+                 POP_JUMP_IF_FALSE       10 (to L43)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              82 ('eval_area_up')
+                 BINARY_OP               26 ([])
+                 JUMP_FORWARD            24 (to L45)
+        L43:     LOAD_FAST_BORROW        43 (area_b)
+                 LOAD_FAST_BORROW        42 (area_a)
+                 COMPARE_OP              18 (bool(<))
+                 POP_JUMP_IF_FALSE       10 (to L44)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              83 ('eval_area_down')
+                 BINARY_OP               26 ([])
+                 JUMP_FORWARD             8 (to L45)
+        L44:     LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              84 ('eval_no_change')
+                 BINARY_OP               26 ([])
+        L45:     STORE_FAST              46 (area_eval)
+
+2837             LOAD_FAST_BORROW        38 (metrics_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              85 ('border_complexity')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              47 (border_a)
+
+2838             LOAD_FAST_BORROW        39 (metrics_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              85 ('border_complexity')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              48 (border_b)
+
+2839             LOAD_FAST_BORROW        40 (calc_diff_pct)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        47 (border_a)
+                 LOAD_FAST_BORROW        48 (border_b)
+                 CALL                     2
+                 STORE_FAST              49 (border_diff_pct)
+
+2840             LOAD_FAST_BORROW        41 (calc_diff_val)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        47 (border_a)
+                 LOAD_FAST_BORROW        48 (border_b)
+                 CALL                     2
+                 STORE_FAST              50 (border_diff_val)
+
+2841             LOAD_FAST_BORROW        48 (border_b)
+                 LOAD_FAST_BORROW        47 (border_a)
+                 COMPARE_OP             148 (bool(>))
+                 POP_JUMP_IF_FALSE       10 (to L46)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              86 ('eval_border_up')
+                 BINARY_OP               26 ([])
+                 JUMP_FORWARD            24 (to L48)
+        L46:     LOAD_FAST_BORROW        48 (border_b)
+                 LOAD_FAST_BORROW        47 (border_a)
+                 COMPARE_OP              18 (bool(<))
+                 POP_JUMP_IF_FALSE       10 (to L47)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              87 ('eval_border_down')
+                 BINARY_OP               26 ([])
+                 JUMP_FORWARD             8 (to L48)
+        L47:     LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              84 ('eval_no_change')
+                 BINARY_OP               26 ([])
+        L48:     STORE_FAST              51 (border_eval)
+
+2844             LOAD_FAST_BORROW        38 (metrics_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              88 ('asymmetry')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              52 (asym_a)
+
+2845             LOAD_FAST_BORROW        39 (metrics_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              88 ('asymmetry')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              53 (asym_b)
+
+2846             LOAD_FAST_BORROW        40 (calc_diff_pct)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        52 (asym_a)
+                 LOAD_FAST_BORROW        53 (asym_b)
+                 CALL                     2
+                 STORE_FAST              54 (asym_diff_pct)
+
+2847             LOAD_FAST_BORROW        41 (calc_diff_val)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        52 (asym_a)
+                 LOAD_FAST_BORROW        53 (asym_b)
+                 CALL                     2
+                 STORE_FAST              55 (asym_diff_val)
+
+2848             LOAD_FAST_BORROW        53 (asym_b)
+                 LOAD_FAST_BORROW        52 (asym_a)
+                 COMPARE_OP             148 (bool(>))
+                 POP_JUMP_IF_FALSE       10 (to L49)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              89 ('eval_asym_up')
+                 BINARY_OP               26 ([])
+                 JUMP_FORWARD            24 (to L51)
+        L49:     LOAD_FAST_BORROW        53 (asym_b)
+                 LOAD_FAST_BORROW        52 (asym_a)
+                 COMPARE_OP              18 (bool(<))
+                 POP_JUMP_IF_FALSE       10 (to L50)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              90 ('eval_asym_down')
+                 BINARY_OP               26 ([])
+                 JUMP_FORWARD             8 (to L51)
+        L50:     LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              84 ('eval_no_change')
+                 BINARY_OP               26 ([])
+        L51:     STORE_FAST              56 (asym_eval)
+
+2851             LOAD_FAST_BORROW        38 (metrics_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              91 ('circularity')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              57 (circ_a)
+
+2852             LOAD_FAST_BORROW        39 (metrics_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              91 ('circularity')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              58 (circ_b)
+
+2853             LOAD_FAST_BORROW        40 (calc_diff_pct)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        57 (circ_a)
+                 LOAD_FAST_BORROW        58 (circ_b)
+                 CALL                     2
+                 STORE_FAST              59 (circ_diff_pct)
+
+2854             LOAD_FAST_BORROW        41 (calc_diff_val)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        57 (circ_a)
+                 LOAD_FAST_BORROW        58 (circ_b)
+                 CALL                     2
+                 STORE_FAST              60 (circ_diff_val)
+
+2855             LOAD_FAST_BORROW        58 (circ_b)
+                 LOAD_FAST_BORROW        57 (circ_a)
+                 COMPARE_OP              18 (bool(<))
+                 POP_JUMP_IF_FALSE       10 (to L52)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              92 ('eval_circ_down')
+                 BINARY_OP               26 ([])
+                 JUMP_FORWARD            24 (to L54)
+        L52:     LOAD_FAST_BORROW        58 (circ_b)
+                 LOAD_FAST_BORROW        57 (circ_a)
+                 COMPARE_OP             148 (bool(>))
+                 POP_JUMP_IF_FALSE       10 (to L53)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              93 ('eval_circ_up')
+                 BINARY_OP               26 ([])
+                 JUMP_FORWARD             8 (to L54)
+        L53:     LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              84 ('eval_no_change')
+                 BINARY_OP               26 ([])
+        L54:     STORE_FAST              61 (circ_eval)
+
+2857             LOAD_GLOBAL             52 (pd)
+                 LOAD_ATTR               54 (DataFrame)
+                 PUSH_NULL
+
+2859             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              94 ('col_metric')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              95 ('metric_area_full')
+                 BINARY_OP               26 ([])
+
+2860             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              96 ('col_moca')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        20 (visit_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 LOAD_CONST              97 (slice(None, 10, None))
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              98 (('date',))
+                 CALL_KW                  1
+                 LOAD_FAST_BORROW        42 (area_a)
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+2861             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             100 ('col_mocb')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        22 (visit_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 LOAD_CONST              97 (slice(None, 10, None))
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              98 (('date',))
+                 CALL_KW                  1
+                 LOAD_FAST_BORROW        43 (area_b)
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+2862             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             101 ('col_diff_abs')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        45 (area_diff_val)
+
+2863             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             102 ('col_diff_pct')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        44 (area_diff_pct)
+
+2864             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             103 ('col_eval')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        46 (area_eval)
+
+2858             BUILD_MAP                6
+
+2867             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              94 ('col_metric')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             104 ('metric_border_full')
+                 BINARY_OP               26 ([])
+
+2868             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              96 ('col_moca')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        20 (visit_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 LOAD_CONST              97 (slice(None, 10, None))
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              98 (('date',))
+                 CALL_KW                  1
+                 LOAD_FAST_BORROW        47 (border_a)
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+2869             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             100 ('col_mocb')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        22 (visit_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 LOAD_CONST              97 (slice(None, 10, None))
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              98 (('date',))
+                 CALL_KW                  1
+                 LOAD_FAST_BORROW        48 (border_b)
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+2870             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             101 ('col_diff_abs')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        50 (border_diff_val)
+
+2871             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             102 ('col_diff_pct')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        49 (border_diff_pct)
+
+2872             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             103 ('col_eval')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        51 (border_eval)
+
+2866             BUILD_MAP                6
+
+2875             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              94 ('col_metric')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             105 ('metric_asym_full')
+                 BINARY_OP               26 ([])
+
+2876             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              96 ('col_moca')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        20 (visit_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 LOAD_CONST              97 (slice(None, 10, None))
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              98 (('date',))
+                 CALL_KW                  1
+                 LOAD_FAST_BORROW        52 (asym_a)
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+2877             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             100 ('col_mocb')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        22 (visit_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 LOAD_CONST              97 (slice(None, 10, None))
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              98 (('date',))
+                 CALL_KW                  1
+                 LOAD_FAST_BORROW        53 (asym_b)
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+2878             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             101 ('col_diff_abs')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        55 (asym_diff_val)
+
+2879             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             102 ('col_diff_pct')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        54 (asym_diff_pct)
+
+2880             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             103 ('col_eval')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        56 (asym_eval)
+
+2874             BUILD_MAP                6
+
+2883             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              94 ('col_metric')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             106 ('metric_circ_full')
+                 BINARY_OP               26 ([])
+
+2884             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              96 ('col_moca')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        20 (visit_a)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 LOAD_CONST              97 (slice(None, 10, None))
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              98 (('date',))
+                 CALL_KW                  1
+                 LOAD_FAST_BORROW        57 (circ_a)
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+2885             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             100 ('col_mocb')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        22 (visit_b)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 CALL                     1
+                 LOAD_CONST              97 (slice(None, 10, None))
+                 BINARY_OP               26 ([])
+                 LOAD_CONST              98 (('date',))
+                 CALL_KW                  1
+                 LOAD_FAST_BORROW        58 (circ_b)
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+2886             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             101 ('col_diff_abs')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        60 (circ_diff_val)
+
+2887             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             102 ('col_diff_pct')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        59 (circ_diff_pct)
+
+2888             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             103 ('col_eval')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        61 (circ_eval)
+
+2882             BUILD_MAP                6
+
+2857             BUILD_LIST               4
+                 CALL                     1
+                 STORE_FAST              62 (comp_df)
+
+2891             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               58 (table)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        62 (comp_df)
+                 CALL                     1
+                 POP_TOP
+                 EXTENDED_ARG             8
+                 JUMP_FORWARD          2263 (to L118)
+
+2894    L55:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (subheader)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             107 ('filter_location')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2896             LOAD_GLOBAL             25 (sorted + NULL)
+                 LOAD_GLOBAL             21 (list + NULL)
+                 LOAD_GLOBAL             61 (set + NULL)
+                 LOAD_CONST             108 (<code object <genexpr> at 0x000002602A351E70, file "D:\DoAn_DaLieu\app_streamlit.py", line 2896>)
+                 MAKE_FUNCTION
+
+2897             LOAD_DEREF             111 (visits)
+                 GET_ITER
+
+2896             CALL                     0
+                 CALL                     1
+                 CALL                     1
+                 CALL                     1
+                 STORE_FAST              63 (unique_locations)
+
+2899             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             109 ('select_all_locations')
+                 BINARY_OP               26 ([])
+                 BUILD_LIST               1
+                 LOAD_FAST_BORROW        63 (unique_locations)
+                 BINARY_OP                0 (+)
+                 STORE_FAST              64 (filter_options)
+
+2900             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               18 (selectbox)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             110 ('filter_location_select')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        64 (filter_options)
+                 LOAD_CONST             111 ('dashboard_location_filter')
+                 LOAD_CONST              42 (('key',))
+                 CALL_KW                  3
+                 STORE_FAST              65 (selected_location)
+
+2903             LOAD_FAST_BORROW        65 (selected_location)
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             109 ('select_all_locations')
+                 BINARY_OP               26 ([])
+                 COMPARE_OP             119 (bool(!=))
+                 POP_JUMP_IF_FALSE       81 (to L62)
+                 NOT_TAKEN
+
+2904             LOAD_DEREF             111 (visits)
+                 GET_ITER
+                 LOAD_FAST_AND_CLEAR     66 (v)
+                 SWAP                     2
+        L56:     BUILD_LIST               0
+                 SWAP                     2
+        L57:     FOR_ITER                67 (to L60)
+                 STORE_FAST              66 (v)
+                 LOAD_GLOBAL             63 (str + NULL)
+                 LOAD_FAST_BORROW        66 (v)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              62 ('location')
+                 LOAD_CONST             112 ('Không rõ')
+                 CALL                     2
+                 CALL                     1
+                 LOAD_ATTR               65 (strip + NULL|self)
+                 CALL                     0
+                 LOAD_ATTR               67 (capitalize + NULL|self)
+                 CALL                     0
+                 LOAD_FAST_CHECK         65 (selected_location)
+                 COMPARE_OP              88 (bool(==))
+        L58:     POP_JUMP_IF_TRUE         3 (to L59)
+                 NOT_TAKEN
+                 JUMP_BACKWARD           65 (to L57)
+        L59:     LOAD_FAST_CHECK         66 (v)
+                 LIST_APPEND              2
+                 JUMP_BACKWARD           69 (to L57)
+        L60:     END_FOR
+                 POP_ITER
+        L61:     STORE_FAST              67 (filtered_visits)
+                 STORE_FAST              66 (v)
+                 JUMP_FORWARD             2 (to L63)
+
+2906    L62:     LOAD_DEREF             111 (visits)
+                 STORE_FAST              67 (filtered_visits)
+
+2908    L63:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+2909             LOAD_GLOBAL             69 (render_evolution_chart + NULL)
+                 LOAD_FAST_CHECK         67 (filtered_visits)
+                 LOAD_FAST_CHECK         65 (selected_location)
+                 CALL                     2
+                 POP_TOP
+
+2911             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+2912             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (subheader)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             113 ('chronological_title')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2914             LOAD_GLOBAL             71 (enumerate + NULL)
+                 LOAD_FAST_BORROW        67 (filtered_visits)
+                 CALL                     1
+                 GET_ITER
+        L64:     EXTENDED_ARG             7
+                 FOR_ITER              1952 (to L117)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              68 (idx)
+                 STORE_FAST              69 (visit)
+
+2915             LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 STORE_FAST              70 (v_time)
+
+2916             LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              62 ('location')
+                 LOAD_CONST             112 ('Không rõ')
+                 CALL                     2
+                 STORE_FAST              71 (v_loc)
+
+2917             LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              57 ('ai_extracted_metrics')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST              28 (ai_metrics)
+
+2918             LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              68 ('image_url')
+                 CALL                     1
+                 STORE_FAST              72 (image_url)
+
+2919             LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             114 ('vqa_conversations')
+                 BUILD_LIST               0
+                 CALL                     2
+                 STORE_FAST              73 (conversations)
+
+2920             LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              58 ('prediction')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 STORE_FAST              29 (v_pred)
+
+2921             LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        12 (to L65)
+                 NOT_TAKEN
+                 LOAD_GLOBAL             41 (get_vietnamese_diagnosis + NULL)
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 CALL                     1
+                 JUMP_FORWARD            21 (to L66)
+        L65:     LOAD_GLOBAL             42 (DIAGNOSIS_DICTIONARY_EN)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 CALL                     2
+        L66:     STORE_FAST              30 (v_vi_name)
+
+2924             LOAD_GLOBAL             17 (len + NULL)
+                 LOAD_DEREF             111 (visits)
+                 CALL                     1
+                 LOAD_DEREF             111 (visits)
+                 LOAD_ATTR               73 (index + NULL|self)
+                 LOAD_FAST_CHECK         69 (visit)
+                 CALL                     1
+                 BINARY_OP               10 (-)
+                 STORE_FAST              74 (visit_index)
+
+2926             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               74 (expander)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             115 ('visit_header')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW        74 (visit_index)
+                 LOAD_FAST_CHECK         70 (v_time)
+                 LOAD_FAST_CHECK         71 (v_loc)
+                 LOAD_CONST             116 (('visit_index', 'v_time', 'v_loc'))
+                 CALL_KW                  3
+                 LOAD_FAST_CHECK         68 (idx)
+                 LOAD_SMALL_INT           0
+                 COMPARE_OP              72 (==)
+                 LOAD_CONST             117 (('expanded',))
+                 CALL_KW                  2
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L67:     POP_TOP
+
+2927             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               28 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST             118 (1.2)
+                 BUILD_LIST               2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              75 (col_img)
+                 STORE_FAST              76 (col_data)
+
+2928             LOAD_FAST               75 (col_img)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L68:     POP_TOP
+
+2929             LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              69 ('mask_url')
+                 CALL                     1
+                 STORE_FAST              33 (mask_url)
+
+2930             LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              70 ('gradcam_url')
+                 CALL                     1
+                 STORE_FAST              34 (grad_url)
+
+2931             LOAD_FAST_BORROW        33 (mask_url)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        10 (to L70)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW        34 (grad_url)
+                 TO_BOOL
+                 EXTENDED_ARG             1
+                 POP_JUMP_IF_FALSE      295 (to L82)
+        L69:     NOT_TAKEN
+
+2932    L70:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               46 (tabs)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              71 ('tab_img')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              72 ('tab_mask')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              73 ('tab_grad')
+                 BINARY_OP               26 ([])
+                 BUILD_LIST               3
+                 CALL                     1
+                 UNPACK_SEQUENCE          3
+                 STORE_FAST              77 (tab_img)
+                 STORE_FAST              78 (tab_mask)
+                 STORE_FAST              79 (tab_grad)
+
+2933             LOAD_FAST               77 (tab_img)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L71:     POP_TOP
+
+2934             LOAD_FAST_CHECK         72 (image_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L72)
+                 NOT_TAKEN
+
+2935             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               48 (image)
+                 PUSH_NULL
+                 LOAD_FAST_CHECK         72 (image_url)
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST              74 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            29 (to L73)
+
+2937    L72:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               14 (warning)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              75 ('no_orig_img')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2933    L73:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2938    L74:     LOAD_FAST_CHECK         78 (tab_mask)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L75:     POP_TOP
+
+2939             LOAD_FAST_BORROW        33 (mask_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L76)
+                 NOT_TAKEN
+
+2940             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               48 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        33 (mask_url)
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST              74 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            29 (to L77)
+
+2942    L76:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               14 (warning)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              76 ('no_mask_img')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2938    L77:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2943    L78:     LOAD_FAST_CHECK         79 (tab_grad)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L79:     POP_TOP
+
+2944             LOAD_FAST_BORROW        34 (grad_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L80)
+                 NOT_TAKEN
+
+2945             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               48 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        34 (grad_url)
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST              74 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            29 (to L81)
+
+2947    L80:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               14 (warning)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST              77 ('no_grad_img')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2943    L81:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+                 JUMP_FORWARD            79 (to L90)
+
+2949    L82:     LOAD_FAST_CHECK         72 (image_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       43 (to L89)
+        L83:     NOT_TAKEN
+
+2950    L84:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               48 (image)
+                 PUSH_NULL
+                 LOAD_FAST_CHECK         72 (image_url)
+                 LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         6 (to L87)
+        L85:     NOT_TAKEN
+        L86:     LOAD_CONST             119 ('Ảnh tổn thương: ')
+                 LOAD_FAST_CHECK         70 (v_time)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 JUMP_FORWARD             4 (to L88)
+        L87:     LOAD_CONST             120 ('Lesion image: ')
+                 LOAD_FAST_CHECK         70 (v_time)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+        L88:     LOAD_CONST               7 (True)
+                 LOAD_CONST             121 (('caption', 'use_container_width'))
+                 CALL_KW                  3
+                 POP_TOP
+                 JUMP_FORWARD            29 (to L90)
+
+2952    L89:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               14 (warning)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             122 ('no_img_visit')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+2928    L90:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2953    L91:     LOAD_FAST_CHECK         76 (col_data)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L92:     POP_TOP
+
+2954             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST             123 ('#### ')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             124 ('ai_results_header')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     1
+                 POP_TOP
+
+2955             LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              59 ('confidence')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 STORE_FAST              80 (conf_val)
+
+2956             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               28 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              81 (m1)
+                 STORE_FAST              82 (m2)
+
+2957             LOAD_FAST_BORROW        81 (m1)
+                 LOAD_ATTR               77 (metric + NULL|self)
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             125 ('pred_label')
+                 BINARY_OP               26 ([])
+                 LOAD_FAST_BORROW        29 (v_pred)
+                 CALL                     2
+                 POP_TOP
+
+2958             LOAD_FAST_BORROW        82 (m2)
+                 LOAD_ATTR               77 (metric + NULL|self)
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             126 ('confidence_label')
+                 BINARY_OP               26 ([])
+                 LOAD_GLOBAL             79 (float + NULL)
+                 LOAD_FAST_BORROW        80 (conf_val)
+                 CALL                     1
+                 LOAD_SMALL_INT         100
+                 BINARY_OP                5 (*)
+                 LOAD_CONST             127 ('.1f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST             128 ('%')
+                 BUILD_STRING             2
+                 CALL                     2
+                 POP_TOP
+
+2959             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+
+2960             LOAD_CONST              32 ('**')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             129 ('translation_label')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST             130 ("** <span style='color:#63b3ed;font-weight:bold;'>")
+                 LOAD_FAST_BORROW        30 (v_vi_name)
+                 FORMAT_SIMPLE
+                 LOAD_CONST             131 ('</span>')
+                 BUILD_STRING             5
+
+2961             LOAD_CONST               7 (True)
+
+2959             LOAD_CONST               8 (('unsafe_allow_html',))
+                 CALL_KW                  2
+                 POP_TOP
+
+2965             LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             132 ('probabilities')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST              83 (probs)
+
+2966             LOAD_FAST_BORROW        83 (probs)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      155 (to L97)
+                 NOT_TAKEN
+
+2967             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              32 ('**')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             133 ('probability_top5')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST              32 ('**')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+2968             LOAD_GLOBAL             25 (sorted + NULL)
+                 LOAD_FAST_CHECK         83 (probs)
+                 LOAD_ATTR               81 (items + NULL|self)
+                 CALL                     0
+                 LOAD_CONST             134 (<code object <lambda> at 0x000002602A45C030, file "D:\DoAn_DaLieu\app_streamlit.py", line 2968>)
+                 MAKE_FUNCTION
+                 LOAD_CONST              42 (('key',))
+                 CALL_KW                  2
+                 LOAD_CONST             135 (slice(None, 5, None))
+                 BINARY_OP               26 ([])
+                 STORE_FAST              84 (sorted_probs)
+
+2969             LOAD_FAST_BORROW        84 (sorted_probs)
+                 GET_ITER
+        L93:     FOR_ITER                80 (to L96)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              85 (label_key)
+                 STORE_FAST              86 (val)
+
+2970             LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        12 (to L94)
+                 NOT_TAKEN
+                 LOAD_GLOBAL             41 (get_vietnamese_diagnosis + NULL)
+                 LOAD_FAST_CHECK         85 (label_key)
+                 CALL                     1
+                 JUMP_FORWARD            21 (to L95)
+        L94:     LOAD_GLOBAL             42 (DIAGNOSIS_DICTIONARY_EN)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST_CHECK         85 (label_key)
+                 LOAD_FAST_BORROW        85 (label_key)
+                 CALL                     2
+        L95:     STORE_FAST              87 (label_name_prob)
+
+2971             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST             136 ('- `')
+                 LOAD_FAST_CHECK         85 (label_key)
+                 FORMAT_SIMPLE
+                 LOAD_CONST             137 ('` (')
+                 LOAD_FAST_BORROW        87 (label_name_prob)
+                 FORMAT_SIMPLE
+                 LOAD_CONST             138 ('): `')
+                 LOAD_FAST_CHECK         86 (val)
+                 LOAD_CONST             139 ('.2%')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              36 ('`')
+                 BUILD_STRING             7
+                 CALL                     1
+                 POP_TOP
+                 JUMP_BACKWARD           82 (to L93)
+
+2969    L96:     END_FOR
+                 POP_ITER
+
+2973    L97:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              32 ('**')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             140 ('geometric_metrics')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST              32 ('**')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+2974             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               44 (write)
+                 PUSH_NULL
+                 LOAD_CONST             141 ('- ')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             142 ('metric_area')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST             143 (': `')
+                 LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              81 ('area_ratio')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              36 ('`')
+                 BUILD_STRING             5
+                 CALL                     1
+                 POP_TOP
+
+2975             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               44 (write)
+                 PUSH_NULL
+                 LOAD_CONST             141 ('- ')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             144 ('metric_border')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST             143 (': `')
+                 LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              85 ('border_complexity')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              36 ('`')
+                 BUILD_STRING             5
+                 CALL                     1
+                 POP_TOP
+
+2976             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               44 (write)
+                 PUSH_NULL
+                 LOAD_CONST             141 ('- ')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             145 ('metric_asymmetry')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST             143 (': `')
+                 LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              88 ('asymmetry')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              36 ('`')
+                 BUILD_STRING             5
+                 CALL                     1
+                 POP_TOP
+
+2977             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               44 (write)
+                 PUSH_NULL
+                 LOAD_CONST             141 ('- ')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             146 ('metric_circularity')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST             143 (': `')
+                 LOAD_FAST_BORROW        28 (ai_metrics)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              91 ('circularity')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              36 ('`')
+                 BUILD_STRING             5
+                 CALL                     1
+                 POP_TOP
+
+2953    L98:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2979    L99:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              54 ('##### ')
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             147 ('chat_log_header')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     1
+                 POP_TOP
+
+2980             LOAD_FAST_CHECK         73 (conversations)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        31 (to L102)
+       L100:     NOT_TAKEN
+
+2981   L101:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               50 (caption)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             148 ('chat_log_empty')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+                 JUMP_FORWARD           126 (to L106)
+
+2983   L102:     LOAD_CONST              35 ('')
+                 STORE_FAST              88 (chat_html)
+
+2984             LOAD_FAST_CHECK         73 (conversations)
+                 GET_ITER
+       L103:     FOR_ITER                94 (to L105)
+                 STORE_FAST              89 (msg)
+
+2985             LOAD_FAST_BORROW        89 (msg)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             149 ('role')
+                 LOAD_CONST              35 ('')
+                 CALL                     2
+                 STORE_FAST              90 (role)
+
+2986             LOAD_FAST_BORROW        89 (msg)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             150 ('content')
+                 LOAD_CONST              35 ('')
+                 CALL                     2
+                 STORE_FAST              91 (content)
+
+2987             LOAD_FAST_BORROW        90 (role)
+                 LOAD_CONST             151 ('user')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE       26 (to L104)
+                 NOT_TAKEN
+
+2988             LOAD_FAST_CHECK         88 (chat_html)
+
+2989             LOAD_CONST             152 ("<div style='background:rgba(99,179,237,0.15);border-left:3px solid #63b3ed;padding:6px 10px;margin:4px 0;border-radius:4px;overflow-wrap:break-word;'><b>")
+
+2991             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             153 ('chat_q')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST             154 (':</b> ')
+                 LOAD_FAST_CHECK         91 (content)
+                 FORMAT_SIMPLE
+                 LOAD_CONST               6 ('</div>')
+
+2989             BUILD_STRING             5
+
+2988             BINARY_OP               13 (+=)
+                 STORE_FAST              88 (chat_html)
+                 JUMP_BACKWARD           71 (to L103)
+
+2994   L104:     LOAD_FAST_CHECK         88 (chat_html)
+
+2995             LOAD_CONST             155 ("<div style='background:rgba(72,187,120,0.12);border-left:3px solid #48bb78;padding:6px 10px;margin:4px 0;border-radius:4px;overflow-wrap:break-word;max-height:200px;overflow-y:auto;'><b>")
+
+2998             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             156 ('chat_a')
+                 BINARY_OP               26 ([])
+                 FORMAT_SIMPLE
+                 LOAD_CONST             154 (':</b> ')
+                 LOAD_FAST_CHECK         91 (content)
+                 FORMAT_SIMPLE
+                 LOAD_CONST               6 ('</div>')
+
+2995             BUILD_STRING             5
+
+2994             BINARY_OP               13 (+=)
+                 STORE_FAST              88 (chat_html)
+                 JUMP_BACKWARD           96 (to L103)
+
+2984   L105:     END_FOR
+                 POP_ITER
+
+3000             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_FAST_CHECK         88 (chat_html)
+                 LOAD_CONST               7 (True)
+                 LOAD_CONST               8 (('unsafe_allow_html',))
+                 CALL_KW                  2
+                 POP_TOP
+
+3003   L106:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+3004             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               28 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           1
+                 LOAD_SMALL_INT           1
+                 BUILD_LIST               2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              92 (col_pdf_btn)
+                 STORE_FAST              93 (col_pdf_download)
+
+3005             LOAD_FAST               92 (col_pdf_btn)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+       L107:     POP_TOP
+
+3006             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               82 (button)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             157 ('generate_pdf_btn')
+                 BINARY_OP               26 ([])
+                 LOAD_CONST             158 ('gen_btn_')
+                 LOAD_FAST_CHECK         69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             159 ('timestamp_id')
+                 LOAD_CONST              35 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 LOAD_CONST              42 (('key',))
+                 CALL_KW                  2
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       91 (to L112)
+                 NOT_TAKEN
+
+3007             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               84 (spinner)
+                 PUSH_NULL
+                 LOAD_CONST             160 ('Đang khởi tạo PDF...')
+                 CALL                     1
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+       L108:     POP_TOP
+
+3008   L109:     NOP
+
+3009   L110:     LOAD_GLOBAL             87 (generate_pdf_report + NULL)
+                 LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_FAST_CHECK         69 (visit)
+                 CALL                     2
+                 STORE_FAST              94 (pdf_data)
+
+3010             LOAD_FAST_BORROW        94 (pdf_data)
+                 LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (session_state)
+                 LOAD_CONST             161 ('pdf_data_')
+                 LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             159 ('timestamp_id')
+                 LOAD_CONST              35 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 STORE_SUBSCR
+
+3007   L111:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+3005   L112:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+3014   L113:     LOAD_FAST_CHECK         93 (col_pdf_download)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+       L114:     POP_TOP
+
+3015             LOAD_CONST             161 ('pdf_data_')
+                 LOAD_FAST_CHECK         69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             159 ('timestamp_id')
+                 LOAD_CONST              35 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 STORE_FAST              96 (pdf_data_key)
+
+3016             LOAD_FAST_BORROW        96 (pdf_data_key)
+                 LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (session_state)
+                 CONTAINS_OP              0 (in)
+                 POP_JUMP_IF_FALSE      128 (to L115)
+                 NOT_TAKEN
+
+3017             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               92 (download_button)
+                 PUSH_NULL
+
+3018             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             163 ('download_pdf_visit_btn')
+                 BINARY_OP               26 ([])
+
+3019             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (session_state)
+                 LOAD_FAST_CHECK         96 (pdf_data_key)
+                 BINARY_OP               26 ([])
+
+3020             LOAD_CONST             164 ('EHR_Report_')
+                 LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              12 ('name')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 LOAD_ATTR               31 (upper + NULL|self)
+                 CALL                     0
+                 FORMAT_SIMPLE
+                 LOAD_CONST             165 ('_')
+                 LOAD_FAST_CHECK         69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             159 ('timestamp_id')
+                 LOAD_CONST              35 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 LOAD_CONST             166 ('.pdf')
+                 BUILD_STRING             5
+
+3021             LOAD_CONST             167 ('application/pdf')
+
+3022             LOAD_CONST             168 ('download_btn_')
+                 LOAD_FAST_BORROW        69 (visit)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST             159 ('timestamp_id')
+                 LOAD_CONST              35 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+
+3017             LOAD_CONST             169 (('label', 'data', 'file_name', 'mime', 'key'))
+                 CALL_KW                  5
+                 POP_TOP
+
+3014   L115:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+2926   L116:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+                 EXTENDED_ARG             7
+                 JUMP_BACKWARD         1955 (to L64)
+
+2914   L117:     END_FOR
+                 POP_ITER
+
+3026   L118:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+3027             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (subheader)
+                 PUSH_NULL
+                 LOAD_DEREF             110 (is_english)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         3 (to L119)
+                 NOT_TAKEN
+                 LOAD_CONST             170 ('Xuất dữ liệu bệnh án')
+                 JUMP_FORWARD             1 (to L120)
+       L119:     LOAD_CONST             171 ('Export Record Data')
+       L120:     CALL                     1
+                 POP_TOP
+
+3028             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               28 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              97 (col_exp_json)
+                 STORE_FAST              98 (col_exp_csv)
+
+3031             LOAD_GLOBAL             94 (json)
+                 LOAD_ATTR               96 (dumps)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        12 (record)
+                 LOAD_CONST             172 (False)
+                 LOAD_GLOBAL             98 (_NumpySafeEncoder)
+                 LOAD_SMALL_INT           2
+                 LOAD_CONST             173 (('ensure_ascii', 'cls', 'indent'))
+                 CALL_KW                  4
+                 STORE_FAST              99 (record_json)
+
+3032             LOAD_FAST_BORROW        97 (col_exp_json)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+       L121:     POP_TOP
+
+3033             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               92 (download_button)
+                 PUSH_NULL
+
+3034             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             174 ('export_json_btn')
+                 BINARY_OP               26 ([])
+
+3035             LOAD_FAST_BORROW        99 (record_json)
+
+3036             LOAD_CONST             175 ('EHR_Export_')
+                 LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              12 ('name')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 LOAD_ATTR               31 (upper + NULL|self)
+                 CALL                     0
+                 FORMAT_SIMPLE
+                 LOAD_CONST             165 ('_')
+                 LOAD_FAST_BORROW         8 (p_id)
+                 FORMAT_SIMPLE
+                 LOAD_CONST             176 ('.json')
+                 BUILD_STRING             5
+
+3037             LOAD_CONST             177 ('application/json')
+
+3038             LOAD_CONST             178 ('export_json_')
+                 LOAD_FAST_BORROW         8 (p_id)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+
+3033             LOAD_CONST             169 (('label', 'data', 'file_name', 'mime', 'key'))
+                 CALL_KW                  5
+                 POP_TOP
+
+3032   L122:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+3042   L123:     BUILD_LIST               0
+                 STORE_FAST             100 (csv_data)
+
+3043             LOAD_GLOBAL             71 (enumerate + NULL)
+                 LOAD_GLOBAL            101 (reversed + NULL)
+                 LOAD_DEREF             111 (visits)
+                 CALL                     1
+                 CALL                     1
+                 GET_ITER
+       L124:     FOR_ITER               249 (to L125)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST             101 (v_idx)
+                 STORE_FAST              66 (v)
+
+3044             LOAD_FAST_BORROW        66 (v)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              57 ('ai_extracted_metrics')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST             102 (m)
+
+3045             LOAD_FAST_CHECK        100 (csv_data)
+                 LOAD_ATTR              103 (append + NULL|self)
+
+3046             LOAD_CONST             179 ('Visit_Number')
+                 LOAD_FAST_BORROW       101 (v_idx)
+                 LOAD_SMALL_INT           1
+                 BINARY_OP                0 (+)
+
+3047             LOAD_CONST             180 ('Date')
+                 LOAD_FAST_BORROW        66 (v)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              55 ('created_at')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+
+3048             LOAD_CONST             181 ('Location')
+                 LOAD_FAST_BORROW        66 (v)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              62 ('location')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+
+3049             LOAD_CONST             182 ('Prediction')
+                 LOAD_FAST_BORROW       102 (m)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              58 ('prediction')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+
+3050             LOAD_CONST             183 ('Confidence')
+                 LOAD_GLOBAL             79 (float + NULL)
+                 LOAD_FAST_BORROW       102 (m)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              59 ('confidence')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 CALL                     1
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+3051             LOAD_CONST             184 ('Area_Ratio')
+                 LOAD_GLOBAL             79 (float + NULL)
+                 LOAD_FAST_BORROW       102 (m)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              81 ('area_ratio')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 CALL                     1
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+3052             LOAD_CONST             185 ('Border_Complexity')
+                 LOAD_GLOBAL             79 (float + NULL)
+                 LOAD_FAST_BORROW       102 (m)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              85 ('border_complexity')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 CALL                     1
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+3053             LOAD_CONST             186 ('Asymmetry')
+                 LOAD_GLOBAL             79 (float + NULL)
+                 LOAD_FAST_BORROW       102 (m)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              88 ('asymmetry')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 CALL                     1
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+3054             LOAD_CONST             187 ('Circularity')
+                 LOAD_GLOBAL             79 (float + NULL)
+                 LOAD_FAST_BORROW       102 (m)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              91 ('circularity')
+                 LOAD_CONST              60 (0.0)
+                 CALL                     2
+                 CALL                     1
+                 LOAD_CONST              99 ('.4f')
+                 FORMAT_WITH_SPEC
+
+3045             BUILD_MAP                9
+                 CALL                     1
+                 POP_TOP
+                 JUMP_BACKWARD          251 (to L124)
+
+3043   L125:     END_FOR
+                 POP_ITER
+
+3056             LOAD_GLOBAL             52 (pd)
+                 LOAD_ATTR               54 (DataFrame)
+                 PUSH_NULL
+                 LOAD_FAST_CHECK        100 (csv_data)
+                 CALL                     1
+                 STORE_FAST             103 (df_csv)
+
+3057             LOAD_FAST_BORROW       103 (df_csv)
+                 LOAD_ATTR              105 (to_csv + NULL|self)
+                 LOAD_CONST             172 (False)
+                 LOAD_CONST             188 ('utf-8-sig')
+                 LOAD_CONST             189 (('index', 'encoding'))
+                 CALL_KW                  2
+                 STORE_FAST             104 (csv_str)
+
+3058             LOAD_FAST_CHECK         98 (col_exp_csv)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+       L126:     POP_TOP
+
+3059             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               92 (download_button)
+                 PUSH_NULL
+
+3060             LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             190 ('export_csv_btn')
+                 BINARY_OP               26 ([])
+
+3061             LOAD_FAST_BORROW       104 (csv_str)
+
+3062             LOAD_CONST             191 ('Visits_Export_')
+                 LOAD_FAST_BORROW         5 (p_info)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              12 ('name')
+                 LOAD_CONST              17 ('N/A')
+                 CALL                     2
+                 LOAD_ATTR               31 (upper + NULL|self)
+                 CALL                     0
+                 FORMAT_SIMPLE
+                 LOAD_CONST             165 ('_')
+                 LOAD_FAST_BORROW         8 (p_id)
+                 FORMAT_SIMPLE
+                 LOAD_CONST             192 ('.csv')
+                 BUILD_STRING             5
+
+3063             LOAD_CONST             193 ('text/csv')
+
+3064             LOAD_CONST             194 ('export_csv_')
+                 LOAD_FAST_BORROW         8 (p_id)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+
+3059             LOAD_CONST             169 (('label', 'data', 'file_name', 'mime', 'key'))
+                 CALL_KW                  5
+                 POP_TOP
+
+3058   L127:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+
+3068   L128:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              30 ('---')
+                 CALL                     1
+                 POP_TOP
+
+3069             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               74 (expander)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             195 ('rag_guidelines_header')
+                 BINARY_OP               26 ([])
+                 LOAD_CONST             172 (False)
+                 LOAD_CONST             117 (('expanded',))
+                 CALL_KW                  2
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+       L129:     POP_TOP
+
+3070             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               44 (write)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             196 ('rag_guidelines_help')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+3071             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR              106 (text_input)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             197 ('rag_search_placeholder')
+                 BINARY_OP               26 ([])
+                 LOAD_CONST             198 ('rag_search_query')
+                 LOAD_CONST              42 (('key',))
+                 CALL_KW                  2
+                 STORE_FAST             105 (query_input)
+
+3072             LOAD_FAST_BORROW       105 (query_input)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      243 (to L136)
+                 NOT_TAKEN
+
+3073             LOAD_GLOBAL            109 (get_rag_engine + NULL)
+                 CALL                     0
+                 STORE_FAST             106 (rag_engine)
+
+3074             LOAD_FAST_BORROW       106 (rag_engine)
+                 POP_JUMP_IF_NONE       207 (to L135)
+                 NOT_TAKEN
+
+3075             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               84 (spinner)
+                 PUSH_NULL
+                 LOAD_CONST             199 ('Đang tìm kiếm...')
+                 CALL                     1
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+       L130:     POP_TOP
+
+3076             LOAD_FAST_CHECK        106 (rag_engine)
+                 LOAD_ATTR              111 (retrieve + NULL|self)
+                 LOAD_FAST_CHECK        105 (query_input)
+                 LOAD_SMALL_INT           3
+                 LOAD_CONST             200 (('n_results',))
+                 CALL_KW                  2
+                 STORE_FAST             107 (results)
+
+3077             LOAD_FAST_BORROW       107 (results)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        30 (to L131)
+                 NOT_TAKEN
+
+3078             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               14 (warning)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             201 ('rag_no_results')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+
+3079   L131:     LOAD_GLOBAL             71 (enumerate + NULL)
+                 LOAD_FAST_CHECK        107 (results)
+                 CALL                     1
+                 GET_ITER
+       L132:     FOR_ITER                95 (to L133)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST             108 (r_idx)
+                 STORE_FAST             109 (r_doc)
+
+3080             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               10 (markdown)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW         1 (t)
+                 LOAD_CONST             202 ('rag_reference_title')
+                 BINARY_OP               26 ([])
+                 LOAD_ATTR               57 (format + NULL|self)
+                 LOAD_FAST_BORROW       108 (r_idx)
+                 LOAD_SMALL_INT           1
+                 BINARY_OP                0 (+)
+                 LOAD_FAST_BORROW       109 (r_doc)
+                 LOAD_CONST             203 ('distance')
+                 BINARY_OP               26 ([])
+                 LOAD_CONST             204 (('r_idx', 'dist'))
+                 CALL_KW                  2
+                 CALL                     1
+                 POP_TOP
+
+3081             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               34 (info)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW       109 (r_doc)
+                 LOAD_CONST             205 ('text')
+                 BINARY_OP               26 ([])
+                 CALL                     1
+                 POP_TOP
+                 JUMP_BACKWARD           97 (to L132)
+
+3079   L133:     END_FOR
+                 POP_ITER
+
+3075   L134:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+                 JUMP_FORWARD            22 (to L136)
+
+3083   L135:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               90 (error)
+                 PUSH_NULL
+                 LOAD_CONST             206 ('Không thể kết nối đến cơ sở dữ liệu y văn.')
+                 CALL                     1
+                 POP_TOP
+
+3069   L136:     LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 LOAD_CONST              10 (None)
+                 CALL                     3
+                 POP_TOP
+                 LOAD_CONST              10 (None)
+                 RETURN_VALUE
+
+2750   L137:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L138)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L138:     POP_TOP
+       L139:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            20
+                 JUMP_BACKWARD_NO_INTERRUPT 5184 (to L10)
+
+  --   L140:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2757   L141:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L142)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L142:     POP_TOP
+       L143:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            19
+                 JUMP_BACKWARD_NO_INTERRUPT 5094 (to L13)
+
+  --   L144:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2786   L145:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L146)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L146:     POP_TOP
+       L147:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            17
+                 JUMP_BACKWARD_NO_INTERRUPT 4575 (to L33)
+
+  --   L148:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2791   L149:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L150)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L150:     POP_TOP
+       L151:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            17
+                 JUMP_BACKWARD_NO_INTERRUPT 4514 (to L37)
+
+  --   L152:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2796   L153:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L154)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L154:     POP_TOP
+       L155:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            17
+                 JUMP_BACKWARD_NO_INTERRUPT 4453 (to L41)
+
+  --   L156:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2771   L157:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L158)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L158:     POP_TOP
+       L159:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            19
+                 JUMP_BACKWARD         5098 (to L18)
+
+  --   L160:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L161:     SWAP                     2
+                 POP_TOP
+
+2904             SWAP                     2
+                 STORE_FAST              66 (v)
+                 RERAISE                  0
+
+2933   L162:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L163)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L163:     POP_TOP
+       L164:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            10
+                 JUMP_BACKWARD_NO_INTERRUPT 2624 (to L74)
+
+  --   L165:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2938   L166:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L167)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L167:     POP_TOP
+       L168:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            10
+                 JUMP_BACKWARD_NO_INTERRUPT 2563 (to L78)
+
+  --   L169:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2943   L170:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L171)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L171:     POP_TOP
+       L172:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             9
+                 JUMP_BACKWARD_NO_INTERRUPT 2422 (to L90)
+
+  --   L173:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2928   L174:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L175)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L175:     POP_TOP
+       L176:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             9
+                 JUMP_BACKWARD_NO_INTERRUPT 2434 (to L91)
+
+  --   L177:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2953   L178:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L179)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L179:     POP_TOP
+       L180:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             7
+                 JUMP_BACKWARD_NO_INTERRUPT 1827 (to L99)
+
+  --   L181:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L182:     PUSH_EXC_INFO
+
+3011             LOAD_GLOBAL             88 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE       37 (to L186)
+                 NOT_TAKEN
+                 STORE_FAST              95 (pdf_err)
+
+3012   L183:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               90 (error)
+                 PUSH_NULL
+                 LOAD_CONST             162 ('Lỗi tạo báo cáo PDF: ')
+                 LOAD_FAST               95 (pdf_err)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     1
+                 POP_TOP
+       L184:     POP_EXCEPT
+                 LOAD_CONST              10 (None)
+                 STORE_FAST              95 (pdf_err)
+                 DELETE_FAST             95 (pdf_err)
+                 EXTENDED_ARG             5
+                 JUMP_BACKWARD_NO_INTERRUPT 1478 (to L111)
+
+  --   L185:     LOAD_CONST              10 (None)
+                 STORE_FAST              95 (pdf_err)
+                 DELETE_FAST             95 (pdf_err)
+                 RERAISE                  1
+
+3011   L186:     RERAISE                  0
+
+  --   L187:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+3007   L188:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L189)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L189:     POP_TOP
+       L190:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             5
+                 JUMP_BACKWARD_NO_INTERRUPT 1495 (to L112)
+
+  --   L191:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+3005   L192:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L193)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L193:     POP_TOP
+       L194:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             5
+                 JUMP_BACKWARD_NO_INTERRUPT 1507 (to L113)
+
+  --   L195:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+3014   L196:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L197)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L197:     POP_TOP
+       L198:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             5
+                 JUMP_BACKWARD_NO_INTERRUPT 1339 (to L116)
+
+  --   L199:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+2926   L200:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L201)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L201:     POP_TOP
+       L202:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG            12
+                 JUMP_BACKWARD         3304 (to L64)
+
+  --   L203:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+3032   L204:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L205)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L205:     POP_TOP
+       L206:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             4
+                 JUMP_BACKWARD_NO_INTERRUPT 1165 (to L123)
+
+  --   L207:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+3058   L208:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L209)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L209:     POP_TOP
+       L210:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             3
+                 JUMP_BACKWARD_NO_INTERRUPT 776 (to L128)
+
+  --   L211:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+3075   L212:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L213)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L213:     POP_TOP
+       L214:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 424 (to L136)
+
+  --   L215:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+3069   L216:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L217)
+                 NOT_TAKEN
+                 RERAISE                  2
+       L217:     POP_TOP
+       L218:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 LOAD_CONST              10 (None)
+                 RETURN_VALUE
+
+  --   L219:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+ExceptionTable:
+  L8 to L9 -> L137 [2] lasti
+  L11 to L12 -> L141 [2] lasti
+  L19 to L22 -> L157 [3] lasti
+  L23 to L26 -> L157 [3] lasti
+  L27 to L30 -> L157 [3] lasti
+  L30 to L32 -> L145 [5] lasti
+  L32 to L34 -> L157 [3] lasti
+  L34 to L36 -> L149 [5] lasti
+  L36 to L38 -> L157 [3] lasti
+  L38 to L40 -> L153 [5] lasti
+  L40 to L41 -> L157 [3] lasti
+  L56 to L58 -> L161 [2]
+  L59 to L61 -> L161 [2]
+  L67 to L68 -> L200 [3] lasti
+  L68 to L69 -> L174 [5] lasti
+  L70 to L71 -> L174 [5] lasti
+  L71 to L73 -> L162 [7] lasti
+  L73 to L75 -> L174 [5] lasti
+  L75 to L77 -> L166 [7] lasti
+  L77 to L79 -> L174 [5] lasti
+  L79 to L81 -> L170 [7] lasti
+  L81 to L83 -> L174 [5] lasti
+  L84 to L85 -> L174 [5] lasti
+  L86 to L90 -> L174 [5] lasti
+  L90 to L92 -> L200 [3] lasti
+  L92 to L98 -> L178 [5] lasti
+  L98 to L100 -> L200 [3] lasti
+  L101 to L107 -> L200 [3] lasti
+  L107 to L108 -> L192 [5] lasti
+  L108 to L109 -> L188 [7] lasti
+  L110 to L111 -> L182 [7]
+  L111 to L112 -> L192 [5] lasti
+  L112 to L114 -> L200 [3] lasti
+  L114 to L115 -> L196 [5] lasti
+  L115 to L116 -> L200 [3] lasti
+  L121 to L122 -> L204 [2] lasti
+  L126 to L127 -> L208 [2] lasti
+  L129 to L130 -> L216 [2] lasti
+  L130 to L134 -> L212 [4] lasti
+  L134 to L136 -> L216 [2] lasti
+  L137 to L139 -> L140 [4] lasti
+  L141 to L143 -> L144 [4] lasti
+  L145 to L147 -> L148 [7] lasti
+  L147 to L149 -> L157 [3] lasti
+  L149 to L151 -> L152 [7] lasti
+  L151 to L153 -> L157 [3] lasti
+  L153 to L155 -> L156 [7] lasti
+  L155 to L157 -> L157 [3] lasti
+  L157 to L159 -> L160 [5] lasti
+  L162 to L164 -> L165 [9] lasti
+  L164 to L166 -> L174 [5] lasti
+  L166 to L168 -> L169 [9] lasti
+  L168 to L170 -> L174 [5] lasti
+  L170 to L172 -> L173 [9] lasti
+  L172 to L174 -> L174 [5] lasti
+  L174 to L176 -> L177 [7] lasti
+  L176 to L178 -> L200 [3] lasti
+  L178 to L180 -> L181 [7] lasti
+  L180 to L182 -> L200 [3] lasti
+  L182 to L183 -> L187 [8] lasti
+  L183 to L184 -> L185 [8] lasti
+  L184 to L185 -> L188 [7] lasti
+  L185 to L187 -> L187 [8] lasti
+  L187 to L188 -> L188 [7] lasti
+  L188 to L190 -> L191 [9] lasti
+  L190 to L192 -> L192 [5] lasti
+  L192 to L194 -> L195 [7] lasti
+  L194 to L196 -> L200 [3] lasti
+  L196 to L198 -> L199 [7] lasti
+  L198 to L200 -> L200 [3] lasti
+  L200 to L202 -> L203 [5] lasti
+  L204 to L206 -> L207 [4] lasti
+  L208 to L210 -> L211 [4] lasti
+  L212 to L214 -> L215 [6] lasti
+  L214 to L216 -> L216 [2] lasti
+  L216 to L218 -> L219 [4] lasti
+
+Disassembly of <code object <lambda> at 0x000002602A3F6E30, file "D:\DoAn_DaLieu\app_streamlit.py", line 2731>:
+2731           RESUME                   0
+               LOAD_FAST_BORROW         0 (x)
+               LOAD_ATTR                1 (get + NULL|self)
+               LOAD_CONST               0 ('timestamp_id')
+               LOAD_CONST               1 ('')
+               CALL                     2
+               RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x000002602A33E630, file "D:\DoAn_DaLieu\app_streamlit.py", line 2754>:
+  --           COPY_FREE_VARS           2
+
+2754           RESUME                   0
+               LOAD_DEREF               1 (is_english)
+               TO_BOOL
+               POP_JUMP_IF_TRUE        72 (to L1)
+               NOT_TAKEN
+               LOAD_CONST               0 ('Lần ')
+               LOAD_GLOBAL              1 (len + NULL)
+               LOAD_DEREF               2 (visits)
+               CALL                     1
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               10 (-)
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               2 ('created_at')
+               CALL                     1
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               3 ('location')
+               CALL                     1
+               FORMAT_SIMPLE
+               BUILD_STRING             6
+               RETURN_VALUE
+       L1:     LOAD_CONST               4 ('Visit ')
+               LOAD_GLOBAL              1 (len + NULL)
+               LOAD_DEREF               2 (visits)
+               CALL                     1
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               10 (-)
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               2 ('created_at')
+               CALL                     1
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               3 ('location')
+               CALL                     1
+               FORMAT_SIMPLE
+               BUILD_STRING             6
+               RETURN_VALUE
+
+Disassembly of <code object <lambda> at 0x000002602A33EA30, file "D:\DoAn_DaLieu\app_streamlit.py", line 2762>:
+  --           COPY_FREE_VARS           2
+
+2762           RESUME                   0
+               LOAD_DEREF               1 (is_english)
+               TO_BOOL
+               POP_JUMP_IF_TRUE        72 (to L1)
+               NOT_TAKEN
+               LOAD_CONST               0 ('Lần ')
+               LOAD_GLOBAL              1 (len + NULL)
+               LOAD_DEREF               2 (visits)
+               CALL                     1
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               10 (-)
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               2 ('created_at')
+               CALL                     1
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               3 ('location')
+               CALL                     1
+               FORMAT_SIMPLE
+               BUILD_STRING             6
+               RETURN_VALUE
+       L1:     LOAD_CONST               4 ('Visit ')
+               LOAD_GLOBAL              1 (len + NULL)
+               LOAD_DEREF               2 (visits)
+               CALL                     1
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               10 (-)
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               2 ('created_at')
+               CALL                     1
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' - ')
+               LOAD_DEREF               2 (visits)
+               LOAD_FAST_BORROW         0 (i)
+               BINARY_OP               26 ([])
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               3 ('location')
+               CALL                     1
+               FORMAT_SIMPLE
+               BUILD_STRING             6
+               RETURN_VALUE
+
+Disassembly of <code object calc_diff_pct at 0x000002602A345CB0, file "D:\DoAn_DaLieu\app_streamlit.py", line 2806>:
+2806            RESUME                   0
+
+2807            NOP
+
+2808    L1:     LOAD_GLOBAL              1 (float + NULL)
+                LOAD_FAST_BORROW         0 (val_a)
+                CALL                     1
+                STORE_FAST               0 (val_a)
+
+2809            LOAD_GLOBAL              1 (float + NULL)
+                LOAD_FAST_BORROW         1 (val_b)
+                CALL                     1
+                STORE_FAST               1 (val_b)
+
+2810            LOAD_FAST_BORROW         0 (val_a)
+                LOAD_SMALL_INT           0
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       12 (to L5)
+                NOT_TAKEN
+
+2811            LOAD_FAST_BORROW         1 (val_b)
+                LOAD_SMALL_INT           0
+                COMPARE_OP             148 (bool(>))
+                POP_JUMP_IF_FALSE        3 (to L3)
+                NOT_TAKEN
+                LOAD_CONST               1 ('+100%')
+        L2:     RETURN_VALUE
+        L3:     LOAD_CONST               2 ('0%')
+        L4:     RETURN_VALUE
+
+2812    L5:     LOAD_FAST_BORROW_LOAD_FAST_BORROW 16 (val_b, val_a)
+                BINARY_OP               10 (-)
+                LOAD_FAST_BORROW         0 (val_a)
+                BINARY_OP               11 (/)
+                LOAD_SMALL_INT         100
+                BINARY_OP                5 (*)
+                STORE_FAST               2 (diff)
+
+2813            LOAD_FAST_BORROW         2 (diff)
+                LOAD_CONST               3 ('+.1f')
+                FORMAT_WITH_SPEC
+                LOAD_CONST               4 ('%')
+                BUILD_STRING             2
+        L6:     RETURN_VALUE
+
+  --    L7:     PUSH_EXC_INFO
+
+2814            LOAD_GLOBAL              2 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        5 (to L9)
+                NOT_TAKEN
+                POP_TOP
+
+2815    L8:     POP_EXCEPT
+                LOAD_CONST               5 ('—')
+                RETURN_VALUE
+
+2814    L9:     RERAISE                  0
+
+  --   L10:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L7 [0]
+  L3 to L4 -> L7 [0]
+  L5 to L6 -> L7 [0]
+  L7 to L8 -> L10 [1] lasti
+  L9 to L10 -> L10 [1] lasti
+
+Disassembly of <code object calc_diff_val at 0x000002602A3C1A70, file "D:\DoAn_DaLieu\app_streamlit.py", line 2817>:
+2817           RESUME                   0
+
+2818           NOP
+
+2819   L1:     LOAD_GLOBAL              1 (float + NULL)
+               LOAD_FAST_BORROW         0 (val_a)
+               CALL                     1
+               STORE_FAST               0 (val_a)
+
+2820           LOAD_GLOBAL              1 (float + NULL)
+               LOAD_FAST_BORROW         1 (val_b)
+               CALL                     1
+               STORE_FAST               1 (val_b)
+
+2821           LOAD_FAST_BORROW_LOAD_FAST_BORROW 16 (val_b, val_a)
+               BINARY_OP               10 (-)
+               STORE_FAST               2 (diff)
+
+2822           LOAD_FAST_BORROW         2 (diff)
+               LOAD_CONST               0 ('+.4f')
+               FORMAT_WITH_SPEC
+       L2:     RETURN_VALUE
+
+  --   L3:     PUSH_EXC_INFO
+
+2823           LOAD_GLOBAL              2 (Exception)
+               CHECK_EXC_MATCH
+               POP_JUMP_IF_FALSE        5 (to L5)
+               NOT_TAKEN
+               POP_TOP
+
+2824   L4:     POP_EXCEPT
+               LOAD_CONST               1 ('—')
+               RETURN_VALUE
+
+2823   L5:     RERAISE                  0
+
+  --   L6:     COPY                     3
+               POP_EXCEPT
+               RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L3 [0]
+  L3 to L4 -> L6 [1] lasti
+  L5 to L6 -> L6 [1] lasti
+
+Disassembly of <code object <genexpr> at 0x000002602A351E70, file "D:\DoAn_DaLieu\app_streamlit.py", line 2896>:
+2896           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+
+2897   L2:     FOR_ITER                60 (to L3)
+               STORE_FAST               1 (v)
+               LOAD_GLOBAL              1 (str + NULL)
+               LOAD_FAST_BORROW         1 (v)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               0 ('location')
+               LOAD_CONST               1 ('Không rõ')
+               CALL                     2
+               CALL                     1
+               LOAD_ATTR                5 (strip + NULL|self)
+               CALL                     0
+               LOAD_ATTR                7 (capitalize + NULL|self)
+               CALL                     0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           62 (to L2)
+       L3:     END_FOR
+               POP_ITER
+               LOAD_CONST               2 (None)
+               RETURN_VALUE
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <lambda> at 0x000002602A45C030, file "D:\DoAn_DaLieu\app_streamlit.py", line 2968>:
+2968           RESUME                   0
+               LOAD_FAST_BORROW         0 (x)
+               LOAD_SMALL_INT           1
+               BINARY_OP               26 ([])
+               UNARY_NEGATIVE
+               RETURN_VALUE

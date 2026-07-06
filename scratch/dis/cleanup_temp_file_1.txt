@@ -1,0 +1,128 @@
+ 100            RESUME                   0
+
+ 102            LOAD_GLOBAL              0 (st)
+                LOAD_ATTR                2 (session_state)
+                LOAD_ATTR                5 (get + NULL|self)
+                LOAD_CONST               1 ('saved_local_img_path')
+                CALL                     1
+                STORE_FAST               0 (path)
+
+ 103            LOAD_FAST_BORROW         0 (path)
+                TO_BOOL
+                EXTENDED_ARG             1
+                POP_JUMP_IF_FALSE      288 (to L9)
+                NOT_TAKEN
+                LOAD_GLOBAL              6 (os)
+                LOAD_ATTR                8 (path)
+                LOAD_ATTR               11 (exists + NULL|self)
+                LOAD_FAST_BORROW         0 (path)
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_FALSE      251 (to L9)
+                NOT_TAKEN
+
+ 104            NOP
+
+ 105    L1:     LOAD_GLOBAL              6 (os)
+                LOAD_ATTR               12 (remove)
+                PUSH_NULL
+                LOAD_FAST_BORROW         0 (path)
+                CALL                     1
+                POP_TOP
+
+ 106            LOAD_GLOBAL              6 (os)
+                LOAD_ATTR                8 (path)
+                LOAD_ATTR               15 (dirname + NULL|self)
+                LOAD_FAST_BORROW         0 (path)
+                CALL                     1
+                STORE_FAST               1 (parent_dir)
+
+ 107            LOAD_GLOBAL              6 (os)
+                LOAD_ATTR                8 (path)
+                LOAD_ATTR               17 (basename + NULL|self)
+                LOAD_FAST_BORROW         1 (parent_dir)
+                CALL                     1
+                LOAD_ATTR               19 (startswith + NULL|self)
+                LOAD_CONST               2 ('tmp')
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_TRUE        22 (to L4)
+        L2:     NOT_TAKEN
+        L3:     LOAD_CONST               2 ('tmp')
+                LOAD_FAST_BORROW         1 (parent_dir)
+                LOAD_ATTR               21 (lower + NULL|self)
+                CALL                     0
+                CONTAINS_OP              0 (in)
+                POP_JUMP_IF_FALSE      124 (to L9)
+                NOT_TAKEN
+
+ 108    L4:     LOAD_CONST               4 (('mask.png', 'gradcam.png', 'crop.png'))
+                GET_ITER
+        L5:     FOR_ITER                95 (to L8)
+                STORE_FAST               2 (f_name)
+
+ 109            LOAD_GLOBAL              6 (os)
+                LOAD_ATTR                8 (path)
+                LOAD_ATTR               23 (join + NULL|self)
+                LOAD_FAST_BORROW_LOAD_FAST_BORROW 18 (parent_dir, f_name)
+                CALL                     2
+                STORE_FAST               3 (f_path)
+
+ 110            LOAD_GLOBAL              6 (os)
+                LOAD_ATTR                8 (path)
+                LOAD_ATTR               11 (exists + NULL|self)
+                LOAD_FAST_BORROW         3 (f_path)
+                CALL                     1
+                TO_BOOL
+        L6:     POP_JUMP_IF_TRUE         3 (to L7)
+                NOT_TAKEN
+                JUMP_BACKWARD           73 (to L5)
+
+ 111    L7:     LOAD_GLOBAL              6 (os)
+                LOAD_ATTR               12 (remove)
+                PUSH_NULL
+                LOAD_FAST_BORROW         3 (f_path)
+                CALL                     1
+                POP_TOP
+                JUMP_BACKWARD           97 (to L5)
+
+ 108    L8:     END_FOR
+                POP_ITER
+
+ 112            LOAD_GLOBAL              6 (os)
+                LOAD_ATTR               24 (rmdir)
+                PUSH_NULL
+                LOAD_FAST_BORROW         1 (parent_dir)
+                CALL                     1
+                POP_TOP
+
+ 115    L9:     LOAD_CONST               3 (None)
+                LOAD_GLOBAL              0 (st)
+                LOAD_ATTR                2 (session_state)
+                LOAD_CONST               1 ('saved_local_img_path')
+                STORE_SUBSCR
+                LOAD_CONST               3 (None)
+                RETURN_VALUE
+
+  --   L10:     PUSH_EXC_INFO
+
+ 113            LOAD_GLOBAL             26 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        4 (to L12)
+                NOT_TAKEN
+                POP_TOP
+
+ 114   L11:     POP_EXCEPT
+                JUMP_BACKWARD_NO_INTERRUPT 34 (to L9)
+
+ 113   L12:     RERAISE                  0
+
+  --   L13:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L10 [0]
+  L3 to L6 -> L10 [0]
+  L7 to L9 -> L10 [0]
+  L10 to L11 -> L13 [1] lasti
+  L12 to L13 -> L13 [1] lasti

@@ -1,0 +1,166 @@
+ 551            RESUME                   0
+
+ 553            LOAD_FAST                0 (patient_name)
+                LOAD_ATTR                1 (strip + NULL|self)
+                CALL                     0
+                TO_BOOL
+                POP_JUMP_IF_TRUE         2 (to L1)
+
+ 554            BUILD_LIST               0
+                RETURN_VALUE
+
+ 555    L1:     NOP
+
+ 556    L2:     LOAD_CONST               1 ('gcp-credentials.json')
+                STORE_FAST               1 (cred_path)
+
+ 557            LOAD_GLOBAL              2 (os)
+                LOAD_ATTR                4 (path)
+                LOAD_ATTR                7 (exists + NULL|self)
+                LOAD_FAST                1 (cred_path)
+                CALL                     1
+                TO_BOOL
+                EXTENDED_ARG             1
+                POP_JUMP_IF_FALSE      348 (to L8)
+
+ 558            LOAD_GLOBAL              8 (service_account)
+                LOAD_ATTR               10 (Credentials)
+                LOAD_ATTR               13 (from_service_account_file + NULL|self)
+                LOAD_FAST                1 (cred_path)
+                CALL                     1
+                STORE_FAST               2 (creds)
+
+ 559            LOAD_GLOBAL             14 (gcp_firestore)
+                LOAD_ATTR               16 (Client)
+                PUSH_NULL
+                LOAD_FAST_LOAD_FAST     34 (creds, creds)
+                LOAD_ATTR               18 (project_id)
+                LOAD_CONST               2 ('(default)')
+                LOAD_CONST               3 (('credentials', 'project', 'database'))
+                CALL_KW                  3
+                STORE_FAST               3 (db)
+
+ 561            LOAD_FAST                3 (db)
+                LOAD_ATTR               21 (collection + NULL|self)
+                LOAD_CONST               4 ('medical_records')
+                CALL                     1
+                LOAD_ATTR               23 (stream + NULL|self)
+                CALL                     0
+                STORE_FAST               4 (docs)
+
+ 562            BUILD_LIST               0
+                STORE_FAST               5 (matching_patients)
+
+ 563            LOAD_CONST               5 ('')
+                LOAD_ATTR               25 (join + NULL|self)
+                LOAD_FAST                0 (patient_name)
+                LOAD_ATTR                1 (strip + NULL|self)
+                CALL                     0
+                LOAD_ATTR               27 (upper + NULL|self)
+                CALL                     0
+                LOAD_ATTR               29 (split + NULL|self)
+                CALL                     0
+                CALL                     1
+                STORE_FAST               6 (normalized_search_name)
+
+ 565            LOAD_FAST                4 (docs)
+                GET_ITER
+        L3:     FOR_ITER               186 (to L6)
+                STORE_FAST               7 (doc)
+
+ 566            LOAD_FAST                7 (doc)
+                LOAD_ATTR               31 (to_dict + NULL|self)
+                CALL                     0
+                STORE_FAST               8 (data)
+
+ 567            LOAD_FAST                8 (data)
+                LOAD_ATTR               33 (get + NULL|self)
+                LOAD_CONST               6 ('patient_info')
+                BUILD_MAP                0
+                CALL                     2
+                STORE_FAST               9 (p_info)
+
+ 568            LOAD_FAST                9 (p_info)
+                LOAD_ATTR               33 (get + NULL|self)
+                LOAD_CONST               7 ('name')
+                LOAD_CONST               5 ('')
+                CALL                     2
+                STORE_FAST              10 (p_name_db)
+
+ 569            LOAD_FAST                8 (data)
+                LOAD_ATTR               33 (get + NULL|self)
+                LOAD_CONST               8 ('patient_id')
+                LOAD_FAST                7 (doc)
+                LOAD_ATTR               34 (id)
+                CALL                     2
+                STORE_FAST              11 (p_id_db)
+
+ 570            LOAD_CONST               5 ('')
+                LOAD_ATTR               25 (join + NULL|self)
+                LOAD_FAST               10 (p_name_db)
+                LOAD_ATTR                1 (strip + NULL|self)
+                CALL                     0
+                LOAD_ATTR               27 (upper + NULL|self)
+                CALL                     0
+                LOAD_ATTR               29 (split + NULL|self)
+                CALL                     0
+                CALL                     1
+                STORE_FAST              12 (normalized_db_name)
+
+ 571            LOAD_FAST_LOAD_FAST    108 (normalized_search_name, normalized_db_name)
+                COMPARE_OP              88 (bool(==))
+        L4:     POP_JUMP_IF_TRUE         2 (to L5)
+                JUMP_BACKWARD          149 (to L3)
+
+ 572    L5:     LOAD_FAST                5 (matching_patients)
+                LOAD_ATTR               37 (append + NULL|self)
+
+ 573            LOAD_FAST               11 (p_id_db)
+
+ 574            LOAD_FAST                9 (p_info)
+
+ 575            LOAD_FAST                8 (data)
+                LOAD_ATTR               33 (get + NULL|self)
+                LOAD_CONST               9 ('created_at')
+                LOAD_CONST               5 ('')
+                CALL                     2
+
+ 572            LOAD_CONST              10 (('patient_id', 'patient_info', 'created_at'))
+                BUILD_CONST_KEY_MAP      3
+                CALL                     1
+                POP_TOP
+                JUMP_BACKWARD          188 (to L3)
+
+ 565    L6:     END_FOR
+                POP_TOP
+
+ 577            LOAD_FAST                5 (matching_patients)
+        L7:     RETURN_VALUE
+
+ 557    L8:     NOP
+
+ 580            BUILD_LIST               0
+                RETURN_VALUE
+
+  --    L9:     PUSH_EXC_INFO
+
+ 578            LOAD_GLOBAL             38 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        4 (to L11)
+                POP_TOP
+
+ 579   L10:     POP_EXCEPT
+
+ 580            BUILD_LIST               0
+                RETURN_VALUE
+
+ 578   L11:     RERAISE                  0
+
+  --   L12:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L2 to L4 -> L9 [0]
+  L5 to L7 -> L9 [0]
+  L9 to L10 -> L12 [1] lasti
+  L11 to L12 -> L12 [1] lasti

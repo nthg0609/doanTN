@@ -1,0 +1,186 @@
+ 583            RESUME                   0
+
+ 590            NOP
+
+ 591    L1:     LOAD_CONST               1 ('gcp-credentials.json')
+                STORE_FAST               4 (cred_path)
+
+ 592            LOAD_GLOBAL              0 (os)
+                LOAD_ATTR                2 (path)
+                LOAD_ATTR                5 (exists + NULL|self)
+                LOAD_FAST                4 (cred_path)
+                CALL                     1
+                TO_BOOL
+                EXTENDED_ARG             1
+                POP_JUMP_IF_FALSE      339 (to L7)
+
+ 593            LOAD_GLOBAL              6 (service_account)
+                LOAD_ATTR                8 (Credentials)
+                LOAD_ATTR               11 (from_service_account_file + NULL|self)
+                LOAD_FAST                4 (cred_path)
+                CALL                     1
+                STORE_FAST               5 (creds)
+
+ 594            LOAD_GLOBAL             12 (gcp_firestore)
+                LOAD_ATTR               14 (Client)
+                PUSH_NULL
+                LOAD_FAST_LOAD_FAST     85 (creds, creds)
+                LOAD_ATTR               16 (project_id)
+                LOAD_CONST               2 ('(default)')
+                LOAD_CONST               3 (('credentials', 'project', 'database'))
+                CALL_KW                  3
+                STORE_FAST               6 (db)
+
+ 595            LOAD_FAST                3 (patient_id)
+                TO_BOOL
+                POP_JUMP_IF_FALSE        2 (to L2)
+                LOAD_FAST                3 (patient_id)
+                JUMP_FORWARD            58 (to L3)
+        L2:     LOAD_CONST               4 ('')
+                LOAD_ATTR               19 (join + NULL|self)
+                LOAD_FAST                0 (patient_name)
+                LOAD_ATTR               21 (strip + NULL|self)
+                CALL                     0
+                LOAD_ATTR               23 (upper + NULL|self)
+                CALL                     0
+                LOAD_ATTR               25 (split + NULL|self)
+                CALL                     0
+                CALL                     1
+        L3:     STORE_FAST               7 (doc_id)
+
+ 596            LOAD_FAST                6 (db)
+                LOAD_ATTR               27 (collection + NULL|self)
+                LOAD_CONST               5 ('medical_records')
+                CALL                     1
+                LOAD_ATTR               29 (document + NULL|self)
+                LOAD_FAST                7 (doc_id)
+                CALL                     1
+                STORE_FAST               8 (doc_ref)
+
+ 597            LOAD_FAST                8 (doc_ref)
+                LOAD_ATTR               31 (get + NULL|self)
+                CALL                     0
+                STORE_FAST               9 (doc_snap)
+
+ 598            LOAD_GLOBAL             32 (datetime)
+                LOAD_ATTR               34 (now)
+                PUSH_NULL
+                CALL                     0
+                LOAD_ATTR               37 (strftime + NULL|self)
+                LOAD_CONST               6 ('%Y-%m-%d %H:%M:%S')
+                CALL                     1
+                STORE_FAST              10 (now_str)
+
+ 599            LOAD_FAST                9 (doc_snap)
+                LOAD_ATTR                4 (exists)
+                TO_BOOL
+                POP_JUMP_IF_FALSE       71 (to L4)
+
+ 600            LOAD_FAST                9 (doc_snap)
+                LOAD_ATTR               39 (to_dict + NULL|self)
+                CALL                     0
+                LOAD_ATTR               31 (get + NULL|self)
+                LOAD_CONST               7 ('visits')
+                BUILD_LIST               0
+                CALL                     2
+                STORE_FAST              11 (existing_visits)
+
+ 601            LOAD_FAST               11 (existing_visits)
+                LOAD_ATTR               41 (append + NULL|self)
+                LOAD_FAST                2 (visit_data)
+                CALL                     1
+                POP_TOP
+
+ 602            LOAD_FAST                8 (doc_ref)
+                LOAD_ATTR               43 (update + NULL|self)
+
+ 603            LOAD_FAST                1 (patient_info)
+
+ 604            LOAD_FAST               10 (now_str)
+
+ 605            LOAD_FAST               11 (existing_visits)
+
+ 602            LOAD_CONST               8 (('patient_info', 'updated_at', 'visits'))
+                BUILD_CONST_KEY_MAP      3
+                CALL                     1
+                POP_TOP
+                JUMP_FORWARD            24 (to L5)
+
+ 608    L4:     LOAD_FAST                8 (doc_ref)
+                LOAD_ATTR               45 (set + NULL|self)
+
+ 609            LOAD_FAST                7 (doc_id)
+
+ 610            LOAD_FAST                1 (patient_info)
+
+ 611            LOAD_FAST               10 (now_str)
+
+ 612            LOAD_FAST               10 (now_str)
+
+ 613            LOAD_FAST                2 (visit_data)
+                BUILD_LIST               1
+
+ 608            LOAD_CONST               9 (('patient_id', 'patient_info', 'created_at', 'updated_at', 'visits'))
+                BUILD_CONST_KEY_MAP      5
+                CALL                     1
+                POP_TOP
+
+ 615    L5:     LOAD_GLOBAL             47 (write_dev_log + NULL)
+                LOAD_FAST_LOAD_FAST    114 (doc_id, visit_data)
+                LOAD_CONST              10 (('patient_id', 'visit'))
+                BUILD_CONST_KEY_MAP      2
+                LOAD_CONST              11 ('SAVE_OR_UPDATE_RECORD')
+                LOAD_CONST              12 (('action_type',))
+                CALL_KW                  2
+                POP_TOP
+
+ 616    L6:     RETURN_CONST            13 (True)
+
+ 618    L7:     LOAD_GLOBAL             48 (st)
+                LOAD_ATTR               50 (error)
+                PUSH_NULL
+                LOAD_CONST              14 (' Không tìm thấy file gcp-credentials.json!')
+                CALL                     1
+                POP_TOP
+
+ 619    L8:     RETURN_CONST            15 (False)
+
+  --    L9:     PUSH_EXC_INFO
+
+ 620            LOAD_GLOBAL             52 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE       35 (to L13)
+                STORE_FAST              12 (e)
+
+ 621   L10:     LOAD_GLOBAL             48 (st)
+                LOAD_ATTR               50 (error)
+                PUSH_NULL
+                LOAD_CONST              16 (' Lỗi ghi dữ liệu lên Cloud Firestore: ')
+                LOAD_FAST               12 (e)
+                FORMAT_SIMPLE
+                BUILD_STRING             2
+                CALL                     1
+                POP_TOP
+       L11:     POP_EXCEPT
+                LOAD_CONST               0 (None)
+                STORE_FAST              12 (e)
+                DELETE_FAST             12 (e)
+
+ 622            RETURN_CONST            15 (False)
+
+  --   L12:     LOAD_CONST               0 (None)
+                STORE_FAST              12 (e)
+                DELETE_FAST             12 (e)
+                RERAISE                  1
+
+ 620   L13:     RERAISE                  0
+
+  --   L14:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L6 -> L9 [0]
+  L7 to L8 -> L9 [0]
+  L9 to L10 -> L14 [1] lasti
+  L10 to L11 -> L12 [1] lasti
+  L12 to L14 -> L14 [1] lasti

@@ -1,0 +1,7 @@
+1908           RESUME                   0
+               LOAD_FAST                0 (x)
+               LOAD_ATTR                1 (get + NULL|self)
+               LOAD_CONST               1 ('timestamp_id')
+               LOAD_CONST               2 ('')
+               CALL                     2
+               RETURN_VALUE

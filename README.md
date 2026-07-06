@@ -1,6 +1,6 @@
 # Hệ thống Chẩn đoán Da liễu Tích hợp & Trợ lý VQA (Unified Dermatology Pipeline & VQA)
 
-Dự án này cung cấp một đường ống xử lý (pipeline) chẩn đoán bệnh da liễu tích hợp, kết hợp giữa các mô hình thị giác máy tính chuyên biệt (Computer Vision - CV) cục bộ và Mô hình Ngôn ngữ Lớn (LLM) thông qua cơ chế **Fusion Prompt** để đảm bảo tính an toàn y tế và triệt tiêu hoàn toàn hiện tượng ảo giác (hallucination).
+Dự án này cung cấp một đường ống xử lý (pipeline) chẩn đoán bệnh da liễu tích hợp, kết hợp giữa các mô hình thị giác máy tính chuyên biệt (Computer Vision - CV) cục bộ và Mô hình Ngôn ngữ Lớn (LLM) thông qua cơ chế **Fusion Prompt** để đảm bảo tính an toàn y tế và giảm thiểu đáng kể hiện tượng ảo giác (hallucination).
 
 ---
 

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Bảo vệ Đồ án Tốt nghiệp - Nguyễn Thành Nghĩa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #f97316;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-light);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Presentation Container */
+        .presentation-container {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Slide Style */
+        .slide {
+            position: absolute;
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            max-height: 700px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(12px);
+            padding: 3rem;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* Slide Header */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(14, 165, 233, 0.2);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .slide-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slide-number {
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+
+        /* Slide Body Content */
+        .slide-body {
+            flex-grow: 1;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .slide-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.2rem;
+        }
+
+        .slide-visual {
+            flex: 1.1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        .slide-visual img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* Lists & Typography */
+        ul {
+            list-style: none;
+        }
+
+        li {
+            position: relative;
+            padding-left: 1.8rem;
+            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: var(--text-light);
+        }
+
+        li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        li strong {
+            color: var(--primary);
+        }
+
+        /* Footer & Controls */
+        .presentation-footer {
+            background: rgba(15, 23, 42, 0.8);
+            border-top: 1px solid var(--card-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .author-info {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Presenter Notes & Timer Panel */
+        .notes-panel {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 380px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--primary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .notes-title {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--success);
+        }
+
+        .notes-content {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-light);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        /* Title Slide Layout */
+        .slide-title-layout {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+        }
+
+        .thesis-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #0ea5e9, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .title-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 80%;
+            margin-top: 2rem;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .meta-col {
+            text-align: left;
+        }
+
+        .meta-col p {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        /* SVG Mock Diagrams */
+        .mock-diagram {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Presentation Viewport -->
+    <div class="presentation-container">
+
+        <!-- SLIDE 1: GIỚI THIỆU -->
+        <div class="slide active" id="slide-1">
+            <div class="slide-title-layout">
+                <span
+                    style="color: var(--primary); font-weight: 600; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px;">Đồ
+                    án Tốt nghiệp Đại học</span>
+                <h1 class="thesis-title">Hệ thống Chẩn đoán Da liễu Đa phương thức Tích hợp Thị giác Máy tính, Hội thoại
+                    Y tế VQA và Hồ sơ Bệnh án Điện tử</h1>
+
+                <div class="title-meta">
+                    <div class="meta-col">
+                        <span class="meta-label">Sinh viên thực hiện</span>
+                        <p><strong>Nguyễn Thành Nghĩa</strong></p>
+                        <span class="meta-label">Chuyên ngành</span>
+                        <p>Khoa học Máy tính / Học máy</p>
+                    </div>
+                    <div class="meta-col">
+                        <span class="meta-label">Giảng viên hướng dẫn</span>
+                        <p><strong>PGS. TS. Giảng Viên Hướng Dẫn</strong></p>
+                        <span class="meta-label">Hội đồng chấm</span>
+                        <p>Khoa Công nghệ Thông tin</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: TÍNH CẤP THIẾT & MỤC TIÊU -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header">
+                <h2>Tính cấp thiết & Mục tiêu Đề tài</h2>
+                <span class="slide-number">Slide 2 / 8</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-text">
+                    <ul>
+                        <li><strong>Thách thức Y tế:</strong> Các bệnh lý ác tính về da (như Melanoma) tăng mạnh. Tỷ lệ
+                            phát hiện sớm quyết định 99% tỷ lệ sống sót, nhưng thiếu hụt bác sĩ chuyên khoa sâu ở tuyến
+                            cơ sở.</li>
+                        <li><strong>Hạn chế của AI hiện tại:</strong> Hầu hết là mô hình "hộp đen" đơn lẻ, thiếu khả
+                            năng biện giải lâm sàng và liên kết EHR động qua nhiều mốc khám.</li>
+                        <li><strong>Mục tiêu Đồ án:</strong> Xây dựng hệ thống chẩn đoán đa phương thức hỗ trợ lâm sàng
+                            (CDSS): Phân vùng (segmentation) đo chỉ số ABCD + Phân loại bệnh lý + Hội thoại VQA thông
+                            minh + Quản lý EHR.</li>
+                    </ul>
+                </div>
+                <div class="slide-visual">
+                    <svg class="mock-diagram" viewBox="0 0 400 300">
+                        <rect x="20" y="40" width="160" height="90" rx="10" fill="#0284c7" opacity="0.8" />
+                        <text x="100" y="85" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">Thiếu
+                            Thiết Bị Soi</text>
+                        <text x="100" y="105" fill="#e0f2fe" font-size="10" text-anchor="middle">Tuyến huyện / xã</text>
+
+                        <rect x="220" y="40" width="160" height="90" rx="10" fill="#b91c1c" opacity="0.8" />
+                        <text x="300" y="85" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">AI Hộp
+                            Đen</text>
+                        <text x="300" y="105" fill="#fee2e2" font-size="10" text-anchor="middle">Không giải thích
+                            được</text>
+
+                        <path d="M 180 180 L 220 180" stroke="#f97316" stroke-width="3" marker-end="url(#arrow)" />
+
+                        <rect x="100" y="170" width="200" height="90" rx="12" fill="#10b981" opacity="0.9" />
+                        <text x="200" y="210" fill="#fff" font-size="16" text-anchor="middle" font-weight="bold">Hệ
+                            thống Đa Phương Thức</text>
+                        <text x="200" y="235" fill="#d1fae5" font-size="11" text-anchor="middle">Chẩn đoán + Hội thoại +
+                            EHR</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: KIẾN TRÚC TỔNG QUAN -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header">
+                <h2>Kiến trúc Tổng quan hệ thống</h2>
+                <span class="slide-number">Slide 3 / 8</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-text">
+                    <ul>
+                        <li><strong>Nguyên tắc song song:</strong> Nhánh phân vùng và Phân loại chạy độc lập song song
+                            để đảm bảo tính khách quan lâm sàng, không gây nhiễu chéo dữ liệu.</li>
+                        <li><strong>Safety Gate (Cổng lọc An toàn):</strong> Đánh giá ảnh đầu vào (độ mờ Laplacian, độ
+                            sáng) và độ tin cậy Top-1. Chỉ hiển thị kết quả chẩn đoán tự động khi vượt qua kiểm duyệt
+                            chất lượng.</li>
+                        <li><strong>Chống thiên kiến chủng tộc:</strong> Tự động điều chỉnh hạ ngưỡng sáng tối thiểu của
+                            Fitzpatrick xuống 30.0 nếu ảnh rõ nét, tránh từ chối chụp ảnh của bệnh nhân da sẫm màu.</li>
+                    </ul>
+                </div>
+                <div class="slide-visual">
+                    <svg class="mock-diagram" viewBox="0 0 400 300" font-family="sans-serif">
+                        <rect x="10" y="10" width="100" height="280" rx="8" fill="#1e293b" stroke="#475569" />
+                        <text x="60" y="150" fill="#94a3b8" font-size="12" text-anchor="middle" font-weight="bold"
+                            transform="rotate(-90 60 150)">ẢNH ĐẦU VÀO RGB</text>
+
+                        <rect x="130" y="25" width="130" height="60" rx="6" fill="#0369a1" stroke="#0ea5e9" />
+                        <text x="195" y="55" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">Phân
+                            vùng DeepLabV3+</text>
+                        <text x="195" y="70" fill="#bae6fd" font-size="8" text-anchor="middle">Metrics ABCD</text>
+
+                        <rect x="130" y="115" width="130" height="60" rx="6" fill="#701a75" stroke="#d946ef" />
+                        <text x="195" y="145" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">Phân
+                            loại EfficientNet-B1</text>
+                        <text x="195" y="160" fill="#fdf4ff" font-size="8" text-anchor="middle">Attention CBAM</text>
+
+                        <rect x="130" y="205" width="130" height="60" rx="6" fill="#15803d" stroke="#22c55e" />
+                        <text x="195" y="235" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">Safety
+                            Gate</text>
+                        <text x="195" y="250" fill="#dcfce7" font-size="8" text-anchor="middle">Kiểm định chất
+                            lượng</text>
+
+                        <rect x="290" y="115" width="100" height="60" rx="6" fill="#b91c1c" stroke="#ef4444" />
+                        <text x="340" y="145" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">VQA &
+                            RAG</text>
+
+                        <draw>
+                            <path d="M 110 55 L 130 55" stroke="#94a3b8" stroke-width="2" />
+                            <path d="M 110 145 L 130 145" stroke="#94a3b8" stroke-width="2" />
+                            <path d="M 110 235 L 130 235" stroke="#94a3b8" stroke-width="2" />
+                            <path d="M 260 145 L 290 145" stroke="#94a3b8" stroke-width="2" />
+                        </draw>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: PHÂN VÙNG TỔN THƯƠNG -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
+                <h2>Phân vùng tổn thương & Chỉ số ABCD</h2>
+                <span class="slide-number">Slide 4 / 8</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-text">
+                    <ul>
+                        <li><strong>Mô hình đề xuất:</strong> Sử dụng DeepLabV3+ kết hợp bộ lọc Atrous Spatial Pyramid
+                            Pooling (ASPP) thu thập đặc trưng đa tỷ lệ.</li>
+                        <li><strong>Multi-scale TTA (Test-Time Augmentation):</strong> Tăng cường ảnh lúc suy luận với
+                            các tỷ lệ {1.0, 0.75, 0.5} giúp cải thiện rõ rệt chỉ số trên ảnh điện thoại bị mờ hoặc có
+                            lông.</li>
+                        <li><strong>Cơ chế dự phòng tương tác (Interactive Fallback):</strong> Cho phép vẽ tay hoặc
+                            click điểm (MobileSAM / GrabCut). Nếu mặt nạ tương tác rỗng hoặc quá nhỏ (&lt; 100px), hệ
+                            thống tự động fallback về mặt nạ tự động của DeepLabV3+ để đảm bảo luồng đo ABCD ổn định.
+                        </li>
+                    </ul>
+                </div>
+                <div class="slide-visual">
+                    <img src="anh/seg_comparison.png" alt="Biểu đồ so sánh phân đoạn">
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: PHÂN LOẠI & HỢP NHẤT BAYES -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header">
+                <h2>Phân loại bệnh lý & Hợp nhất Bayes</h2>
+                <span class="slide-number">Slide 5 / 8</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-text">
+                    <ul>
+                        <li><strong>Kiến trúc phân loại chính:</strong> EfficientNet-B1 tích hợp mô-đun chú ý kép CBAM
+                            (Channel & Spatial Attention) tập trung vào vùng tổn thương sắc tố.</li>
+                        <li><strong>Chiến lược xử lý mất cân bằng lớp:</strong> Áp dụng Weighted Random Sampler và tăng
+                            cường Elastic Deformation cho các lớp thiểu số như U xơ da (DF), giúp tăng chỉ số Macro
+                            F1-Score thêm 7%.</li>
+                        <li><strong>Hợp nhất Bayes Đa phương thức (Bayesian Late Fusion):</strong> Kết hợp xác suất ảnh
+                            và dữ liệu dịch tễ y tế (Tuổi, Giới tính, Vị trí tổn thương) thống kê từ HAM10000 thông qua
+                            tham số tin cậy ảnh $\lambda$.</li>
+                    </ul>
+                </div>
+                <div class="slide-visual">
+                    <svg class="mock-diagram" viewBox="0 0 400 300" font-family="sans-serif">
+                        <circle cx="100" cy="100" r="50" fill="#0ea5e9" opacity="0.8" />
+                        <text x="100" y="105" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">Ảnh
+                            (EfficientNet)</text>
+
+                        <circle cx="300" cy="100" r="50" fill="#a855f7" opacity="0.8" />
+                        <text x="300" y="105" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">Dịch tễ
+                            (Bayes)</text>
+
+                        <rect x="150" y="190" width="100" height="50" rx="8" fill="#f97316" />
+                        <text x="200" y="220" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">Hợp
+                            nhất muộn</text>
+
+                        <path d="M 120 140 L 170 190" stroke="#f97316" stroke-width="2" />
+                        <path d="M 280 140 L 230 190" stroke="#f97316" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: TRỢ LÝ ĐÀM THOẠI VQA & RAG -->
+        <div class="slide" id="slide-6">
+            <div class="slide-header">
+                <h2>Trợ lý hội thoại y khoa VQA & RAG</h2>
+                <span class="slide-number">Slide 6 / 8</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-text">
+                    <ul>
+                        <li><strong>Kiến trúc VQA ngoại tuyến:</strong> DistilGPT-2 tích hợp tầng chiếu đặc trưng thị
+                            giác (Linear Projection) và tinh chỉnh qua LoRA (rank r=8) chỉ chiếm 2.13% tham số huấn
+                            luyện.</li>
+                        <li><strong>Kiến trúc VQA đám mây:</strong> Sử dụng API GPT-4o-mini tích hợp RAG y văn và rào
+                            cản an toàn thuốc (Medication Guardrails) ngăn chặn hiện tượng tự kê đơn thuốc gây hại.</li>
+                        <li><strong>Truy xuất RAG tiếng Việt:</strong> Đoạn tài liệu hướng dẫn điều trị của Bộ Y tế Việt
+                            Nam có độ tương đồng Cosine cao nhất sẽ được đính kèm trực tiếp vào prompt để LLM giải đáp
+                            chính xác, tránh ảo giác.</li>
+                    </ul>
+                </div>
+                <div class="slide-visual">
+                    <img src="anh/vqa_loss_curves.png" alt="Biểu đồ hội tụ loss VQA">
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: KẾT QUẢ THỰC NGHIỆM -->
+        <div class="slide" id="slide-7">
+            <div class="slide-header">
+                <h2>Kết quả Thực nghiệm & Ablation Study</h2>
+                <span class="slide-number">Slide 7 / 8</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-text">
+                    <ul>
+                        <li><strong>Độ chính xác phân loại:</strong> Đạt **95.01%** toàn luồng trên ứng dụng thực tế
+                            (phiên bản tối ưu đạt 96.51% trong nghiên cứu cắt bỏ).</li>
+                        <li><strong>Tốc độ đáp ứng (Latency):</strong> Đạt tốc độ suy luận trung bình cực kỳ nhanh chỉ
+                            **232.27 ms** đầu cuối, phù hợp triển khai trên các thiết bị y tế cấu hình trung bình ở
+                            tuyến xã.</li>
+                        <li><strong>Ablation Study:</strong> Việc chuyển đổi từ ảnh thô sang cắt ROI bằng mặt nạ
+                            DeepLabV3+ đóng góp mức tăng trưởng độ chính xác cao nhất (từ 88.10% lên 95.01%), chứng minh
+                            sự tối ưu của Pipeline.</li>
+                    </ul>
+                </div>
+                <div class="slide-visual">
+                    <img src="anh/inference_breakdown.png" alt="Phân rã thời gian xử lý">
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: KẾT LUẬN & HƯỚNG PHÁT TRIỂN -->
+        <div class="slide" id="slide-8">
+            <div class="slide-header">
+                <h2>Kết luận & Hướng phát triển</h2>
+                <span class="slide-number">Slide 8 / 8</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-text">
+                    <ul>
+                        <li><strong>Kết quả đạt được:</strong> Xây dựng thành công hệ thống CDSS y tế hoàn chỉnh, bảo vệ
+                            an toàn cao thông qua Safety Gate, minh bạch hóa chẩn đoán bằng Grad-CAM và xuất báo cáo PDF
+                            tự động đồng bộ Firestore.</li>
+                        <li><strong>Hướng phát triển 1 (Tích hợp PACS):</strong> Tích hợp sâu tiêu chuẩn DICOM SR và
+                            PACS/RIS kết nối trực tiếp với thiết bị chụp chiếu tại bệnh viện lớn.</li>
+                        <li><strong>Hướng phát triển 2 (Học chủ động):</strong> Tạo chu kỳ học máy chủ động liên tục
+                            (Active Learning Loop) lấy trực tiếp các mặt nạ hiệu chỉnh từ nét vẽ tay của bác sĩ để cập
+                            nhật mô hình.</li>
+                    </ul>
+                </div>
+                <div class="slide-visual">
+                    <svg class="mock-diagram" viewBox="0 0 400 300" font-family="sans-serif">
+                        <rect x="50" y="30" width="300" height="70" rx="8" fill="#1e3a8a" opacity="0.8" />
+                        <text x="200" y="70" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">PACS /
+                            RIS BỆNH VIỆN</text>
+
+                        <rect x="50" y="190" width="300" height="70" rx="8" fill="#14532d" opacity="0.8" />
+                        <text x="200" y="230" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">Chu Kỳ
+                            Học Liên Tục (Active Learning)</text>
+
+                        <path d="M 200 100 L 200 190" stroke="#f97316" stroke-width="3" marker-end="url(#arrow)" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Presentation Footer & Controls -->
+    <div class="presentation-footer">
+        <div class="author-info">
+            <strong>Đồ án tốt nghiệp: Nguyễn Thành Nghĩa</strong> | Đề tài Chẩn đoán da liễu đa phương thức
+        </div>
+        <div class="controls">
+            <button id="notes-btn">Lời thoại (N)</button>
+            <button id="prev-btn" disabled>Trước</button>
+            <button id="next-btn">Sau</button>
+        </div>
+    </div>
+
+    <!-- Presenter Notes Panel -->
+    <div class="notes-panel" id="notes-panel">
+        <div class="notes-header">
+            <span class="notes-title">Gợi ý lời nói & Thời gian</span>
+            <span class="timer" id="timer">07:00</span>
+        </div>
+        <div class="notes-content" id="notes-content">
+            Lời thoại gợi ý sẽ hiển thị ở đây.
+        </div>
+    </div>
+
+    <!-- Interactivity Script -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const notesBtn = document.getElementById('notes-btn');
+        const notesPanel = document.getElementById('notes-panel');
+        const notesContent = document.getElementById('notes-content');
+        const timerDisplay = document.getElementById('timer');
+
+        let currentSlide = 0;
+        let timerSeconds = 7 * 60; // 7 minutes
+        let timerInterval = null;
+
+        // Presenter Notes Content for each slide
+        const notes = [
+            "Kính chào Hội đồng. Em tên là Nguyễn Thành Nghĩa. Hôm nay em xin phép bảo vệ đồ án tốt nghiệp với đề tài: Hệ thống Chẩn đoán Da liễu Đa phương thức Tích hợp Thị giác Máy tính, Hội thoại Y tế VQA và Hồ sơ Bệnh án Điện tử. Đồ án được hướng dẫn bởi PGS. TS. Giảng Viên Hướng Dẫn.",
+            "Về tính cấp thiết, Melanoma hay BCC là ung thư da nguy hiểm cần phát hiện sớm. Tuy nhiên, các hệ thống AI hiện nay hầu hết là hộp đen và khó phân tích trực quan. Vì vậy mục tiêu của em là xây dựng hệ thống đa phương thức hỗ trợ lâm sàng kết hợp phân vùng đo chỉ số hình học ABCD, phân loại Bayes và trợ lý đàm thoại y tế VQA bổ trợ RAG để hỗ trợ bác sĩ tuyến đầu.",
+            "Đây là sơ đồ kiến trúc của hệ thống. Ảnh da đầu vào sẽ được xử lý qua 2 nhánh độc lập: Nhánh phân vùng DeepLabV3+ đo đạc ABCD và Nhánh phân loại EfficientNet-B1. Đầu ra sẽ đi qua Safety Gate kiểm duyệt độ sắc nét, phơi sáng thích ứng chủng tộc da màu trước khi hiển thị. Kết quả cũng được chuyển vào trợ lý VQA và lưu trữ Firestore.",
+            "Nhánh phân vùng sử dụng DeepLabV3+ kết hợp Test-Time Augmentation (TTA) đa tỷ lệ giúp nâng Dice Score lên 91.32% trên ảnh chụp di động thực tế. Hệ thống cũng cung cấp cơ chế Fallback tự động quay về DeepLabV3+ nếu bác sĩ click điểm mồi tương tác bị rỗng hoặc diện tích nhỏ dưới 100 pixel.",
+            "Nhánh phân loại sử dụng EfficientNet-B1 nhúng khối chú ý kép CBAM để định vị ranh giới bệnh lý. Để giải quyết sự mất cân bằng lớp của HAM10000, em áp dụng bộ nạp mẫu ngẫu nhiên có trọng số giúp nâng Macro F1-Score lên 0.68. Kết quả phân loại được hợp nhất Bayes với dữ liệu dịch tễ tuổi, giới tính, vị trí tổn thương theo trọng số lambda do bác sĩ cấu hình.",
+            "Trợ lý hội thoại VQA ngoại tuyến sử dụng DistilGPT-2 tinh chỉnh LoRA rank 8, chỉ huấn luyện 2.13% tham số nhưng hội tụ Loss rất tốt ở Epoch 12. Trong khi đó, trợ lý đám mây dùng gpt-4o-mini tích hợp RAG y văn tiếng Việt của Bộ Y tế giúp loại bỏ ảo giác và Medication Guardrails ngăn chặn AI tự kê đơn nguy hiểm.",
+            "Về kết quả định lượng, hệ thống đạt độ chính xác chẩn đoán toàn luồng là 95.01%. Latency suy luận trung bình đạt 232.27 ms (chưa tới 0.25 giây) chạy cực kỳ mượt mà. Nghiên cứu cắt bỏ cấu trúc chứng minh bước cắt ROI từ mặt nạ phân đoạn đóng góp mức tăng trưởng độ chính xác cao nhất (hơn 6%).",
+            "Đồ án đã xây dựng thành công một hệ thống hỗ trợ chẩn đoán CDSS an toàn, minh bạch với Grad-CAM và quản lý EHR tốt. Trong tương lai, em định hướng tích hợp sâu tiêu chuẩn DICOM SR, hệ thống PACS bệnh viện và thiết lập chu kỳ học chủ động liên tục (Active Learning) từ nét vẽ tay mặt nạ của bác sĩ."
+        ];
+
+        function updateSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+
+            // Button states
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+
+            // Notes
+            notesContent.innerHTML = notes[currentSlide];
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                updateSlide(currentSlide + 1);
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                updateSlide(currentSlide - 1);
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                if (currentSlide < slides.length - 1) updateSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) updateSlide(currentSlide - 1);
+            } else if (e.key === 'n' || e.key === 'N') {
+                toggleNotes();
+            }
+        });
+
+        // Presenter Notes toggle
+        function toggleNotes() {
+            if (notesPanel.style.display === 'block') {
+                notesPanel.style.display = 'none';
+            } else {
+                notesPanel.style.display = 'block';
+                if (!timerInterval) startTimer();
+            }
+        }
+
+        notesBtn.addEventListener('click', toggleNotes);
+
+        // Timer function
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timerSeconds > 0) {
+                    timerSeconds--;
+                    const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                    const secs = (timerSeconds % 60).toString().padStart(2, '0');
+                    timerDisplay.textContent = `${mins}:${secs}`;
+
+                    if (timerSeconds < 60) {
+                        timerDisplay.style.color = '#ef4444'; // Red warning
+                    }
+                } else {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+
+        // Initialize notes
+        notesContent.innerHTML = notes[0];
+    </script>
+</body>
+
+</html>

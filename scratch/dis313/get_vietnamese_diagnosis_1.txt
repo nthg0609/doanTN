@@ -1,0 +1,8 @@
+267           RESUME                   0
+
+268           LOAD_GLOBAL              0 (DIAGNOSIS_DICTIONARY)
+              LOAD_ATTR                3 (get + NULL|self)
+              LOAD_FAST                0 (pred_label)
+              LOAD_CONST               1 ('Bệnh lý da liễu khác')
+              CALL                     2
+              RETURN_VALUE

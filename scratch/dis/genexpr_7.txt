@@ -1,0 +1,32 @@
+1351           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+       L2:     FOR_ITER                37 (to L5)
+               STORE_FAST_LOAD_FAST    17 (c, c)
+               LOAD_ATTR                1 (isalnum + NULL|self)
+               CALL                     0
+               TO_BOOL
+               POP_JUMP_IF_TRUE        10 (to L4)
+               NOT_TAKEN
+               LOAD_FAST_BORROW         1 (c)
+               LOAD_CONST               2 (('-', '_'))
+               CONTAINS_OP              0 (in)
+       L3:     POP_JUMP_IF_TRUE         3 (to L4)
+               NOT_TAKEN
+               JUMP_BACKWARD           33 (to L2)
+       L4:     LOAD_FAST_BORROW         1 (c)
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           39 (to L2)
+       L5:     END_FOR
+               POP_ITER
+               LOAD_CONST               1 (None)
+               RETURN_VALUE
+
+  --   L6:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L3 -> L6 [0] lasti
+  L4 to L6 -> L6 [0] lasti

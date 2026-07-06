@@ -1,0 +1,143 @@
+  --           MAKE_CELL                0 (__classdict__)
+
+1437           RESUME                   0
+               LOAD_NAME                0 (__name__)
+               STORE_NAME               1 (__module__)
+               LOAD_CONST               0 ('MedicalPDF')
+               STORE_NAME               2 (__qualname__)
+               LOAD_CONST               1 (1437)
+               STORE_NAME               3 (__firstlineno__)
+               LOAD_LOCALS
+               STORE_DEREF              0 (__classdict__)
+
+1438           LOAD_CONST               2 (<code object header at 0x000002602A130BA0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1438>)
+               MAKE_FUNCTION
+               STORE_NAME               4 (header)
+
+1448           LOAD_CONST               3 (<code object footer at 0x000002602A3560B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1448>)
+               MAKE_FUNCTION
+               STORE_NAME               5 (footer)
+               LOAD_CONST               4 (())
+               STORE_NAME               6 (__static_attributes__)
+               LOAD_FAST_BORROW         0 (__classdict__)
+               STORE_NAME               7 (__classdictcell__)
+               LOAD_CONST               5 (None)
+               RETURN_VALUE
+
+Disassembly of <code object header at 0x000002602A130BA0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1438>:
+1438           RESUME                   0
+
+1439           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                1 (set_fill_color + NULL|self)
+               LOAD_SMALL_INT          26
+               LOAD_SMALL_INT          54
+               LOAD_SMALL_INT          93
+               CALL                     3
+               POP_TOP
+
+1440           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                3 (rect + NULL|self)
+               LOAD_SMALL_INT           0
+               LOAD_SMALL_INT           0
+               LOAD_SMALL_INT         210
+               LOAD_SMALL_INT          35
+               LOAD_CONST               1 ('F')
+               CALL                     5
+               POP_TOP
+
+1441           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                5 (set_text_color + NULL|self)
+               LOAD_SMALL_INT         255
+               LOAD_SMALL_INT         255
+               LOAD_SMALL_INT         255
+               CALL                     3
+               POP_TOP
+
+1442           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                7 (set_font + NULL|self)
+               LOAD_CONST               2 ('helvetica')
+               LOAD_CONST               3 ('B')
+               LOAD_SMALL_INT          16
+               CALL                     3
+               POP_TOP
+
+1443           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                9 (cell + NULL|self)
+               LOAD_SMALL_INT           0
+               LOAD_SMALL_INT          10
+               LOAD_CONST               4 ('BAO CAO CHAN DOAN Y KHOA DA LIEU')
+               LOAD_CONST               5 (True)
+               LOAD_CONST               6 ('C')
+               LOAD_CONST               7 (('ln', 'align'))
+               CALL_KW                  5
+               POP_TOP
+
+1444           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                7 (set_font + NULL|self)
+               LOAD_CONST               2 ('helvetica')
+               LOAD_CONST               8 ('')
+               LOAD_SMALL_INT          10
+               CALL                     3
+               POP_TOP
+
+1445           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                9 (cell + NULL|self)
+               LOAD_SMALL_INT           0
+               LOAD_SMALL_INT           5
+               LOAD_CONST               9 ('He thong sang loc so bo tich hop Hoc sau & VQA')
+               LOAD_CONST               5 (True)
+               LOAD_CONST               6 ('C')
+               LOAD_CONST               7 (('ln', 'align'))
+               CALL_KW                  5
+               POP_TOP
+
+1446           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR               11 (ln + NULL|self)
+               LOAD_SMALL_INT          10
+               CALL                     1
+               POP_TOP
+               LOAD_CONST              10 (None)
+               RETURN_VALUE
+
+Disassembly of <code object footer at 0x000002602A3560B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 1448>:
+1448           RESUME                   0
+
+1449           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                1 (set_y + NULL|self)
+               LOAD_CONST               8 (-15)
+               CALL                     1
+               POP_TOP
+
+1450           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                3 (set_font + NULL|self)
+               LOAD_CONST               1 ('helvetica')
+               LOAD_CONST               2 ('I')
+               LOAD_SMALL_INT           8
+               CALL                     3
+               POP_TOP
+
+1451           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                5 (set_text_color + NULL|self)
+               LOAD_SMALL_INT         128
+               LOAD_SMALL_INT         128
+               LOAD_SMALL_INT         128
+               CALL                     3
+               POP_TOP
+
+1452           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                7 (cell + NULL|self)
+               LOAD_SMALL_INT           0
+               LOAD_SMALL_INT          10
+               LOAD_CONST               3 ('Trang ')
+               LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                9 (page_no + NULL|self)
+               CALL                     0
+               FORMAT_SIMPLE
+               LOAD_CONST               4 ('/{nb} | Tai lieu y te bao mat')
+               BUILD_STRING             3
+               LOAD_CONST               5 ('C')
+               LOAD_CONST               6 (('align',))
+               CALL_KW                  4
+               POP_TOP
+               LOAD_CONST               7 (None)
+               RETURN_VALUE

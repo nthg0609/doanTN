@@ -1,0 +1,53 @@
+341           RESUME                   0
+
+345           LOAD_FAST                0 (img_rgb)
+              LOAD_ATTR                0 (shape)
+              UNPACK_SEQUENCE          3
+              STORE_FAST_STORE_FAST   52 (h, w)
+              STORE_FAST               5 (_)
+
+346           LOAD_FAST                1 (bbox)
+              UNPACK_SEQUENCE          4
+              STORE_FAST_STORE_FAST  103 (x, y)
+              STORE_FAST_STORE_FAST  137 (bw, bh)
+
+349           LOAD_GLOBAL              3 (max + NULL)
+              LOAD_CONST               1 (0)
+              LOAD_FAST_LOAD_FAST     98 (x, padding)
+              BINARY_OP               10 (-)
+              CALL                     2
+              STORE_FAST              10 (x_min)
+
+350           LOAD_GLOBAL              3 (max + NULL)
+              LOAD_CONST               1 (0)
+              LOAD_FAST_LOAD_FAST    114 (y, padding)
+              BINARY_OP               10 (-)
+              CALL                     2
+              STORE_FAST              11 (y_min)
+
+351           LOAD_GLOBAL              5 (min + NULL)
+              LOAD_FAST_LOAD_FAST     70 (w, x)
+              LOAD_FAST                8 (bw)
+              BINARY_OP                0 (+)
+              LOAD_FAST                2 (padding)
+              BINARY_OP                0 (+)
+              CALL                     2
+              STORE_FAST              12 (x_max)
+
+352           LOAD_GLOBAL              5 (min + NULL)
+              LOAD_FAST_LOAD_FAST     55 (h, y)
+              LOAD_FAST                9 (bh)
+              BINARY_OP                0 (+)
+              LOAD_FAST                2 (padding)
+              BINARY_OP                0 (+)
+              CALL                     2
+              STORE_FAST              13 (y_max)
+
+354           LOAD_FAST_LOAD_FAST     11 (img_rgb, y_min)
+              LOAD_FAST               13 (y_max)
+              BUILD_SLICE              2
+              LOAD_FAST_LOAD_FAST    172 (x_min, x_max)
+              BUILD_SLICE              2
+              BUILD_TUPLE              2
+              BINARY_SUBSCR
+              RETURN_VALUE

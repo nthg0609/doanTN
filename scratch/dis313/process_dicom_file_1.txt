@@ -1,0 +1,350 @@
+ 422            RESUME                   0
+
+ 424            LOAD_CONST               1 (0)
+                LOAD_CONST               2 (None)
+                IMPORT_NAME              0 (pydicom)
+                STORE_FAST               1 (pydicom)
+
+ 425            LOAD_GLOBAL              2 (tempfile)
+                LOAD_ATTR                4 (NamedTemporaryFile)
+                PUSH_NULL
+                LOAD_CONST               3 (False)
+                LOAD_CONST               4 ('.dcm')
+                LOAD_CONST               5 (('delete', 'suffix'))
+                CALL_KW                  2
+                BEFORE_WITH
+        L1:     STORE_FAST               2 (tmp_dcm)
+
+ 426            LOAD_FAST                2 (tmp_dcm)
+                LOAD_ATTR                7 (write + NULL|self)
+                LOAD_FAST                0 (uploaded_file)
+                LOAD_ATTR                9 (read + NULL|self)
+                CALL                     0
+                CALL                     1
+                POP_TOP
+
+ 427            LOAD_FAST                2 (tmp_dcm)
+                LOAD_ATTR               10 (name)
+                STORE_FAST               3 (tmp_dcm_path)
+
+ 425    L2:     LOAD_CONST               2 (None)
+                LOAD_CONST               2 (None)
+                LOAD_CONST               2 (None)
+                CALL                     2
+                POP_TOP
+
+ 429    L3:     NOP
+
+ 430    L4:     LOAD_FAST                1 (pydicom)
+                LOAD_ATTR               13 (dcmread + NULL|self)
+                LOAD_FAST_CHECK          3 (tmp_dcm_path)
+                CALL                     1
+                STORE_FAST               4 (ds)
+
+ 432            LOAD_GLOBAL             15 (hasattr + NULL)
+                LOAD_FAST                4 (ds)
+                LOAD_CONST               6 ('pixel_array')
+                CALL                     2
+                TO_BOOL
+                POP_JUMP_IF_TRUE        11 (to L5)
+
+ 433            LOAD_GLOBAL             17 (ValueError + NULL)
+                LOAD_CONST               7 ('Tệp DICOM không chứa dữ liệu hình ảnh (pixel_array).')
+                CALL                     1
+                RAISE_VARARGS            1
+
+ 435    L5:     LOAD_FAST                4 (ds)
+                LOAD_ATTR               18 (pixel_array)
+                STORE_FAST               5 (pixel_array)
+
+ 436            LOAD_FAST                5 (pixel_array)
+                LOAD_ATTR               21 (min + NULL|self)
+                CALL                     0
+                STORE_FAST               6 (pixel_min)
+
+ 437            LOAD_FAST                5 (pixel_array)
+                LOAD_ATTR               23 (max + NULL|self)
+                CALL                     0
+                STORE_FAST               7 (pixel_max)
+
+ 438            LOAD_FAST_LOAD_FAST    118 (pixel_max, pixel_min)
+                COMPARE_OP             148 (bool(>))
+                POP_JUMP_IF_FALSE       42 (to L6)
+
+ 439            LOAD_FAST_LOAD_FAST     86 (pixel_array, pixel_min)
+                BINARY_OP               10 (-)
+                LOAD_FAST_LOAD_FAST    118 (pixel_max, pixel_min)
+                BINARY_OP               10 (-)
+                BINARY_OP               11 (/)
+                LOAD_CONST               8 (255.0)
+                BINARY_OP                5 (*)
+                LOAD_ATTR               25 (astype + NULL|self)
+                LOAD_GLOBAL             26 (np)
+                LOAD_ATTR               28 (uint8)
+                CALL                     1
+                STORE_FAST               8 (img_normalized)
+                JUMP_FORWARD            35 (to L7)
+
+ 441    L6:     LOAD_GLOBAL             26 (np)
+                LOAD_ATTR               30 (zeros_like)
+                PUSH_NULL
+                LOAD_FAST                5 (pixel_array)
+                LOAD_GLOBAL             26 (np)
+                LOAD_ATTR               28 (uint8)
+                LOAD_CONST               9 (('dtype',))
+                CALL_KW                  2
+                STORE_FAST               8 (img_normalized)
+
+ 443    L7:     LOAD_GLOBAL             33 (len + NULL)
+                LOAD_FAST                8 (img_normalized)
+                LOAD_ATTR               34 (shape)
+                CALL                     1
+                LOAD_CONST              10 (2)
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       38 (to L8)
+
+ 444            LOAD_GLOBAL             36 (cv2)
+                LOAD_ATTR               38 (cvtColor)
+                PUSH_NULL
+                LOAD_FAST                8 (img_normalized)
+                LOAD_GLOBAL             36 (cv2)
+                LOAD_ATTR               40 (COLOR_GRAY2RGB)
+                CALL                     2
+                STORE_FAST               9 (img_rgb)
+                JUMP_FORWARD            39 (to L10)
+
+ 445    L8:     LOAD_GLOBAL             33 (len + NULL)
+                LOAD_FAST                8 (img_normalized)
+                LOAD_ATTR               34 (shape)
+                CALL                     1
+                LOAD_CONST              11 (3)
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE        3 (to L9)
+
+ 446            LOAD_FAST                8 (img_normalized)
+                STORE_FAST               9 (img_rgb)
+                JUMP_FORWARD            11 (to L10)
+
+ 448    L9:     LOAD_GLOBAL             17 (ValueError + NULL)
+                LOAD_CONST              12 ('Dữ liệu hình ảnh DICOM không hợp lệ.')
+                CALL                     1
+                RAISE_VARARGS            1
+
+ 450   L10:     BUILD_MAP                0
+                STORE_FAST              10 (metadata)
+
+ 451            LOAD_CONST              13 ('PatientName')
+                LOAD_FAST                4 (ds)
+                CONTAINS_OP              0
+                POP_JUMP_IF_FALSE       62 (to L11)
+
+ 452            LOAD_GLOBAL             43 (str + NULL)
+                LOAD_FAST                4 (ds)
+                LOAD_ATTR               44 (PatientName)
+                CALL                     1
+                LOAD_ATTR               47 (replace + NULL|self)
+                LOAD_CONST              14 ('^')
+                LOAD_CONST              15 (' ')
+                CALL                     2
+                LOAD_ATTR               49 (strip + NULL|self)
+                CALL                     0
+                STORE_FAST              11 (name_str)
+
+ 453            LOAD_FAST               11 (name_str)
+                TO_BOOL
+                POP_JUMP_IF_FALSE        4 (to L11)
+
+ 454            LOAD_FAST_LOAD_FAST    186 (name_str, metadata)
+                LOAD_CONST              16 ('name')
+                STORE_SUBSCR
+
+ 455   L11:     LOAD_CONST              17 ('PatientAge')
+                LOAD_FAST                4 (ds)
+                CONTAINS_OP              0
+                POP_JUMP_IF_FALSE      113 (to L17)
+
+ 456            LOAD_GLOBAL             43 (str + NULL)
+                LOAD_FAST                4 (ds)
+                LOAD_ATTR               50 (PatientAge)
+                CALL                     1
+                LOAD_ATTR               49 (strip + NULL|self)
+                CALL                     0
+                STORE_FAST              12 (age_str)
+
+ 457            LOAD_FAST               12 (age_str)
+                LOAD_ATTR               53 (endswith + NULL|self)
+                LOAD_CONST              18 ('Y')
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_TRUE        22 (to L12)
+                LOAD_FAST               12 (age_str)
+                LOAD_ATTR               53 (endswith + NULL|self)
+                LOAD_CONST              19 ('y')
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_FALSE       19 (to L15)
+
+ 458   L12:     NOP
+
+ 459   L13:     LOAD_GLOBAL             55 (int + NULL)
+                LOAD_FAST               12 (age_str)
+                LOAD_CONST               2 (None)
+                LOAD_CONST              20 (-1)
+                BINARY_SLICE
+                CALL                     1
+                LOAD_FAST               10 (metadata)
+                LOAD_CONST              21 ('age')
+                STORE_SUBSCR
+       L14:     JUMP_FORWARD            15 (to L17)
+
+ 463   L15:     NOP
+
+ 464   L16:     LOAD_GLOBAL             55 (int + NULL)
+                LOAD_FAST               12 (age_str)
+                CALL                     1
+                LOAD_FAST               10 (metadata)
+                LOAD_CONST              21 ('age')
+                STORE_SUBSCR
+
+ 467   L17:     LOAD_CONST              22 ('PatientSex')
+                LOAD_FAST                4 (ds)
+                CONTAINS_OP              0
+                POP_JUMP_IF_FALSE       72 (to L19)
+
+ 468            LOAD_GLOBAL             43 (str + NULL)
+                LOAD_FAST                4 (ds)
+                LOAD_ATTR               56 (PatientSex)
+                CALL                     1
+                LOAD_ATTR               59 (upper + NULL|self)
+                CALL                     0
+                LOAD_ATTR               49 (strip + NULL|self)
+                CALL                     0
+                STORE_FAST              13 (sex_str)
+
+ 469            LOAD_FAST               13 (sex_str)
+                LOAD_CONST              23 ('M')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE        6 (to L18)
+
+ 470            LOAD_CONST              24 ('Nam')
+                LOAD_FAST               10 (metadata)
+                LOAD_CONST              25 ('gender')
+                STORE_SUBSCR
+                JUMP_FORWARD            11 (to L19)
+
+ 471   L18:     LOAD_FAST               13 (sex_str)
+                LOAD_CONST              26 ('F')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE        5 (to L19)
+
+ 472            LOAD_CONST              27 ('Nữ')
+                LOAD_FAST               10 (metadata)
+                LOAD_CONST              25 ('gender')
+                STORE_SUBSCR
+
+ 474   L19:     LOAD_FAST_LOAD_FAST    154 (img_rgb, metadata)
+                BUILD_TUPLE              2
+
+ 476   L20:     LOAD_GLOBAL             60 (os)
+                LOAD_ATTR               62 (path)
+                LOAD_ATTR               65 (exists + NULL|self)
+                LOAD_FAST                3 (tmp_dcm_path)
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_FALSE       23 (to L21)
+
+ 477            LOAD_GLOBAL             60 (os)
+                LOAD_ATTR               66 (remove)
+                PUSH_NULL
+                LOAD_FAST                3 (tmp_dcm_path)
+                CALL                     1
+                POP_TOP
+                RETURN_VALUE
+
+ 476   L21:     RETURN_VALUE
+
+ 425   L22:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         1 (to L23)
+                RERAISE                  2
+       L23:     POP_TOP
+       L24:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                EXTENDED_ARG             2
+                JUMP_BACKWARD_NO_INTERRUPT 618 (to L3)
+
+  --   L25:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L26:     PUSH_EXC_INFO
+
+ 460            LOAD_GLOBAL             16 (ValueError)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        3 (to L28)
+                POP_TOP
+
+ 461   L27:     POP_EXCEPT
+                JUMP_BACKWARD_NO_INTERRUPT 170 (to L17)
+
+ 460   L28:     RERAISE                  0
+
+  --   L29:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L30:     PUSH_EXC_INFO
+
+ 465            LOAD_GLOBAL             16 (ValueError)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        3 (to L32)
+                POP_TOP
+
+ 466   L31:     POP_EXCEPT
+                JUMP_BACKWARD_NO_INTERRUPT 186 (to L17)
+
+ 465   L32:     RERAISE                  0
+
+  --   L33:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L34:     PUSH_EXC_INFO
+
+ 476            LOAD_GLOBAL             60 (os)
+                LOAD_ATTR               62 (path)
+                LOAD_ATTR               65 (exists + NULL|self)
+                LOAD_FAST_CHECK          3 (tmp_dcm_path)
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_FALSE       23 (to L35)
+
+ 477            LOAD_GLOBAL             60 (os)
+                LOAD_ATTR               66 (remove)
+                PUSH_NULL
+                LOAD_FAST                3 (tmp_dcm_path)
+                CALL                     1
+                POP_TOP
+                RERAISE                  0
+
+ 476   L35:     RERAISE                  0
+
+  --   L36:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L22 [1] lasti
+  L4 to L12 -> L34 [0]
+  L13 to L14 -> L26 [0]
+  L14 to L15 -> L34 [0]
+  L16 to L17 -> L30 [0]
+  L17 to L20 -> L34 [0]
+  L22 to L24 -> L25 [3] lasti
+  L26 to L27 -> L29 [1] lasti
+  L27 to L28 -> L34 [0]
+  L28 to L29 -> L29 [1] lasti
+  L29 to L30 -> L34 [0]
+  L30 to L31 -> L33 [1] lasti
+  L31 to L32 -> L34 [0]
+  L32 to L33 -> L33 [1] lasti
+  L33 to L34 -> L34 [0]
+  L34 to L36 -> L36 [1] lasti

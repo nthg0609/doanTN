@@ -1,0 +1,32 @@
+1499           RESUME                   0
+
+1502           LOAD_FAST                5 (kwargs)
+               LOAD_ATTR                1 (pop + NULL|self)
+               LOAD_CONST               1 ('new_x')
+               LOAD_CONST               0 (None)
+               CALL                     2
+               POP_TOP
+
+1503           LOAD_FAST                5 (kwargs)
+               LOAD_ATTR                1 (pop + NULL|self)
+               LOAD_CONST               2 ('new_y')
+               LOAD_CONST               0 (None)
+               CALL                     2
+               POP_TOP
+
+1504           LOAD_FAST                0 (pdf)
+               LOAD_ATTR                2 (cell)
+               PUSH_NULL
+               LOAD_FAST_LOAD_FAST     18 (w, h)
+               LOAD_GLOBAL              5 (_safe + NULL)
+               LOAD_FAST                3 (txt)
+               CALL                     1
+               BUILD_TUPLE              3
+               LOAD_CONST               3 ('ln')
+               LOAD_FAST                4 (ln)
+               BUILD_MAP                1
+               LOAD_FAST                5 (kwargs)
+               DICT_MERGE               1
+               CALL_FUNCTION_EX         1
+               POP_TOP
+               RETURN_CONST             0 (None)

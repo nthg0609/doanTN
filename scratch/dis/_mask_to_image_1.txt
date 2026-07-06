@@ -1,0 +1,63 @@
+508           RESUME                   0
+
+509           LOAD_FAST_BORROW         0 (mask)
+              POP_JUMP_IF_NOT_NONE     3 (to L1)
+              NOT_TAKEN
+
+510           LOAD_CONST               0 (None)
+              RETURN_VALUE
+
+511   L1:     LOAD_FAST_BORROW         0 (mask)
+              LOAD_ATTR                0 (ndim)
+              LOAD_SMALL_INT           2
+              COMPARE_OP             119 (bool(!=))
+              POP_JUMP_IF_FALSE       10 (to L2)
+              NOT_TAKEN
+
+512           LOAD_FAST_BORROW         0 (mask)
+              LOAD_CONST               2 ((slice(None, None, None), slice(None, None, None), 0))
+              BINARY_OP               26 ([])
+              STORE_FAST               0 (mask)
+
+513   L2:     LOAD_FAST_BORROW         0 (mask)
+              LOAD_ATTR                2 (shape)
+              LOAD_FAST_BORROW         1 (target_shape)
+              COMPARE_OP             119 (bool(!=))
+              POP_JUMP_IF_FALSE       85 (to L3)
+              NOT_TAKEN
+
+514           LOAD_GLOBAL              4 (cv2)
+              LOAD_ATTR                6 (resize)
+              PUSH_NULL
+
+515           LOAD_FAST_BORROW         0 (mask)
+              LOAD_ATTR                9 (astype + NULL|self)
+              LOAD_GLOBAL             10 (np)
+              LOAD_ATTR               12 (uint8)
+              CALL                     1
+
+516           LOAD_FAST_BORROW         1 (target_shape)
+              LOAD_SMALL_INT           1
+              BINARY_OP               26 ([])
+              LOAD_FAST_BORROW         1 (target_shape)
+              LOAD_SMALL_INT           0
+              BINARY_OP               26 ([])
+              BUILD_TUPLE              2
+
+517           LOAD_GLOBAL              4 (cv2)
+              LOAD_ATTR               14 (INTER_NEAREST)
+
+514           LOAD_CONST               1 (('interpolation',))
+              CALL_KW                  3
+              STORE_FAST               0 (mask)
+
+519   L3:     LOAD_FAST_BORROW         0 (mask)
+              LOAD_SMALL_INT           0
+              COMPARE_OP             132 (>)
+              LOAD_ATTR                9 (astype + NULL|self)
+              LOAD_GLOBAL             10 (np)
+              LOAD_ATTR               12 (uint8)
+              CALL                     1
+              LOAD_SMALL_INT         255
+              BINARY_OP                5 (*)
+              RETURN_VALUE

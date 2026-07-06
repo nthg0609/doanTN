@@ -1,0 +1,8 @@
+ 97           RESUME                   0
+
+ 98           LOAD_GLOBAL              0 (DIAGNOSIS_DICTIONARY)
+              LOAD_ATTR                3 (get + NULL|self)
+              LOAD_FAST_BORROW         0 (pred_label)
+              LOAD_CONST               0 ('Bệnh lý da liễu khác')
+              CALL                     2
+              RETURN_VALUE

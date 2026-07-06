@@ -1,0 +1,9 @@
+3110           RESUME                   0
+
+3111           LOAD_GLOBAL              1 (glass_alert + NULL)
+               LOAD_FAST_BORROW         0 (msg)
+               LOAD_CONST               0 ('info')
+               CALL                     2
+               POP_TOP
+               LOAD_CONST               1 (None)
+               RETURN_VALUE

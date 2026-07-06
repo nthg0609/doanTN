@@ -1,0 +1,23 @@
+648           RESUME                   0
+
+650           LOAD_CONST               1 (0)
+              LOAD_CONST               2 (('UnifiedDermatologyPipeline',))
+              IMPORT_NAME              0 (pipeline)
+              IMPORT_FROM              1 (UnifiedDermatologyPipeline)
+              STORE_FAST               1 (UnifiedDermatologyPipeline)
+              POP_TOP
+
+651           LOAD_FAST                1 (UnifiedDermatologyPipeline)
+              PUSH_NULL
+
+652           LOAD_CONST               3 ('both')
+
+653           LOAD_CONST               4 ('min_class_confidence')
+              LOAD_GLOBAL              5 (float + NULL)
+              LOAD_FAST                0 (min_conf)
+              CALL                     1
+              BUILD_MAP                1
+
+651           LOAD_CONST               5 (('mode', 'safety_overrides'))
+              CALL_KW                  2
+              RETURN_VALUE

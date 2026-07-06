@@ -1,0 +1,40 @@
+754           RESUME                   0
+
+755           LOAD_FAST                1 (result)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               1 ('classification')
+              CALL                     1
+              COPY                     1
+              TO_BOOL
+              POP_JUMP_IF_TRUE         2 (to L1)
+              POP_TOP
+              BUILD_MAP                0
+      L1:     STORE_FAST               2 (cls)
+
+757           LOAD_CONST               2 ('Bạn hỏi: "')
+              LOAD_FAST                0 (question)
+              FORMAT_SIMPLE
+              LOAD_CONST               3 ('". Mô hình dự đoán: ')
+
+758           LOAD_FAST                2 (cls)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               4 ('prediction')
+              LOAD_CONST               5 ('N/A')
+              CALL                     2
+              FORMAT_SIMPLE
+              LOAD_CONST               6 (' (')
+
+759           LOAD_GLOBAL              3 (float + NULL)
+              LOAD_FAST                2 (cls)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               7 ('confidence')
+              LOAD_CONST               8 (0.0)
+              CALL                     2
+              CALL                     1
+              LOAD_CONST               9 ('.3f')
+              FORMAT_WITH_SPEC
+              LOAD_CONST              10 ('). Vui lòng tham khảo ý kiến bác sĩ da liễu.')
+
+757           BUILD_STRING             7
+
+756           RETURN_VALUE

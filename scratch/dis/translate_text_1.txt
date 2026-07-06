@@ -1,0 +1,96 @@
+ 788           RESUME                   0
+
+ 790           LOAD_GLOBAL              0 (os)
+               LOAD_ATTR                2 (getenv)
+               PUSH_NULL
+               LOAD_CONST               1 ('OPENAI_API_KEY')
+               CALL                     1
+               STORE_FAST               2 (api_key)
+
+ 791           LOAD_FAST_BORROW         2 (api_key)
+               TO_BOOL
+               POP_JUMP_IF_TRUE         3 (to L1)
+               NOT_TAKEN
+
+ 792           LOAD_FAST_BORROW         0 (text)
+               RETURN_VALUE
+
+ 793   L1:     NOP
+
+ 794   L2:     LOAD_SMALL_INT           0
+               LOAD_CONST               2 (('OpenAI',))
+               IMPORT_NAME              2 (openai)
+               IMPORT_FROM              3 (OpenAI)
+               STORE_FAST               3 (OpenAI)
+               POP_TOP
+
+ 795           LOAD_FAST_BORROW         3 (OpenAI)
+               PUSH_NULL
+               LOAD_FAST_BORROW         2 (api_key)
+               LOAD_CONST               3 (('api_key',))
+               CALL_KW                  1
+               STORE_FAST               4 (client)
+
+ 796           LOAD_CONST               4 ('Translate the following medical text into ')
+               LOAD_FAST_BORROW         1 (target_lang)
+               FORMAT_SIMPLE
+               LOAD_CONST               5 ('. Return ONLY the translated text. Do not add any conversational introduction, quotes, or explanation.\n\nText: ')
+               LOAD_FAST_BORROW         0 (text)
+               FORMAT_SIMPLE
+               BUILD_STRING             4
+               STORE_FAST               5 (prompt)
+
+ 797           LOAD_FAST_BORROW         4 (client)
+               LOAD_ATTR                8 (chat)
+               LOAD_ATTR               10 (completions)
+               LOAD_ATTR               13 (create + NULL|self)
+
+ 798           LOAD_CONST               6 ('gpt-4o-mini')
+
+ 799           LOAD_CONST               7 ('role')
+               LOAD_CONST               8 ('user')
+               LOAD_CONST               9 ('content')
+               LOAD_FAST_BORROW         5 (prompt)
+               BUILD_MAP                2
+               BUILD_LIST               1
+
+ 800           LOAD_CONST              10 (0.1)
+
+ 801           LOAD_CONST              11 (300)
+
+ 797           LOAD_CONST              12 (('model', 'messages', 'temperature', 'max_tokens'))
+               CALL_KW                  4
+               STORE_FAST               6 (resp)
+
+ 803           LOAD_FAST_BORROW         6 (resp)
+               LOAD_ATTR               14 (choices)
+               LOAD_SMALL_INT           0
+               BINARY_OP               26 ([])
+               LOAD_ATTR               16 (message)
+               LOAD_ATTR               18 (content)
+               LOAD_ATTR               21 (strip + NULL|self)
+               CALL                     0
+       L3:     RETURN_VALUE
+
+  --   L4:     PUSH_EXC_INFO
+
+ 804           LOAD_GLOBAL             22 (Exception)
+               CHECK_EXC_MATCH
+               POP_JUMP_IF_FALSE        6 (to L6)
+               NOT_TAKEN
+               POP_TOP
+
+ 805           LOAD_FAST                0 (text)
+               SWAP                     2
+       L5:     POP_EXCEPT
+               RETURN_VALUE
+
+ 804   L6:     RERAISE                  0
+
+  --   L7:     COPY                     3
+               POP_EXCEPT
+               RERAISE                  1
+ExceptionTable:
+  L2 to L3 -> L4 [0]
+  L4 to L5 -> L7 [1] lasti
+  L6 to L7 -> L7 [1] lasti

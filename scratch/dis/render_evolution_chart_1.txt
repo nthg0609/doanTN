@@ -1,0 +1,808 @@
+1708            RESUME                   0
+
+1710            LOAD_GLOBAL              1 (list + NULL)
+                LOAD_GLOBAL              3 (set + NULL)
+                LOAD_CONST               1 (<code object <genexpr> at 0x000002602A351630, file "D:\DoAn_DaLieu\app_streamlit.py", line 1710>)
+                MAKE_FUNCTION
+                LOAD_FAST_BORROW         0 (visits)
+                GET_ITER
+                CALL                     0
+                CALL                     1
+                CALL                     1
+                STORE_FAST               2 (unique_locs)
+
+1712            LOAD_FAST_BORROW         1 (selected_location)
+                LOAD_CONST               2 ('Tất cả vị trí')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       41 (to L1)
+                NOT_TAKEN
+                LOAD_GLOBAL              5 (len + NULL)
+                LOAD_FAST_BORROW         2 (unique_locs)
+                CALL                     1
+                LOAD_SMALL_INT           1
+                COMPARE_OP             148 (bool(>))
+                POP_JUMP_IF_FALSE       25 (to L1)
+                NOT_TAKEN
+
+1713            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR                8 (info)
+                PUSH_NULL
+                LOAD_CONST               3 (' Bệnh nhân này có tổn thương ở nhiều vị trí khác nhau. Vui lòng chọn một vị trí tổn thương cụ thể từ bộ lọc bên trên để xem đồ thị tiến triển chi tiết của tổn thương đó.')
+                CALL                     1
+                POP_TOP
+
+1714            LOAD_CONST               4 (None)
+                RETURN_VALUE
+
+1716    L1:     LOAD_GLOBAL              5 (len + NULL)
+                LOAD_FAST_BORROW         0 (visits)
+                CALL                     1
+                LOAD_SMALL_INT           2
+                COMPARE_OP              18 (bool(<))
+                POP_JUMP_IF_FALSE       25 (to L2)
+                NOT_TAKEN
+
+1717            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR                8 (info)
+                PUSH_NULL
+                LOAD_CONST               5 (' Cần ít nhất 2 mốc khám của cùng một tổn thương để vẽ biểu đồ theo dõi tiến triển lâm sàng.')
+                CALL                     1
+                POP_TOP
+
+1718            LOAD_CONST               4 (None)
+                RETURN_VALUE
+
+1721    L2:     LOAD_GLOBAL             11 (sorted + NULL)
+                LOAD_FAST_BORROW         0 (visits)
+                LOAD_CONST               6 (<code object <lambda> at 0x000002602A3F6930, file "D:\DoAn_DaLieu\app_streamlit.py", line 1721>)
+                MAKE_FUNCTION
+                LOAD_CONST               7 (('key',))
+                CALL_KW                  2
+                STORE_FAST               3 (sorted_visits)
+
+1723            BUILD_LIST               0
+                STORE_FAST               4 (dates)
+
+1724            BUILD_LIST               0
+                STORE_FAST               5 (area_ratios)
+
+1725            BUILD_LIST               0
+                STORE_FAST               6 (borders)
+
+1726            BUILD_LIST               0
+                STORE_FAST               7 (asymmetries)
+
+1727            BUILD_LIST               0
+                STORE_FAST               8 (circularities)
+
+1728            BUILD_LIST               0
+                STORE_FAST               9 (confidences)
+
+1729            BUILD_LIST               0
+                STORE_FAST              10 (predictions)
+
+1731            LOAD_FAST_BORROW         3 (sorted_visits)
+                GET_ITER
+        L3:     EXTENDED_ARG             1
+                FOR_ITER               341 (to L6)
+                STORE_FAST              11 (v)
+
+1732            LOAD_FAST_BORROW        11 (v)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST               8 ('created_at')
+                LOAD_CONST               9 ('N/A')
+                CALL                     2
+                STORE_FAST              12 (v_time)
+
+1733            NOP
+
+1734    L4:     LOAD_GLOBAL             14 (datetime)
+                LOAD_ATTR               16 (strptime)
+                PUSH_NULL
+                LOAD_FAST_BORROW        12 (v_time)
+                LOAD_CONST              10 ('%Y/%m/%d %H:%M:%S')
+                CALL                     2
+                STORE_FAST              13 (dt)
+
+1735            LOAD_FAST_BORROW        13 (dt)
+                LOAD_ATTR               19 (strftime + NULL|self)
+                LOAD_CONST              11 ('%d/%m %H:%M')
+                CALL                     1
+                STORE_FAST              14 (short_time)
+
+1739    L5:     LOAD_FAST_BORROW         4 (dates)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_FAST_BORROW        14 (short_time)
+                CALL                     1
+                POP_TOP
+
+1741            LOAD_FAST_BORROW        11 (v)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              12 ('ai_extracted_metrics')
+                BUILD_MAP                0
+                CALL                     2
+                STORE_FAST              15 (metrics)
+
+1742            LOAD_FAST_BORROW         5 (area_ratios)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST_BORROW        15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              13 ('area_ratio')
+                LOAD_CONST              14 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1743            LOAD_FAST_BORROW         6 (borders)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST_BORROW        15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              15 ('border_complexity')
+                LOAD_CONST              14 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1744            LOAD_FAST_BORROW         7 (asymmetries)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST_BORROW        15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              16 ('asymmetry')
+                LOAD_CONST              14 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1745            LOAD_FAST_BORROW         8 (circularities)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST_BORROW        15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              17 ('circularity')
+                LOAD_CONST              14 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1747            LOAD_FAST_BORROW         9 (confidences)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_GLOBAL             25 (float + NULL)
+                LOAD_FAST_BORROW        15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              18 ('confidence')
+                LOAD_CONST              14 (0.0)
+                CALL                     2
+                CALL                     1
+                CALL                     1
+                POP_TOP
+
+1748            LOAD_FAST_BORROW        10 (predictions)
+                LOAD_ATTR               23 (append + NULL|self)
+                LOAD_FAST_BORROW        15 (metrics)
+                LOAD_ATTR               13 (get + NULL|self)
+                LOAD_CONST              19 ('prediction')
+                LOAD_CONST               9 ('N/A')
+                CALL                     2
+                CALL                     1
+                POP_TOP
+                EXTENDED_ARG             1
+                JUMP_BACKWARD          344 (to L3)
+
+1731    L6:     END_FOR
+                POP_ITER
+
+1750            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               26 (subheader)
+                PUSH_NULL
+                LOAD_CONST              20 (' Đồ thị Tiến triển Lâm sàng theo Thời gian')
+                CALL                     1
+                POP_TOP
+
+1752            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               28 (tabs)
+                PUSH_NULL
+                BUILD_LIST               0
+                LOAD_CONST              81 ((' Diện tích & Độ phức tạp bờ', ' Đối xứng & Độ tròn', ' Độ tin cậy Chẩn đoán'))
+                LIST_EXTEND              1
+                CALL                     1
+                STORE_FAST              16 (chart_tabs)
+
+1754            LOAD_FAST_BORROW        16 (chart_tabs)
+                LOAD_SMALL_INT           0
+                BINARY_OP               26 ([])
+                COPY                     1
+                LOAD_SPECIAL             1 (__exit__)
+                SWAP                     2
+                SWAP                     3
+                LOAD_SPECIAL             0 (__enter__)
+                CALL                     0
+        L7:     POP_TOP
+
+1755            LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               32 (Figure)
+                PUSH_NULL
+                CALL                     0
+                STORE_FAST              17 (fig1)
+
+1756            LOAD_FAST_BORROW        17 (fig1)
+                LOAD_ATTR               35 (add_trace + NULL|self)
+                LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               36 (Scatter)
+                PUSH_NULL
+
+1757            LOAD_FAST_BORROW_LOAD_FAST_BORROW 69 (dates, area_ratios)
+                LOAD_CONST              21 ('Area ratio (Trục trái)')
+
+1758            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              22 ('#63b3ed')
+                LOAD_SMALL_INT           3
+                LOAD_CONST              23 (('color', 'width'))
+                CALL_KW                  2
+
+1759            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_SMALL_INT           8
+                LOAD_CONST              24 (('size',))
+                CALL_KW                  1
+
+1760            LOAD_CONST              25 ('Thời gian: %{x}<br>Area ratio: %{y:.4f}<extra></extra>')
+
+1756            LOAD_CONST              26 (('x', 'y', 'name', 'line', 'marker', 'hovertemplate'))
+                CALL_KW                  6
+                CALL                     1
+                POP_TOP
+
+1762            LOAD_FAST_BORROW        17 (fig1)
+                LOAD_ATTR               35 (add_trace + NULL|self)
+                LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               36 (Scatter)
+                PUSH_NULL
+
+1763            LOAD_FAST_BORROW_LOAD_FAST_BORROW 70 (dates, borders)
+                LOAD_CONST              27 ('Border complexity (Trục phải)')
+
+1764            LOAD_CONST              28 ('y2')
+
+1765            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              29 ('#fc8181')
+                LOAD_SMALL_INT           3
+                LOAD_CONST              30 ('dash')
+                LOAD_CONST              31 (('color', 'width', 'dash'))
+                CALL_KW                  3
+
+1766            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_SMALL_INT           8
+                LOAD_CONST              24 (('size',))
+                CALL_KW                  1
+
+1767            LOAD_CONST              32 ('Thời gian: %{x}<br>Border: %{y:.2f}<extra></extra>')
+
+1762            LOAD_CONST              33 (('x', 'y', 'name', 'yaxis', 'line', 'marker', 'hovertemplate'))
+                CALL_KW                  7
+                CALL                     1
+                POP_TOP
+
+1770            LOAD_FAST_BORROW        17 (fig1)
+                LOAD_ATTR               41 (update_layout + NULL|self)
+
+1771            LOAD_CONST              34 ('rgba(255,255,255,0.6)')
+
+1772            LOAD_CONST              34 ('rgba(255,255,255,0.6)')
+
+1773            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              35 ('#1e293b')
+                LOAD_CONST              36 (('color',))
+                CALL_KW                  1
+
+1774            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_SMALL_INT          40
+                LOAD_SMALL_INT          40
+                LOAD_SMALL_INT          30
+                LOAD_SMALL_INT          30
+                LOAD_CONST              37 (('l', 'r', 't', 'b'))
+                CALL_KW                  4
+
+1775            LOAD_CONST              38 (280)
+
+1776            LOAD_CONST              39 (True)
+
+1777            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              40 ('h')
+                LOAD_CONST              41 ('bottom')
+                LOAD_CONST              42 (1.02)
+                LOAD_CONST              43 ('right')
+                LOAD_SMALL_INT           1
+                LOAD_CONST              44 (('orientation', 'yanchor', 'y', 'xanchor', 'x'))
+                CALL_KW                  5
+
+1778            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              45 ('rgba(0,0,0,0.08)')
+                LOAD_CONST              46 (('gridcolor',))
+                CALL_KW                  1
+
+1779            LOAD_GLOBAL             39 (dict + NULL)
+
+1780            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              47 ('Area ratio')
+                LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              48 ('#0284c7')
+                LOAD_CONST              36 (('color',))
+                CALL_KW                  1
+                LOAD_CONST              49 (('text', 'font'))
+                CALL_KW                  2
+
+1781            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              48 ('#0284c7')
+                LOAD_CONST              36 (('color',))
+                CALL_KW                  1
+
+1782            LOAD_CONST              45 ('rgba(0,0,0,0.08)')
+
+1779            LOAD_CONST              50 (('title', 'tickfont', 'gridcolor'))
+                CALL_KW                  3
+
+1784            LOAD_GLOBAL             39 (dict + NULL)
+
+1785            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              51 ('Border complexity')
+                LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              52 ('#e53e3e')
+                LOAD_CONST              36 (('color',))
+                CALL_KW                  1
+                LOAD_CONST              49 (('text', 'font'))
+                CALL_KW                  2
+
+1786            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              52 ('#e53e3e')
+                LOAD_CONST              36 (('color',))
+                CALL_KW                  1
+
+1787            LOAD_CONST              53 ('y')
+
+1788            LOAD_CONST              43 ('right')
+
+1784            LOAD_CONST              54 (('title', 'tickfont', 'overlaying', 'side'))
+                CALL_KW                  4
+
+1770            LOAD_CONST              55 (('plot_bgcolor', 'paper_bgcolor', 'font', 'margin', 'height', 'showlegend', 'legend', 'xaxis', 'yaxis', 'yaxis2'))
+                CALL_KW                 10
+                POP_TOP
+
+1791            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               42 (plotly_chart)
+                PUSH_NULL
+                LOAD_FAST_BORROW        17 (fig1)
+                LOAD_CONST              39 (True)
+                LOAD_CONST              56 (('use_container_width',))
+                CALL_KW                  2
+                POP_TOP
+
+1754    L8:     LOAD_CONST               4 (None)
+                LOAD_CONST               4 (None)
+                LOAD_CONST               4 (None)
+                CALL                     3
+                POP_TOP
+
+1793    L9:     LOAD_FAST_BORROW        16 (chart_tabs)
+                LOAD_SMALL_INT           1
+                BINARY_OP               26 ([])
+                COPY                     1
+                LOAD_SPECIAL             1 (__exit__)
+                SWAP                     2
+                SWAP                     3
+                LOAD_SPECIAL             0 (__enter__)
+                CALL                     0
+       L10:     POP_TOP
+
+1794            LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               32 (Figure)
+                PUSH_NULL
+                CALL                     0
+                STORE_FAST              18 (fig2)
+
+1795            LOAD_FAST_BORROW        18 (fig2)
+                LOAD_ATTR               35 (add_trace + NULL|self)
+                LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               36 (Scatter)
+                PUSH_NULL
+
+1796            LOAD_FAST_BORROW_LOAD_FAST_BORROW 71 (dates, asymmetries)
+                LOAD_CONST              57 ('Asymmetry')
+
+1797            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              58 ('#ed8936')
+                LOAD_SMALL_INT           3
+                LOAD_CONST              23 (('color', 'width'))
+                CALL_KW                  2
+
+1798            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_SMALL_INT           8
+                LOAD_CONST              24 (('size',))
+                CALL_KW                  1
+
+1799            LOAD_CONST              59 ('Thời gian: %{x}<br>Asymmetry: %{y:.4f}<extra></extra>')
+
+1795            LOAD_CONST              26 (('x', 'y', 'name', 'line', 'marker', 'hovertemplate'))
+                CALL_KW                  6
+                CALL                     1
+                POP_TOP
+
+1801            LOAD_FAST_BORROW        18 (fig2)
+                LOAD_ATTR               35 (add_trace + NULL|self)
+                LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               36 (Scatter)
+                PUSH_NULL
+
+1802            LOAD_FAST_BORROW_LOAD_FAST_BORROW 72 (dates, circularities)
+                LOAD_CONST              60 ('Circularity')
+
+1803            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              61 ('#48bb78')
+                LOAD_SMALL_INT           3
+                LOAD_CONST              23 (('color', 'width'))
+                CALL_KW                  2
+
+1804            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_SMALL_INT           8
+                LOAD_CONST              24 (('size',))
+                CALL_KW                  1
+
+1805            LOAD_CONST              62 ('Thời gian: %{x}<br>Circularity: %{y:.4f}<extra></extra>')
+
+1801            LOAD_CONST              26 (('x', 'y', 'name', 'line', 'marker', 'hovertemplate'))
+                CALL_KW                  6
+                CALL                     1
+                POP_TOP
+
+1807            LOAD_FAST               18 (fig2)
+                LOAD_ATTR               41 (update_layout + NULL|self)
+
+1808            LOAD_CONST              34 ('rgba(255,255,255,0.6)')
+
+1809            LOAD_CONST              34 ('rgba(255,255,255,0.6)')
+
+1810            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              35 ('#1e293b')
+                LOAD_CONST              36 (('color',))
+                CALL_KW                  1
+
+1811            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_SMALL_INT          40
+                LOAD_SMALL_INT          40
+                LOAD_SMALL_INT          30
+                LOAD_SMALL_INT          30
+                LOAD_CONST              37 (('l', 'r', 't', 'b'))
+                CALL_KW                  4
+
+1812            LOAD_CONST              38 (280)
+
+1813            LOAD_CONST              39 (True)
+
+1814            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              40 ('h')
+                LOAD_CONST              41 ('bottom')
+                LOAD_CONST              42 (1.02)
+                LOAD_CONST              43 ('right')
+                LOAD_SMALL_INT           1
+                LOAD_CONST              44 (('orientation', 'yanchor', 'y', 'xanchor', 'x'))
+                CALL_KW                  5
+
+1815            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              45 ('rgba(0,0,0,0.08)')
+                LOAD_CONST              46 (('gridcolor',))
+                CALL_KW                  1
+
+1816            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_GLOBAL             44 (is_english)
+                TO_BOOL
+                POP_JUMP_IF_TRUE         3 (to L11)
+                NOT_TAKEN
+                LOAD_CONST              63 ('Giá trị [0 - 1]')
+                JUMP_FORWARD             1 (to L12)
+       L11:     LOAD_CONST              64 ('Value [0 - 1]')
+       L12:     LOAD_CONST              82 (-0.05)
+                LOAD_CONST              65 (1.05)
+                BUILD_LIST               2
+                LOAD_CONST              45 ('rgba(0,0,0,0.08)')
+                LOAD_CONST              66 (('title', 'range', 'gridcolor'))
+                CALL_KW                  3
+
+1807            LOAD_CONST              67 (('plot_bgcolor', 'paper_bgcolor', 'font', 'margin', 'height', 'showlegend', 'legend', 'xaxis', 'yaxis'))
+                CALL_KW                  9
+                POP_TOP
+
+1818            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               42 (plotly_chart)
+                PUSH_NULL
+                LOAD_FAST_BORROW        18 (fig2)
+                LOAD_CONST              39 (True)
+                LOAD_CONST              56 (('use_container_width',))
+                CALL_KW                  2
+                POP_TOP
+
+1793   L13:     LOAD_CONST               4 (None)
+                LOAD_CONST               4 (None)
+                LOAD_CONST               4 (None)
+                CALL                     3
+                POP_TOP
+
+1820   L14:     LOAD_FAST_BORROW        16 (chart_tabs)
+                LOAD_SMALL_INT           2
+                BINARY_OP               26 ([])
+                COPY                     1
+                LOAD_SPECIAL             1 (__exit__)
+                SWAP                     2
+                SWAP                     3
+                LOAD_SPECIAL             0 (__enter__)
+                CALL                     0
+       L15:     POP_TOP
+
+1821            LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               32 (Figure)
+                PUSH_NULL
+                CALL                     0
+                STORE_FAST              19 (fig3)
+
+1822            LOAD_GLOBAL             47 (zip + NULL)
+                LOAD_FAST_BORROW_LOAD_FAST_BORROW 169 (predictions, confidences)
+                CALL                     2
+                GET_ITER
+                LOAD_FAST_AND_CLEAR     20 (p)
+                LOAD_FAST_AND_CLEAR     21 (c)
+                SWAP                     3
+       L16:     BUILD_LIST               0
+                SWAP                     2
+       L17:     FOR_ITER                15 (to L18)
+                UNPACK_SEQUENCE          2
+                STORE_FAST              20 (p)
+                STORE_FAST              21 (c)
+                LOAD_FAST_BORROW        20 (p)
+                FORMAT_SIMPLE
+                LOAD_CONST              68 (' (')
+                LOAD_FAST_BORROW        21 (c)
+                LOAD_CONST              69 ('.1%')
+                FORMAT_WITH_SPEC
+                LOAD_CONST              70 (')')
+                BUILD_STRING             4
+                LIST_APPEND              2
+                JUMP_BACKWARD           17 (to L17)
+       L18:     END_FOR
+                POP_ITER
+       L19:     STORE_FAST              22 (text_labels)
+                STORE_FAST              20 (p)
+                STORE_FAST              21 (c)
+
+1823            LOAD_FAST_BORROW        19 (fig3)
+                LOAD_ATTR               35 (add_trace + NULL|self)
+                LOAD_GLOBAL             30 (go)
+                LOAD_ATTR               36 (Scatter)
+                PUSH_NULL
+
+1824            LOAD_FAST_BORROW_LOAD_FAST_BORROW 73 (dates, confidences)
+                LOAD_CONST              71 ('Độ tin cậy')
+
+1825            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              72 ('#d53f8c')
+                LOAD_SMALL_INT           3
+                LOAD_CONST              23 (('color', 'width'))
+                CALL_KW                  2
+
+1826            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_SMALL_INT          10
+                LOAD_CONST              73 ('diamond')
+                LOAD_CONST              74 (('size', 'symbol'))
+                CALL_KW                  2
+
+1827            LOAD_FAST_BORROW        22 (text_labels)
+
+1828            LOAD_CONST              75 ('Thời gian: %{x}<br>Dự đoán: %{text}<extra></extra>')
+
+1823            LOAD_CONST              76 (('x', 'y', 'name', 'line', 'marker', 'text', 'hovertemplate'))
+                CALL_KW                  7
+                CALL                     1
+                POP_TOP
+
+1830            LOAD_FAST               19 (fig3)
+                LOAD_ATTR               41 (update_layout + NULL|self)
+
+1831            LOAD_CONST              34 ('rgba(255,255,255,0.6)')
+
+1832            LOAD_CONST              34 ('rgba(255,255,255,0.6)')
+
+1833            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              35 ('#1e293b')
+                LOAD_CONST              36 (('color',))
+                CALL_KW                  1
+
+1834            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_SMALL_INT          40
+                LOAD_SMALL_INT          40
+                LOAD_SMALL_INT          30
+                LOAD_SMALL_INT          30
+                LOAD_CONST              37 (('l', 'r', 't', 'b'))
+                CALL_KW                  4
+
+1835            LOAD_CONST              38 (280)
+
+1836            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_CONST              45 ('rgba(0,0,0,0.08)')
+                LOAD_CONST              46 (('gridcolor',))
+                CALL_KW                  1
+
+1837            LOAD_GLOBAL             39 (dict + NULL)
+                LOAD_GLOBAL             44 (is_english)
+                TO_BOOL
+                POP_JUMP_IF_TRUE         3 (to L20)
+                NOT_TAKEN
+                LOAD_CONST              71 ('Độ tin cậy')
+                JUMP_FORWARD             1 (to L21)
+       L20:     LOAD_CONST              77 ('Confidence')
+       L21:     LOAD_CONST              14 (0.0)
+                LOAD_CONST              65 (1.05)
+                BUILD_LIST               2
+                LOAD_CONST              78 ('.0%')
+                LOAD_CONST              45 ('rgba(0,0,0,0.08)')
+                LOAD_CONST              79 (('title', 'range', 'tickformat', 'gridcolor'))
+                CALL_KW                  4
+
+1830            LOAD_CONST              80 (('plot_bgcolor', 'paper_bgcolor', 'font', 'margin', 'height', 'xaxis', 'yaxis'))
+                CALL_KW                  7
+                POP_TOP
+
+1839            LOAD_GLOBAL              6 (st)
+                LOAD_ATTR               42 (plotly_chart)
+                PUSH_NULL
+                LOAD_FAST_BORROW        19 (fig3)
+                LOAD_CONST              39 (True)
+                LOAD_CONST              56 (('use_container_width',))
+                CALL_KW                  2
+                POP_TOP
+
+1820   L22:     LOAD_CONST               4 (None)
+                LOAD_CONST               4 (None)
+                LOAD_CONST               4 (None)
+                CALL                     3
+                POP_TOP
+                LOAD_CONST               4 (None)
+                RETURN_VALUE
+
+  --   L23:     PUSH_EXC_INFO
+
+1736            LOAD_GLOBAL             20 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        7 (to L25)
+                NOT_TAKEN
+                POP_TOP
+
+1737            LOAD_FAST               12 (v_time)
+                STORE_FAST              14 (short_time)
+       L24:     POP_EXCEPT
+                EXTENDED_ARG             4
+                JUMP_BACKWARD_NO_INTERRUPT 1265 (to L5)
+
+1736   L25:     RERAISE                  0
+
+  --   L26:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+
+1754   L27:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         2 (to L28)
+                NOT_TAKEN
+                RERAISE                  2
+       L28:     POP_TOP
+       L29:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                POP_TOP
+                EXTENDED_ARG             2
+                JUMP_BACKWARD_NO_INTERRUPT 597 (to L9)
+
+  --   L30:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+
+1793   L31:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         2 (to L32)
+                NOT_TAKEN
+                RERAISE                  2
+       L32:     POP_TOP
+       L33:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                POP_TOP
+                EXTENDED_ARG             1
+                JUMP_BACKWARD_NO_INTERRUPT 319 (to L14)
+
+  --   L34:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L35:     SWAP                     2
+                POP_TOP
+
+1822            SWAP                     3
+                STORE_FAST              21 (c)
+                STORE_FAST              20 (p)
+                RERAISE                  0
+
+1820   L36:     PUSH_EXC_INFO
+                WITH_EXCEPT_START
+                TO_BOOL
+                POP_JUMP_IF_TRUE         2 (to L37)
+                NOT_TAKEN
+                RERAISE                  2
+       L37:     POP_TOP
+       L38:     POP_EXCEPT
+                POP_TOP
+                POP_TOP
+                POP_TOP
+                LOAD_CONST               4 (None)
+                RETURN_VALUE
+
+  --   L39:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L4 to L5 -> L23 [1]
+  L7 to L8 -> L27 [2] lasti
+  L10 to L13 -> L31 [2] lasti
+  L15 to L16 -> L36 [2] lasti
+  L16 to L19 -> L35 [5]
+  L19 to L22 -> L36 [2] lasti
+  L23 to L24 -> L26 [2] lasti
+  L25 to L26 -> L26 [2] lasti
+  L27 to L29 -> L30 [4] lasti
+  L31 to L33 -> L34 [4] lasti
+  L35 to L36 -> L36 [2] lasti
+  L36 to L38 -> L39 [4] lasti
+
+Disassembly of <code object <genexpr> at 0x000002602A351630, file "D:\DoAn_DaLieu\app_streamlit.py", line 1710>:
+1710           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+       L2:     FOR_ITER                60 (to L3)
+               STORE_FAST               1 (v)
+               LOAD_GLOBAL              1 (str + NULL)
+               LOAD_FAST_BORROW         1 (v)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               0 ('location')
+               LOAD_CONST               1 ('Không rõ')
+               CALL                     2
+               CALL                     1
+               LOAD_ATTR                5 (strip + NULL|self)
+               CALL                     0
+               LOAD_ATTR                7 (capitalize + NULL|self)
+               CALL                     0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           62 (to L2)
+       L3:     END_FOR
+               POP_ITER
+               LOAD_CONST               2 (None)
+               RETURN_VALUE
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <lambda> at 0x000002602A3F6930, file "D:\DoAn_DaLieu\app_streamlit.py", line 1721>:
+1721           RESUME                   0
+               LOAD_FAST_BORROW         0 (x)
+               LOAD_ATTR                1 (get + NULL|self)
+               LOAD_CONST               0 ('timestamp_id')
+               LOAD_CONST               1 ('')
+               CALL                     2
+               RETURN_VALUE

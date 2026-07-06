@@ -1,0 +1,24 @@
+120           RESUME                   0
+              LOAD_FAST_BORROW         0 (format)
+              LOAD_SMALL_INT           2
+              COMPARE_OP             132 (>)
+              POP_JUMP_IF_FALSE        3 (to L1)
+              NOT_TAKEN
+              LOAD_COMMON_CONSTANT     1 (NotImplementedError)
+              RAISE_VARARGS            1
+      L1:     LOAD_CONST               1 ('img_rgb')
+              LOAD_GLOBAL              0 (np)
+              LOAD_ATTR                2 (ndarray)
+              LOAD_CONST               2 ('mask')
+              LOAD_GLOBAL              0 (np)
+              LOAD_ATTR                2 (ndarray)
+              LOAD_CONST               3 ('return')
+              LOAD_GLOBAL              4 (List)
+              LOAD_GLOBAL              6 (Dict)
+              LOAD_GLOBAL              8 (str)
+              LOAD_GLOBAL             10 (Any)
+              BUILD_TUPLE              2
+              BINARY_OP               26 ([])
+              BINARY_OP               26 ([])
+              BUILD_MAP                3
+              RETURN_VALUE

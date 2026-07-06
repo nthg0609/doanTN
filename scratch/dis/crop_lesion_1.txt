@@ -1,0 +1,53 @@
+171           RESUME                   0
+
+175           LOAD_FAST_BORROW         0 (img_rgb)
+              LOAD_ATTR                0 (shape)
+              UNPACK_SEQUENCE          3
+              STORE_FAST_STORE_FAST   52 (h, w)
+              STORE_FAST               5 (_)
+
+176           LOAD_FAST_BORROW         1 (bbox)
+              UNPACK_SEQUENCE          4
+              STORE_FAST_STORE_FAST  103 (x, y)
+              STORE_FAST_STORE_FAST  137 (bw, bh)
+
+179           LOAD_GLOBAL              3 (max + NULL)
+              LOAD_SMALL_INT           0
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 98 (x, padding)
+              BINARY_OP               10 (-)
+              CALL                     2
+              STORE_FAST              10 (x_min)
+
+180           LOAD_GLOBAL              3 (max + NULL)
+              LOAD_SMALL_INT           0
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 114 (y, padding)
+              BINARY_OP               10 (-)
+              CALL                     2
+              STORE_FAST              11 (y_min)
+
+181           LOAD_GLOBAL              5 (min + NULL)
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 70 (w, x)
+              LOAD_FAST_BORROW         8 (bw)
+              BINARY_OP                0 (+)
+              LOAD_FAST_BORROW         2 (padding)
+              BINARY_OP                0 (+)
+              CALL                     2
+              STORE_FAST              12 (x_max)
+
+182           LOAD_GLOBAL              5 (min + NULL)
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 55 (h, y)
+              LOAD_FAST_BORROW         9 (bh)
+              BINARY_OP                0 (+)
+              LOAD_FAST_BORROW         2 (padding)
+              BINARY_OP                0 (+)
+              CALL                     2
+              STORE_FAST              13 (y_max)
+
+184           LOAD_FAST_BORROW_LOAD_FAST_BORROW 11 (img_rgb, y_min)
+              LOAD_FAST_BORROW        13 (y_max)
+              BUILD_SLICE              2
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 172 (x_min, x_max)
+              BUILD_SLICE              2
+              BUILD_TUPLE              2
+              BINARY_OP               26 ([])
+              RETURN_VALUE

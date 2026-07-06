@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Voice Input</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+      background: transparent;
+      padding: 0;
+      overflow: hidden;
+    }
+    #voice-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      height: 38px;
+    }
+    #btn-toggle {
+      padding: 6px 14px;
+      border: 1px solid #3b82f6;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      outline: none;
+      white-space: nowrap;
+    }
+    #btn-toggle.idle {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+    }
+    #btn-toggle.idle:hover { background: rgba(59, 130, 246, 0.25); }
+    #btn-toggle.listening {
+      background: #ef4444;
+      color: #fff;
+      border-color: #ef4444;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70%  { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    #status-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    #status-badge.idle   { background: rgba(255,255,255,0.05); color: #94a3b8; }
+    #status-badge.active { background: rgba(239,68,68,0.1);    color: #f87171; }
+    #status-badge.done   { background: rgba(34,197,94,0.1);    color: #4ade80; }
+    #status-badge.error  { background: rgba(234,179,8,0.1);    color: #facc15; }
+    #not-supported {
+      display: none;
+      background: rgba(234,179,8,0.1);
+      border: 1px solid rgba(234,179,8,0.3);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      color: #facc15;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+<div id="voice-container">
+  <div id="not-supported">Trình duyệt không hỗ trợ nhận dạng giọng nói trực tiếp.</div>
+  <button id="btn-toggle" class="idle">Bắt đầu nói</button>
+  <span id="status-badge" class="idle">Sẵn sàng mic</span>
+</div>
+<script>
+  /* ── Streamlit messaging ── */
+  function sendToStreamlit(type, payload) {
+    window.parent.postMessage(
+      Object.assign({ isStreamlitMessage: true, type: type }, payload),
+      "*"
+    );
+  }
+  function setFrameHeight(h) {
+    sendToStreamlit("streamlit:setFrameHeight", { height: h });
+  }
+  function setComponentValue(val) {
+    sendToStreamlit("streamlit:setComponentValue", { value: val });
+  }
+
+  sendToStreamlit("streamlit:componentReady", { apiVersion: 1 });
+
+  let LANGUAGE = "vi-VN";
+  window.addEventListener("message", function(ev) {
+    if (ev.data && ev.data.type === "streamlit:render") {
+      const args = ev.data.args || {};
+      if (args.language) LANGUAGE = args.language;
+      updateHeight();
+    }
+  });
+
+  /* ── Speech Recognition ── */
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const btnToggle   = document.getElementById("btn-toggle");
+  const statusBadge = document.getElementById("status-badge");
+
+  let recognition  = null;
+  let isListening  = false;
+  let finalText    = "";
+
+  if (!SpeechRecognition) {
+    document.getElementById("not-supported").style.display = "block";
+    btnToggle.style.display   = "none";
+    statusBadge.style.display = "none";
+  } else {
+    initRecognition();
+  }
+
+  function initRecognition() {
+    recognition = new SpeechRecognition();
+    recognition.lang             = LANGUAGE;
+    recognition.interimResults   = true;
+    recognition.continuous       = true;
+    recognition.maxAlternatives  = 1;
+
+    recognition.onstart = function() {
+      isListening = true;
+      btnToggle.textContent   = "Dừng lại";
+      btnToggle.className     = "listening";
+      statusBadge.className   = "active";
+      statusBadge.textContent = "Đang nghe...";
+      updateHeight();
+    };
+
+    recognition.onresult = function(event) {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalText += (finalText ? " " : "") + t.trim();
+        } else {
+          interim += t;
+        }
+      }
+      const displayText = finalText + (interim ? " " + interim : "");
+      injectToDom(displayText);
+    };
+
+    recognition.onerror = function(event) {
+      statusBadge.className   = "error";
+      statusBadge.textContent = "Lỗi mic: " + event.error;
+      doStop();
+    };
+
+    recognition.onend = function() {
+      if (isListening) {
+        try { recognition.start(); } catch(e) { doStop(); }
+      }
+    };
+  }
+
+  /* Ghi trực tiếp vào React state của input bằng prototype setter + xóa tracker */
+  function injectToDom(text) {
+    try {
+      const parentWindow = window.parent;
+      const parentDoc = parentWindow.document;
+      const inp = parentDoc.querySelector('input[placeholder*="nhập hoặc nói"]')
+               || parentDoc.querySelector('input[placeholder*="Nhập hoặc nói"]')
+               || parentDoc.querySelector('input[placeholder*="câu hỏi của bạn"]');
+      if (inp) {
+        let nativeValueSetter = null;
+        try {
+          let proto = Object.getPrototypeOf(inp);
+          while (proto) {
+            const desc = Object.getOwnPropertyDescriptor(proto, "value");
+            if (desc && desc.set) {
+              nativeValueSetter = desc.set;
+              break;
+            }
+            proto = Object.getPrototypeOf(proto);
+          }
+        } catch (e) {}
+
+        if (nativeValueSetter) {
+          nativeValueSetter.call(inp, text);
+        } else {
+          inp.value = text;
+        }
+
+        // Xóa value tracker của React để cập nhật tức thì
+        try { delete inp._valueTracker; } catch(e) {}
+
+        // Phát sự kiện để React nhận biết thay đổi
+        inp.dispatchEvent(new Event("input", { bubbles: true }));
+        inp.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    } catch(e) {}
+  }
+
+  function startListening() {
+    finalText = "";
+    recognition.lang = LANGUAGE;
+    try { recognition.start(); } catch(e) {}
+  }
+
+  function doStop() {
+    isListening = false;
+    try { recognition.stop(); } catch(e) {}
+    btnToggle.textContent   = "Bắt đầu nói";
+    btnToggle.className     = "idle";
+    statusBadge.className   = "idle";
+    statusBadge.textContent = "Sẵn sàng mic";
+    updateHeight();
+  }
+
+  btnToggle.addEventListener("click", function() {
+    if (isListening) {
+      doStop();
+    } else {
+      startListening();
+    }
+  });
+
+  /* Lắng nghe phím Enter và click chuột gửi: Ghi đè trực tiếp hàm callback để dọn dẹp các closure cũ khi thay đổi iframe */
+  function attachStreamlitListeners() {
+    try {
+      const parentDoc = window.parent.document;
+      const inp = parentDoc.querySelector('input[placeholder*="nhập hoặc nói"]')
+               || parentDoc.querySelector('input[placeholder*="Nhập hoặc nói"]')
+               || parentDoc.querySelector('input[placeholder*="câu hỏi của bạn"]');
+      
+      if (inp) {
+        // Ghi đè trực tiếp onkeydown để thay thế hoàn toàn handler cũ của phiên bản iframe trước
+        inp.onkeydown = function(ev) {
+          if (ev.key === "Enter" && !ev.shiftKey) {
+            if (isListening) {
+              doStop();
+            }
+            const val = inp.value;
+            if (val.trim()) {
+              setComponentValue({ text: val.trim(), submit: true, ts: Date.now() });
+            }
+          }
+        };
+      }
+
+      const btn = Array.from(parentDoc.querySelectorAll("button"))
+                       .find(b => b.textContent.trim() === "➤");
+      if (btn) {
+        // Ghi đè trực tiếp onmousedown để trỏ chính xác về iframe đang hoạt động hiện tại
+        btn.onmousedown = function() {
+          if (isListening) {
+            doStop();
+          }
+          const val = inp ? inp.value : "";
+          if (val.trim()) {
+            setComponentValue({ text: val.trim(), submit: true, ts: Date.now() });
+          }
+        };
+      }
+    } catch(e) {}
+  }
+  
+  setInterval(attachStreamlitListeners, 100);
+
+  function updateHeight() {
+    setFrameHeight(document.getElementById("voice-container").scrollHeight + 4);
+  }
+  setTimeout(updateHeight, 150);
+</script>
+</body>
+</html>

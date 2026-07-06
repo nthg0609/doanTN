@@ -1,0 +1,114 @@
+   1           RESUME                   0
+               LOAD_FAST_BORROW         0 (format)
+               LOAD_SMALL_INT           2
+               COMPARE_OP             132 (>)
+               POP_JUMP_IF_FALSE        3 (to L1)
+               NOT_TAKEN
+               LOAD_COMMON_CONSTANT     1 (NotImplementedError)
+               RAISE_VARARGS            1
+       L1:     BUILD_MAP                0
+
+  42           LOAD_SMALL_INT           0
+               LOAD_GLOBAL              0 (__conditional_annotations__)
+               CONTAINS_OP              0 (in)
+               POP_JUMP_IF_FALSE       27 (to L2)
+               NOT_TAKEN
+               LOAD_GLOBAL              2 (Dict)
+               LOAD_GLOBAL              4 (str)
+               LOAD_GLOBAL              4 (str)
+               BUILD_TUPLE              2
+               BINARY_OP               26 ([])
+               COPY                     2
+               LOAD_CONST               1 ('DIAGNOSIS_DICTIONARY')
+
+   1           STORE_SUBSCR
+
+  53   L2:     LOAD_SMALL_INT           1
+               LOAD_GLOBAL              0 (__conditional_annotations__)
+               CONTAINS_OP              0 (in)
+               POP_JUMP_IF_FALSE       10 (to L3)
+               NOT_TAKEN
+               LOAD_GLOBAL              6 (list)
+               COPY                     2
+               LOAD_CONST               2 ('MALIGNANT_CLASSES')
+
+   1           STORE_SUBSCR
+
+  54   L3:     LOAD_SMALL_INT           2
+               LOAD_GLOBAL              0 (__conditional_annotations__)
+               CONTAINS_OP              0 (in)
+               POP_JUMP_IF_FALSE       10 (to L4)
+               NOT_TAKEN
+               LOAD_GLOBAL              6 (list)
+               COPY                     2
+               LOAD_CONST               3 ('BENIGN_CLASSES')
+
+   1           STORE_SUBSCR
+
+  56   L4:     LOAD_SMALL_INT           3
+               LOAD_GLOBAL              0 (__conditional_annotations__)
+               CONTAINS_OP              0 (in)
+               POP_JUMP_IF_FALSE       10 (to L5)
+               NOT_TAKEN
+               LOAD_GLOBAL              8 (float)
+               COPY                     2
+               LOAD_CONST               4 ('MALIGNANT_ALERT_THRESHOLD')
+
+   1           STORE_SUBSCR
+
+  58   L5:     LOAD_SMALL_INT           4
+               LOAD_GLOBAL              0 (__conditional_annotations__)
+               CONTAINS_OP              0 (in)
+               POP_JUMP_IF_FALSE       27 (to L6)
+               NOT_TAKEN
+               LOAD_GLOBAL              2 (Dict)
+               LOAD_GLOBAL              4 (str)
+               LOAD_GLOBAL              4 (str)
+               BUILD_TUPLE              2
+               BINARY_OP               26 ([])
+               COPY                     2
+               LOAD_CONST               5 ('TRIAGE_REASON_VI')
+
+   1           STORE_SUBSCR
+
+  67   L6:     LOAD_SMALL_INT           5
+               LOAD_GLOBAL              0 (__conditional_annotations__)
+               CONTAINS_OP              0 (in)
+               POP_JUMP_IF_FALSE       21 (to L7)
+               NOT_TAKEN
+               LOAD_GLOBAL             10 (List)
+               LOAD_GLOBAL              4 (str)
+               BINARY_OP               26 ([])
+               COPY                     2
+               LOAD_CONST               6 ('BODY_LOCATIONS')
+
+   1           STORE_SUBSCR
+
+  73   L7:     LOAD_SMALL_INT           6
+               LOAD_GLOBAL              0 (__conditional_annotations__)
+               CONTAINS_OP              0 (in)
+               POP_JUMP_IF_FALSE       21 (to L8)
+               NOT_TAKEN
+               LOAD_GLOBAL             10 (List)
+               LOAD_GLOBAL              4 (str)
+               BINARY_OP               26 ([])
+               COPY                     2
+               LOAD_CONST               7 ('VIETNAM_PROVINCES')
+
+   1           STORE_SUBSCR
+
+2071   L8:     LOAD_SMALL_INT           7
+               LOAD_GLOBAL              0 (__conditional_annotations__)
+               CONTAINS_OP              0 (in)
+               POP_JUMP_IF_FALSE       27 (to L9)
+               NOT_TAKEN
+               LOAD_GLOBAL              2 (Dict)
+               LOAD_GLOBAL              4 (str)
+               LOAD_GLOBAL              4 (str)
+               BUILD_TUPLE              2
+               BINARY_OP               26 ([])
+               COPY                     2
+               LOAD_CONST               8 ('DIAGNOSIS_DICTIONARY_EN')
+
+   1           STORE_SUBSCR
+       L9:     RETURN_VALUE

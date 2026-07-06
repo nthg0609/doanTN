@@ -1,0 +1,31 @@
+2896           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+
+2897   L2:     FOR_ITER                60 (to L3)
+               STORE_FAST               1 (v)
+               LOAD_GLOBAL              1 (str + NULL)
+               LOAD_FAST_BORROW         1 (v)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               0 ('location')
+               LOAD_CONST               1 ('Không rõ')
+               CALL                     2
+               CALL                     1
+               LOAD_ATTR                5 (strip + NULL|self)
+               CALL                     0
+               LOAD_ATTR                7 (capitalize + NULL|self)
+               CALL                     0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           62 (to L2)
+       L3:     END_FOR
+               POP_ITER
+               LOAD_CONST               2 (None)
+               RETURN_VALUE
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti

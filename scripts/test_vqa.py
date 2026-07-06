@@ -37,7 +37,12 @@ def test_vqa():
 
     # Load weights
     checkpoint = torch.load(model_path, map_location=device)
-    model.load_state_dict(checkpoint["model_state_dict"])
+    use_spatial_tokens = checkpoint.get("use_spatial_tokens", False)
+    model.use_spatial_tokens = use_spatial_tokens
+    model.vision_backbone.use_spatial_tokens = use_spatial_tokens
+    has_prefix = any(k.startswith("clinical_prefix.") for k in checkpoint["model_state_dict"].keys())
+    model.has_prefix = has_prefix
+    model.load_state_dict(checkpoint["model_state_dict"], strict=False)
     model.eval()
     
     tokenizer = AutoTokenizer.from_pretrained("distilgpt2")
@@ -72,9 +77,24 @@ def test_vqa():
     
     print("\nGenerating response...")
     with torch.no_grad():
-        img_embeds = model.projection(model.vision_backbone(img_tensor)).unsqueeze(1)
-        text_embeds = model.llm.base_model.model.transformer.wte(inputs["input_ids"])
-        inputs_embeds = torch.cat([img_embeds, text_embeds], dim=1)
+        if hasattr(model.llm, "transformer"):
+            text_embeds = model.llm.transformer.wte(inputs["input_ids"])
+        elif hasattr(model.llm, "base_model"):
+            text_embeds = model.llm.base_model.model.transformer.wte(inputs["input_ids"])
+        else:
+            text_embeds = None
+
+        if hasattr(model, "get_image_embeddings"):
+            img_embeds = model.get_image_embeddings(img_tensor, text_embeds=text_embeds)
+        else:
+            img_embeds = model.projection(model.vision_backbone(img_tensor)).unsqueeze(1)
+
+        # --- V3: Prepend ClinicalPrefix tokens nếu model có ---
+        if hasattr(model, "clinical_prefix") and getattr(model, "has_prefix", True):
+            prefix_embeds = model.clinical_prefix(img_tensor.size(0), img_tensor.device)
+            inputs_embeds = torch.cat([prefix_embeds, img_embeds, text_embeds], dim=1)
+        else:
+            inputs_embeds = torch.cat([img_embeds, text_embeds], dim=1)
         
         attention_mask = torch.ones(inputs_embeds.shape[:2], device=device, dtype=torch.long)
         

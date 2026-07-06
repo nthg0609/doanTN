@@ -1,0 +1,171 @@
+684           RESUME                   0
+
+690           LOAD_FAST                0 (cv_context)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               1 ('prediction')
+              LOAD_CONST               2 ('N/A')
+              CALL                     2
+              STORE_FAST               1 (pred)
+
+691           LOAD_GLOBAL              3 (get_vietnamese_diagnosis + NULL)
+              LOAD_FAST                1 (pred)
+              CALL                     1
+              STORE_FAST               2 (vi_name)
+
+692           LOAD_GLOBAL              5 (float + NULL)
+              LOAD_FAST                0 (cv_context)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               3 ('confidence')
+              LOAD_CONST               4 (0.0)
+              CALL                     2
+              CALL                     1
+              STORE_FAST               3 (conf)
+
+693           LOAD_FAST                0 (cv_context)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               5 ('metrics')
+              BUILD_MAP                0
+              CALL                     2
+              STORE_FAST               4 (metrics)
+
+694           LOAD_FAST                0 (cv_context)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST               6 ('probabilities')
+              BUILD_MAP                0
+              CALL                     2
+              STORE_FAST               5 (probs)
+
+696           LOAD_CONST               7 ('\n')
+              LOAD_ATTR                7 (join + NULL|self)
+              LOAD_CONST               8 (<code object <genexpr> at 0x000001813F0261F0, file "D:\DoAn_DaLieu\app_streamlit.py", line 696>)
+              MAKE_FUNCTION
+
+698           LOAD_GLOBAL              9 (sorted + NULL)
+              LOAD_FAST                5 (probs)
+              LOAD_ATTR               11 (items + NULL|self)
+              CALL                     0
+              LOAD_CONST               9 (<code object <lambda> at 0x000001813F041530, file "D:\DoAn_DaLieu\app_streamlit.py", line 698>)
+              MAKE_FUNCTION
+              LOAD_CONST              10 (('key',))
+              CALL_KW                  2
+              GET_ITER
+
+696           CALL                     0
+              CALL                     1
+              STORE_FAST               6 (prob_lines)
+
+701           LOAD_CONST              11 ('[IDENTITY]\n# Bạn là Trợ lý Da liễu AI — một hệ thống hỗ trợ sàng lọc y tế tích hợp mô hình Thị giác Máy tính (CV) và Mô hình Ngôn ngữ Lớn (LLM). Bạn tư vấn dựa HOÀN TOÀN trên dữ liệu CV được cung cấp bên dưới, không được bịa đặt số liệu.\n\n[CV_CONTEXT — DỮ LIỆU CHẮC CHẮN TỪ MÔ HÌNH CV]\n# Kết quả phân loại mô hình chuyên biệt EfficientNet-B1 + CBAM Attention:\n# • Nhãn dự đoán cao nhất : ')
+
+706           LOAD_FAST                1 (pred)
+              FORMAT_SIMPLE
+              LOAD_CONST              12 (' → ')
+              LOAD_FAST                2 (vi_name)
+              FORMAT_SIMPLE
+              LOAD_CONST              13 ('\n#     • Độ tin cậy            : ')
+
+707           LOAD_FAST                3 (conf)
+              LOAD_CONST              14 ('.4f')
+              FORMAT_WITH_SPEC
+              LOAD_CONST              15 (' (')
+              LOAD_FAST                3 (conf)
+              LOAD_CONST              16 (100)
+              BINARY_OP                5 (*)
+              LOAD_CONST              17 ('.1f')
+              FORMAT_WITH_SPEC
+              LOAD_CONST              18 ('%)\n\n# Phân phối xác suất đầy đủ 7 nhãn bệnh lý (ISIC):\n    ')
+
+710           LOAD_FAST                6 (prob_lines)
+              FORMAT_SIMPLE
+              LOAD_CONST              19 ('\n\n# Chỉ số hình học tổn thương (DeepLabV3+ Segmentation):\n    • Tỉ lệ diện tích (Area ratio)      : ')
+
+713           LOAD_FAST                4 (metrics)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST              20 ('area_ratio')
+              LOAD_CONST               4 (0.0)
+              CALL                     2
+              LOAD_CONST              14 ('.4f')
+              FORMAT_WITH_SPEC
+              LOAD_CONST              21 ('\n    • Độ phức tạp bờ (Border complexity): ')
+
+714           LOAD_FAST                4 (metrics)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST              22 ('border_complexity')
+              LOAD_CONST               4 (0.0)
+              CALL                     2
+              LOAD_CONST              14 ('.4f')
+              FORMAT_WITH_SPEC
+              LOAD_CONST              23 ('\n    • Bất đối xứng (Asymmetry score)    : ')
+
+715           LOAD_FAST                4 (metrics)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST              24 ('asymmetry')
+              LOAD_CONST               4 (0.0)
+              CALL                     2
+              LOAD_CONST              14 ('.4f')
+              FORMAT_WITH_SPEC
+              LOAD_CONST              25 ('  [0=đối xứng, 1=bất đối xứng]\n    • Độ tròn (Circularity)             : ')
+
+716           LOAD_FAST                4 (metrics)
+              LOAD_ATTR                1 (get + NULL|self)
+              LOAD_CONST              26 ('circularity')
+              LOAD_CONST               4 (0.0)
+              CALL                     2
+              LOAD_CONST              14 ('.4f')
+              FORMAT_WITH_SPEC
+              LOAD_CONST              27 ('  [0=không tròn, 1=tròn đều]\n\n    [GUARDRAIL_RULES — QUY TẮC BẮT BUỘC TUYỆT ĐỐI]\n\nĐƯỢC PHÉP:\n# ✅ Giải thích cơ chế bệnh sinh, mô tả triệu chứng lâm sàng phổ biến của nhãn bệnh trên.\n#   ✅ Hướng dẫn chăm sóc da không dùng thuốc (làm sạch, tránh nắng, dưỡng ẩm, bảo vệ).\n  ✅ Phân nhóm thuốc tổng quát (ví dụ: "nhóm kháng nấm bôi tại chỗ", "nhóm corticosteroid bôi ngoài").\n# ✅ Giải thích ý nghĩa các chỉ số hình học CV ở trên khi người dùng hỏi.\n# ✅ Luôn khuyên người dùng đến gặp bác sĩ da liễu chuyên khoa để được chẩn đoán chính xác.\n\nQUY TẮC GIẢI THÍCH TIẾN TRIỂN & HẬU QUẢ BỆNH (CLINICAL PATHOLOGY PROGRESSION RULES):\n#   Khi người dùng hỏi về tiến triển, biến chứng hoặc hậu quả của bệnh, hãy dựa vào NHÃN DỰ ĐOÁN CAO NHẤT (')
+
+728           LOAD_FAST                1 (pred)
+              FORMAT_SIMPLE
+              LOAD_CONST              28 (') từ mô hình CV để phản hồi chính xác:\n#   - Nếu nhãn dự đoán là LÀNH TÍNH (BKL, NV, VASC, DF):\n# • Phải khẳng định rõ đây là tổn thương bản chất LÀNH TÍNH, không có khả năng tự biến đổi hoặc phát triển thành ung thư.\n#     • Làm rõ các ảnh hưởng chỉ dừng lại ở mặt thẩm mỹ, kích ứng tại chỗ (như cọ xát quần áo, ngứa nhẹ), hoặc tâm lý lo lắng.\n• Nhấn mạnh nguy cơ lớn nhất là "nhầm lẫn" (misdiagnosis) — tự chẩn đoán nhầm một tổn thương ác tính thực sự thành nốt lành tính, dẫn đến chủ quan không đi khám.\n#   - Nếu nhãn dự đoán là TIỀN ÁC TÍNH hoặc ÁC TÍNH (AKIEC, BCC, MEL):\n#     • Giải thích thận trọng, khách quan về nguy cơ tiến triển nếu không can thiệp (ví dụ: AKIEC có thể tiến triển thành ung thư biểu mô tế bào vảy xâm lấn; BCC xâm lấn phá hủy mô tại chỗ; MEL có thể di căn xa).\n# • Tránh dùng từ ngữ gây hoảng loạn cực đoan cho bệnh nhân, nhưng phải nhấn mạnh tầm quan trọng của việc đi khám bác sĩ, sinh thiết và điều trị y khoa kịp thời để kiểm soát bệnh.\n\nTUYỆT ĐỐI CẤM — MEDICATION GUARDRAIL:\n#   🚫 KHÔNG được nêu tên bất kỳ biệt dược cụ thể nào (Amoxicillin, Tretinoin, Mometasone, Hydrocortisone, Clotrimazole, Acyclovir, v.v.)\n#   🚫 KHÔNG được nêu liều lượng (mg, ml, %, IU, lần/ngày, tuần/lần).\n#   🚫 KHÔNG được nêu thời gian dùng thuốc (7 ngày, 2 tuần, 1 tháng).\n🚫 KHÔNG được đề xuất thuốc kể cả khi người dùng đặt câu hỏi dạng "ví dụ", "giả sử", "trường hợp giả định".\n# 🚫 KHÔNG được xác nhận hay phủ nhận một loại thuốc cụ thể người dùng tự đề xuất.\n# → Nếu bị hỏi về tên thuốc cụ thể: Lịch sự từ chối, giải thích lý do y đức, và hướng dẫn gặp bác sĩ.\n\nĐỊNH DẠNG PHẢN HỒI:\n# - Ngôn ngữ: Tiếng Việt, rõ ràng, chuyên nghiệp, dễ hiểu với bệnh nhân.\n# - Độ dài: Tối đa 400 từ mỗi câu trả lời. Nếu câu hỏi phức tạp, chia thành đề mục ngắn.\n# - Kết thúc mỗi câu trả lời bằng nhắc nhở đến khám bác sĩ da liễu.\n\n')
+
+701           BUILD_STRING            21
+              STORE_FAST               7 (system_prompt)
+
+751           LOAD_FAST                7 (system_prompt)
+              RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x000001813F0261F0, file "D:\DoAn_DaLieu\app_streamlit.py", line 696>:
+ 696           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+
+ 698           GET_ITER
+       L2:     FOR_ITER                28 (to L3)
+               UNPACK_SEQUENCE          2
+               STORE_FAST_STORE_FAST   18 (k, v)
+
+ 697           LOAD_CONST               0 ('    • ')
+               LOAD_FAST                1 (k)
+               FORMAT_SIMPLE
+               LOAD_CONST               1 (' (')
+               LOAD_GLOBAL              1 (get_vietnamese_diagnosis + NULL)
+               LOAD_FAST                1 (k)
+               CALL                     1
+               FORMAT_SIMPLE
+               LOAD_CONST               2 ('): ')
+               LOAD_FAST                2 (v)
+               LOAD_CONST               3 ('.4f')
+               FORMAT_WITH_SPEC
+               BUILD_STRING             6
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           30 (to L2)
+
+ 698   L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             4 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <lambda> at 0x000001813F041530, file "D:\DoAn_DaLieu\app_streamlit.py", line 698>:
+698           RESUME                   0
+              LOAD_FAST                0 (x)
+              LOAD_CONST               1 (1)
+              BINARY_SUBSCR
+              UNARY_NEGATIVE
+              RETURN_VALUE

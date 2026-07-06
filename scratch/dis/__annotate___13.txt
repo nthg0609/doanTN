@@ -1,0 +1,40 @@
+424           RESUME                   0
+              LOAD_FAST_BORROW         0 (format)
+              LOAD_SMALL_INT           2
+              COMPARE_OP             132 (>)
+              POP_JUMP_IF_FALSE        3 (to L1)
+              NOT_TAKEN
+              LOAD_COMMON_CONSTANT     1 (NotImplementedError)
+              RAISE_VARARGS            1
+      L1:     LOAD_CONST               1 ('patient_name')
+
+425           LOAD_GLOBAL              0 (str)
+
+424           LOAD_CONST               2 ('patient_info')
+
+426           LOAD_GLOBAL              2 (Dict)
+              LOAD_GLOBAL              0 (str)
+              LOAD_GLOBAL              4 (Any)
+              BUILD_TUPLE              2
+              BINARY_OP               26 ([])
+
+424           LOAD_CONST               3 ('visit_data')
+
+427           LOAD_GLOBAL              2 (Dict)
+              LOAD_GLOBAL              0 (str)
+              LOAD_GLOBAL              4 (Any)
+              BUILD_TUPLE              2
+              BINARY_OP               26 ([])
+
+424           LOAD_CONST               4 ('patient_id')
+
+428           LOAD_GLOBAL              6 (Optional)
+              LOAD_GLOBAL              0 (str)
+              BINARY_OP               26 ([])
+
+424           LOAD_CONST               5 ('return')
+
+429           LOAD_GLOBAL              8 (bool)
+
+424           BUILD_MAP                5
+              RETURN_VALUE

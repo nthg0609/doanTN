@@ -1,0 +1,149 @@
+2028            RESUME                   0
+
+2030            LOAD_GLOBAL              1 (strip_emojis + NULL)
+                LOAD_GLOBAL              3 (str + NULL)
+                LOAD_FAST_BORROW         0 (message)
+                CALL                     1
+                CALL                     1
+                STORE_FAST               0 (message)
+
+2031            LOAD_GLOBAL              4 (st)
+                LOAD_ATTR                6 (session_state)
+                LOAD_ATTR                9 (get + NULL|self)
+                LOAD_CONST               1 ('language_select')
+                LOAD_CONST               2 ('Tiếng Việt')
+                CALL                     2
+                STORE_FAST               2 (lang)
+
+2033            LOAD_FAST_BORROW         1 (level)
+                LOAD_CONST               3 ('success')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       19 (to L3)
+                NOT_TAKEN
+
+2034            LOAD_CONST               4 ('rgba(72, 187, 120, 0.08)')
+                STORE_FAST               3 (bg_color)
+
+2035            LOAD_CONST               5 ('rgba(72, 187, 120, 0.25)')
+                STORE_FAST               4 (border_color)
+
+2036            LOAD_CONST               6 ('#15803d')
+                STORE_FAST               5 (text_color)
+
+2037            LOAD_FAST_BORROW         2 (lang)
+                LOAD_CONST               2 ('Tiếng Việt')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE        3 (to L1)
+                NOT_TAKEN
+                LOAD_CONST               7 ('Thành công')
+                JUMP_FORWARD             1 (to L2)
+        L1:     LOAD_CONST               8 ('Success')
+        L2:     STORE_FAST               6 (title)
+                JUMP_FORWARD            67 (to L12)
+
+2038    L3:     LOAD_FAST_BORROW         1 (level)
+                LOAD_CONST               9 ('warning')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       19 (to L6)
+                NOT_TAKEN
+
+2039            LOAD_CONST              10 ('rgba(237, 137, 54, 0.08)')
+                STORE_FAST               3 (bg_color)
+
+2040            LOAD_CONST              11 ('rgba(237, 137, 54, 0.25)')
+                STORE_FAST               4 (border_color)
+
+2041            LOAD_CONST              12 ('#c2410c')
+                STORE_FAST               5 (text_color)
+
+2042            LOAD_FAST_BORROW         2 (lang)
+                LOAD_CONST               2 ('Tiếng Việt')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE        3 (to L4)
+                NOT_TAKEN
+                LOAD_CONST              13 ('Cảnh báo')
+                JUMP_FORWARD             1 (to L5)
+        L4:     LOAD_CONST              14 ('Warning')
+        L5:     STORE_FAST               6 (title)
+                JUMP_FORWARD            42 (to L12)
+
+2043    L6:     LOAD_FAST_BORROW         1 (level)
+                LOAD_CONST              15 ('error')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE       19 (to L9)
+                NOT_TAKEN
+
+2044            LOAD_CONST              16 ('rgba(229, 62, 62, 0.08)')
+                STORE_FAST               3 (bg_color)
+
+2045            LOAD_CONST              17 ('rgba(229, 62, 62, 0.25)')
+                STORE_FAST               4 (border_color)
+
+2046            LOAD_CONST              18 ('#b91c1c')
+                STORE_FAST               5 (text_color)
+
+2047            LOAD_FAST_BORROW         2 (lang)
+                LOAD_CONST               2 ('Tiếng Việt')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE        3 (to L7)
+                NOT_TAKEN
+                LOAD_CONST              19 ('Lỗi')
+                JUMP_FORWARD             1 (to L8)
+        L7:     LOAD_CONST              20 ('Error')
+        L8:     STORE_FAST               6 (title)
+                JUMP_FORWARD            17 (to L12)
+
+2049    L9:     LOAD_CONST              21 ('rgba(99, 179, 237, 0.08)')
+                STORE_FAST               3 (bg_color)
+
+2050            LOAD_CONST              22 ('rgba(99, 179, 237, 0.25)')
+                STORE_FAST               4 (border_color)
+
+2051            LOAD_CONST              23 ('#0369a1')
+                STORE_FAST               5 (text_color)
+
+2052            LOAD_FAST_BORROW         2 (lang)
+                LOAD_CONST               2 ('Tiếng Việt')
+                COMPARE_OP              88 (bool(==))
+                POP_JUMP_IF_FALSE        3 (to L10)
+                NOT_TAKEN
+                LOAD_CONST              24 ('Thông báo')
+                JUMP_FORWARD             1 (to L11)
+       L10:     LOAD_CONST              25 ('Information')
+       L11:     STORE_FAST               6 (title)
+
+2054   L12:     LOAD_CONST              26 ('\n    <div style="\n        background: ')
+
+2056            LOAD_FAST_BORROW         3 (bg_color)
+                FORMAT_SIMPLE
+                LOAD_CONST              27 (';\n        border: 1px solid ')
+
+2057            LOAD_FAST_BORROW         4 (border_color)
+                FORMAT_SIMPLE
+                LOAD_CONST              28 (';\n        border-radius: 12px;\n        padding: 12px 18px;\n        margin: 10px 0;\n        color: ')
+
+2061            LOAD_FAST_BORROW         5 (text_color)
+                FORMAT_SIMPLE
+                LOAD_CONST              29 (';\n        backdrop-filter: blur(8px);\n    ">\n        <strong style="display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.92rem;">')
+
+2064            LOAD_FAST_BORROW         6 (title)
+                FORMAT_SIMPLE
+                LOAD_CONST              30 ('</strong>\n        <span style="font-size: 0.88rem; line-height: 1.4;">')
+
+2065            LOAD_FAST_BORROW         0 (message)
+                FORMAT_SIMPLE
+                LOAD_CONST              31 ('</span>\n    </div>\n    ')
+
+2054            BUILD_STRING            11
+                STORE_FAST               7 (html_content)
+
+2068            LOAD_GLOBAL              4 (st)
+                LOAD_ATTR               10 (markdown)
+                PUSH_NULL
+                LOAD_FAST_BORROW         7 (html_content)
+                LOAD_CONST              32 (True)
+                LOAD_CONST              33 (('unsafe_allow_html',))
+                CALL_KW                  2
+                POP_TOP
+                LOAD_CONST              34 (None)
+                RETURN_VALUE

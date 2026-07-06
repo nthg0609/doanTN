@@ -32,6 +32,9 @@ graph TD
     
     K -->|Áp dụng Guardrails: Cấm kê đơn thuốc| M[Câu trả lời VQA an toàn, chuẩn y tế]
 ```
+<p align="center">
+  <b>Hình 1: Overall architecture of proposed CDSS for dermatology (Sơ đồ tổng thể kiến trúc hệ thống CDSS hỗ trợ chẩn đoán da liễu đề xuất).</b>
+</p>
 
 ### Chi tiết các bước thực thi:
 1. **Tiếp nhận ảnh**: Người dùng tải ảnh lên qua giao diện Streamlit.
@@ -70,10 +73,22 @@ Hệ thống tận dụng các mô hình chuyên biệt cho từng nhiệm vụ:
    - **Tác dụng**: Trích xuất ngữ cảnh đa tỷ lệ nhờ khối Atrous Spatial Pyramid Pooling (ASPP), giúp phân tách biên giới tổn thương cực kỳ chính xác.
    - **Tập dữ liệu**: Huấn luyện trên 2,594 mẫu ảnh phân vùng, đạt chỉ số kiểm thử **Dice = 0.9128** và **IoU = 0.8455**.
 
-3. **Mô hình VQA Cục bộ (Offline VQA Model)**:
-   - **Kiến trúc**: `CPUMedicalVQAModel`.
+3. **Mô hình VQA Cục bộ Nâng cấp (Offline VQA Model - Kiến trúc V3)**:
+   - **Kiến trúc**: `CPUMedicalVQAModel` (Overhauled v3.0).
      - Bộ mã hóa hình ảnh (Vision Encoder): `EfficientNet-B1` + `CBAM` (lấy trọng số từ mô hình phân loại được huấn luyện trước).
+     - **SemanticEnhancer (Sửa điểm yếu #2)**: Khối nút thắt cổ chai phi tuyến tính (bottleneck 1280 → 256 → 1280) kết hợp kết nối tắt (residual connection) tỷ lệ $0.1$. Module này giúp lọc bớt thiên lệch bề mặt (texture bias) của EfficientNet và tái cấu trúc các đặc trưng ngữ cảnh lâm sàng toàn cục sâu hơn.
      - Bộ chuyển đổi đặc trưng (Projection Layer): Mạng tuyến tính gồm 2 lớp MLP với hàm kích hoạt GELU và Dropout, dịch chuyển chiều đặc trưng ảnh từ $1280 \to 768$ (phù hợp với không gian nhúng của mô hình ngôn ngữ).
+     - **Mã hóa Vị trí Không gian (Spatial Position Embeddings)**: Kích thước $1 \times 49 \times 768$ (nn.Parameter học được) cộng trực tiếp vào các vector nhúng hình ảnh sau MLP để bổ sung cấu trúc lưới địa lý 2D.
+     - **ClinicalStructureInjector (Sửa điểm yếu #5)**: Tiếp nhận các chỉ số hình học ABCD có cấu trúc thực tế ($1 \times 4$) cùng với xác suất phân loại 7 lớp bệnh da liễu ($1 \times 7$), ánh xạ qua một MLP thành một token lâm sàng đặc biệt ($1 \times 768$). Token này được chèn vào trước (prepend) chuỗi token ảnh không gian trước khi đưa vào cầu nối chú ý.
+     - **DeepCrossAttentionBridge (Sửa điểm yếu #1)**: Thay thế khối attention 1 lớp lọc thông thường bằng kiến trúc chú ý chéo sâu 2 lớp xếp chồng (`DeepCrossAttentionBridge` gồm 2 lớp `_CrossAttentionLayer`). Mỗi lớp bao gồm:
+       * Multi-head Cross-Attention (với Query là các `query_tokens` học được và Key/Value là chuỗi token ảnh đã chèn token lâm sàng lâm sàng).
+       * Residual Connection, Layer Normalization, và Feed-Forward Network (FFN).
+       * Cho phép mô hình thực hiện các bước lập luận thị giác đa tầng (multi-step visual reasoning) trên các vùng ảnh.
+     - **Cơ chế chống quá khớp cải tiến (Sửa điểm yếu #4)**: 
+       * Tích hợp cơ chế **DropKey** loại bỏ ngẫu nhiên 10% các liên kết chú ý trong ma trận Attention của lớp chú ý chéo trong quá trình huấn luyện để tránh việc tập trung quá mức vào một vài pixel nhiễu.
+       * Sử dụng tham số nhiệt độ có thể học được (learnable temperature $\tau$) trong hàm Softmax để tối ưu hóa việc phân bổ trọng số chú ý thích ứng với tập dữ liệu cực kỳ nhỏ (~80 samples).
+     - **ClinicalPrefix (Sửa điểm yếu #3)**: Áp dụng phương pháp Prefix-Tuning, tự động tạo sinh ra 8 tokens tiền tố lâm sàng học được (`ClinicalPrefix`) thông qua MLP chiếu. Các tokens này được chèn trực tiếp vào đầu chuỗi đầu vào của GPT-2 Decoder để định hướng không gian suy luận của Decoder về ngôn ngữ y khoa chuyên ngành trước khi tiếp nhận các tokens ảnh và văn bản.
+     - **Tương thích ngược (Backward Compatibility)**: Toàn bộ quá trình suy luận hỗ trợ cơ chế nạp động checkpoint `strict=False` kết hợp các `hasattr` kiểm tra. Nếu nạp các checkpoint cũ (phiên bản V1/V2), mô hình tự động fallback về cấu hình mặc định (1-token pooling) mà không gây crash ứng dụng.
      - Bộ giải mã văn bản (Language Decoder): **DistilGPT-2** (Causal LM) được tích hợp công nghệ **LoRA** (PEFT) để tinh chỉnh hiệu quả tham số (target lớp `c_attn`).
    - **Dữ liệu huấn luyện**: 74-80 cặp câu hỏi - câu trả lời da liễu tự tạo.
    - **Chỉ số đánh giá (Validation)**: BLEU-1 đạt **0.7269**, BLEU-2 đạt **0.6812**.
@@ -158,17 +173,18 @@ Phản hồi chat VQA cuối cùng trả về chuỗi văn bản (String) dạng
 ## 5. ĐÁNH GIÁ HỆ THỐNG VQA HIỆN TẠI (CRITICAL EVALUATION)
 
 ### A. Ưu điểm (Strengths)
-1. **Kiểm soát thông tin tuyệt đối (No Hallucination)**: LLM đám mây không thể tự do sáng tạo chẩn đoán bừa bãi nhờ cơ chế nhúng cứng kết quả phân tích CV chuyên biệt vào cấu trúc System Prompt.
-2. **An toàn y tế vượt trội**: Cổng Safety Gate ngăn chặn kịp thời các trường hợp ảnh chất lượng kém, hoặc mô hình phân loại bị phân vân (độ tin cậy thấp). Medication Guardrail ngăn cản hoàn toàn nguy cơ LLM kê đơn thuốc hoặc biệt dược trái phép.
+1. **Hạn chế tối đa thông tin sai lệch (Hallucination Mitigation)**: LLM đám mây được định hướng thông tin chặt chẽ, giảm thiểu khả năng tự ý đưa ra chẩn đoán ngoài luồng nhờ cơ chế nhúng cứng kết quả phân tích CV chuyên biệt vào cấu trúc System Prompt.
+2. **An toàn y tế vượt trội**: Cổng Safety Gate hỗ trợ phát hiện các trường hợp ảnh chất lượng kém hoặc mô hình phân loại có độ tin cậy thấp. Medication Guardrail được thiết kế nhằm hạn chế tối đa nguy cơ LLM tự ý đề xuất thuốc hoặc biệt dược trái phép.
 3. **Phản hồi linh hoạt theo phân loại bệnh lý**: Khác biệt rõ ràng trong cách hành xử giữa bệnh lành tính (giảm lo âu cho bệnh nhân) và ác tính (thúc giục đi khám cấp thiết).
 4. **Hỗ trợ EHR tích hợp**: Lưu trữ lịch sử khám bệnh qua nhiều mốc thời gian trên Cloud Firestore và lưu trữ đồ thị phân phối xác suất lâm sàng phục vụ công tác tra cứu của bác sĩ.
 
-### B. Hạn chế (Weaknesses)
-1. **Sự phụ thuộc vào OpenAI Cloud**: Luồng VQA trong Web App hoạt động tốt nhờ gọi API của OpenAI. Điều này yêu cầu kết nối Internet liên tục và phát sinh chi phí vận hành API.
-2. **Mô hình VQA Cục bộ (`CPUMedicalVQAModel`) quá yếu**:
-   - Sử dụng **DistilGPT-2** (chỉ 82M tham số), năng lực hiểu ngôn ngữ tự nhiên còn thô sơ. Thường gặp lỗi lặp từ, hoặc sinh văn bản không mạch lạc khi hỏi các câu phức tạp.
-   - Tập dữ liệu VQA offline quá nhỏ (chỉ 74-80 QA cặp), khiến mô hình VQA cục bộ chưa có khả năng khái quát hóa sang các bệnh lý khác ngoài tập huấn luyện.
-   - Chỉ số đánh giá BLEU-1/2 chỉ thể hiện mức độ trùng khớp từ ngữ với câu trả lời mẫu, chưa thực sự đánh giá được tính chính xác về kiến thức y khoa của câu trả lời.
+### B. Hạn chế và Thách thức (Limitations & Weaknesses)
+1. **Sự phụ thuộc vào dịch vụ đám mây trong sản xuất:** Luồng VQA thời gian thực trên giao diện Web Dashboard dựa trên các API thương mại (gpt-4o-mini). Điều này yêu cầu kết nối Internet ổn định và phát sinh chi phí vận hành API.
+2. **Hiệu năng của mô hình VQA ngoại tuyến cục bộ (`CPUMedicalVQAModel`):**
+   - Do kích thước giới hạn của **DistilGPT-2** (82 triệu tham số), năng lực biểu diễn ngôn ngữ tự nhiên còn đơn giản, dễ gặp hiện tượng lặp từ hoặc bị cắt cụt câu trả lời khi tạo sinh các chuỗi dài.
+   - Bộ dữ liệu VQA nội bộ quy mô nhỏ (74-80 cặp câu hỏi) chưa đủ để huấn luyện mô hình có khả năng khái quát hóa cao đối với các câu hỏi lâm sàng đa dạng khác ngoài tập dữ liệu.
+   - Chỉ số đánh giá BLEU trên tập xác thực nhỏ có thể phản ánh hiện tượng ghi nhớ mẫu (memorization) hơn là năng lực thực tế của mô hình.
+3. **Độ phức tạp trong việc triển khai cục bộ (Local Ollama):** Việc chạy chế độ Local Ollama đòi hỏi người dùng cuối phải cài đặt phần mềm nền Ollama và tải về mô hình (kích thước ~2GB). Đây là chi tiết cấu hình triển khai thực tế và được xem là hạn chế đối với các thiết bị đầu cuối cấu hình yếu, chỉ phù hợp làm phương án thử nghiệm cho máy trạm độc lập hoặc hạ tầng mạng nội bộ bệnh viện.
 
 ---
 

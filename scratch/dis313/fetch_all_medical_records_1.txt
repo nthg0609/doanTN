@@ -1,0 +1,109 @@
+ 625           RESUME                   0
+
+ 626           BUILD_LIST               0
+               STORE_FAST               0 (records)
+
+ 627           NOP
+
+ 628   L1:     LOAD_CONST               1 ('gcp-credentials.json')
+               STORE_FAST               1 (cred_path)
+
+ 629           LOAD_GLOBAL              0 (os)
+               LOAD_ATTR                2 (path)
+               LOAD_ATTR                5 (exists + NULL|self)
+               LOAD_FAST                1 (cred_path)
+               CALL                     1
+               TO_BOOL
+               POP_JUMP_IF_FALSE      194 (to L5)
+
+ 630           LOAD_GLOBAL              6 (service_account)
+               LOAD_ATTR                8 (Credentials)
+               LOAD_ATTR               11 (from_service_account_file + NULL|self)
+               LOAD_FAST                1 (cred_path)
+               CALL                     1
+               STORE_FAST               2 (creds)
+
+ 631           LOAD_GLOBAL             12 (gcp_firestore)
+               LOAD_ATTR               14 (Client)
+               PUSH_NULL
+               LOAD_FAST_LOAD_FAST     34 (creds, creds)
+               LOAD_ATTR               16 (project_id)
+               LOAD_CONST               2 ('(default)')
+               LOAD_CONST               3 (('credentials', 'project', 'database'))
+               CALL_KW                  3
+               STORE_FAST               3 (db)
+
+ 632           LOAD_FAST                3 (db)
+               LOAD_ATTR               19 (collection + NULL|self)
+               LOAD_CONST               4 ('medical_records')
+               CALL                     1
+               LOAD_ATTR               21 (order_by + NULL|self)
+
+ 633           LOAD_CONST               5 ('updated_at')
+               LOAD_GLOBAL             12 (gcp_firestore)
+               LOAD_ATTR               22 (Query)
+               LOAD_ATTR               24 (DESCENDING)
+
+ 632           LOAD_CONST               6 (('direction',))
+               CALL_KW                  2
+
+ 634           LOAD_ATTR               27 (stream + NULL|self)
+               CALL                     0
+
+ 632           STORE_FAST               4 (docs)
+
+ 635           LOAD_FAST                4 (docs)
+               GET_ITER
+       L2:     FOR_ITER                57 (to L4)
+               STORE_FAST               5 (doc)
+
+ 636           LOAD_FAST                5 (doc)
+               LOAD_ATTR               29 (to_dict + NULL|self)
+               CALL                     0
+               STORE_FAST               6 (data)
+
+ 637           LOAD_CONST               7 ('patient_id')
+               LOAD_FAST                6 (data)
+               CONTAINS_OP              1
+               POP_JUMP_IF_FALSE       15 (to L3)
+
+ 638           LOAD_FAST                5 (doc)
+               LOAD_ATTR               30 (id)
+               LOAD_FAST                6 (data)
+               LOAD_CONST               7 ('patient_id')
+               STORE_SUBSCR
+
+ 639   L3:     LOAD_FAST                0 (records)
+               LOAD_ATTR               33 (append + NULL|self)
+               LOAD_FAST                6 (data)
+               CALL                     1
+               POP_TOP
+               JUMP_BACKWARD           59 (to L2)
+
+ 635   L4:     END_FOR
+               POP_TOP
+
+ 642   L5:     LOAD_FAST                0 (records)
+               RETURN_VALUE
+
+  --   L6:     PUSH_EXC_INFO
+
+ 640           LOAD_GLOBAL             34 (Exception)
+               CHECK_EXC_MATCH
+               POP_JUMP_IF_FALSE        4 (to L8)
+               POP_TOP
+
+ 641   L7:     POP_EXCEPT
+
+ 642           LOAD_FAST                0 (records)
+               RETURN_VALUE
+
+ 640   L8:     RERAISE                  0
+
+  --   L9:     COPY                     3
+               POP_EXCEPT
+               RERAISE                  1
+ExceptionTable:
+  L1 to L5 -> L6 [0]
+  L6 to L7 -> L9 [1] lasti
+  L8 to L9 -> L9 [1] lasti

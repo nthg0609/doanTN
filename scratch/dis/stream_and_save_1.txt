@@ -1,0 +1,59 @@
+  --           COPY_FREE_VARS           1
+
+3876           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+
+3877           LOAD_SMALL_INT           0
+               LOAD_CONST               1 (None)
+               IMPORT_NAME              0 (time)
+               STORE_FAST               0 (time)
+
+3878           LOAD_CONST               2 ('')
+               STORE_FAST               1 (partial_text)
+
+3879           LOAD_DEREF               4 (stream_gen)
+               GET_ITER
+       L2:     FOR_ITER                60 (to L5)
+               STORE_FAST               2 (chunk)
+
+3880           LOAD_FAST_BORROW         2 (chunk)
+               GET_ITER
+       L3:     FOR_ITER                51 (to L4)
+               STORE_FAST               3 (char)
+
+3881           LOAD_FAST_BORROW_LOAD_FAST_BORROW 19 (partial_text, char)
+               BINARY_OP               13 (+=)
+               STORE_FAST               1 (partial_text)
+
+3882           LOAD_FAST_BORROW         1 (partial_text)
+               LOAD_GLOBAL              2 (st)
+               LOAD_ATTR                4 (session_state)
+               LOAD_CONST               3 ('partial_response')
+               STORE_SUBSCR
+
+3883           LOAD_FAST_BORROW         3 (char)
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+
+3884           LOAD_FAST_BORROW         0 (time)
+               LOAD_ATTR                7 (sleep + NULL|self)
+               LOAD_CONST               4 (0.005)
+               CALL                     1
+               POP_TOP
+               JUMP_BACKWARD           53 (to L3)
+
+3880   L4:     END_FOR
+               POP_ITER
+               JUMP_BACKWARD           62 (to L2)
+
+3879   L5:     END_FOR
+               POP_ITER
+               LOAD_CONST               1 (None)
+               RETURN_VALUE
+
+  --   L6:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L6 -> L6 [0] lasti

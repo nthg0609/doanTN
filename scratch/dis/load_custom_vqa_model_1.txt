@@ -1,0 +1,317 @@
+ 736            RESUME                   0
+
+ 739            LOAD_SMALL_INT           0
+                LOAD_CONST               1 (None)
+                IMPORT_NAME              0 (torch)
+                STORE_FAST               0 (torch)
+
+ 740            LOAD_SMALL_INT           0
+                LOAD_CONST               1 (None)
+                IMPORT_NAME              1 (sys)
+                STORE_FAST               1 (sys)
+
+ 741            LOAD_SMALL_INT           0
+                LOAD_CONST               2 (('Path',))
+                IMPORT_NAME              2 (pathlib)
+                IMPORT_FROM              3 (Path)
+                STORE_FAST               2 (Path)
+                POP_TOP
+
+ 743            LOAD_FAST_BORROW         2 (Path)
+                PUSH_NULL
+                LOAD_CONST               3 ('d:/DoAn_DaLieu')
+                CALL                     1
+                STORE_FAST               3 (BASE_DIR)
+
+ 744            LOAD_GLOBAL              9 (str + NULL)
+                LOAD_FAST_BORROW         3 (BASE_DIR)
+                CALL                     1
+                LOAD_FAST_BORROW         1 (sys)
+                LOAD_ATTR               10 (path)
+                CONTAINS_OP              1 (not in)
+                POP_JUMP_IF_FALSE       38 (to L1)
+                NOT_TAKEN
+
+ 745            LOAD_FAST_BORROW         1 (sys)
+                LOAD_ATTR               10 (path)
+                LOAD_ATTR               13 (insert + NULL|self)
+                LOAD_SMALL_INT           0
+                LOAD_GLOBAL              9 (str + NULL)
+                LOAD_FAST_BORROW         3 (BASE_DIR)
+                CALL                     1
+                CALL                     2
+                POP_TOP
+
+ 747    L1:     NOP
+
+ 748    L2:     LOAD_SMALL_INT           0
+                LOAD_CONST               4 (('VisionBackbone', 'CPUMedicalVQAModel'))
+                IMPORT_NAME              7 (scripts.train_vqa_joint)
+                IMPORT_FROM              8 (VisionBackbone)
+                STORE_FAST               4 (VisionBackbone)
+                IMPORT_FROM              9 (CPUMedicalVQAModel)
+                STORE_FAST               5 (CPUMedicalVQAModel)
+                POP_TOP
+
+ 752    L3:     LOAD_SMALL_INT           0
+                LOAD_CONST               6 (('AutoTokenizer',))
+                IMPORT_NAME             11 (transformers)
+                IMPORT_FROM             12 (AutoTokenizer)
+                STORE_FAST               6 (AutoTokenizer)
+                POP_TOP
+
+ 753            LOAD_SMALL_INT           0
+                LOAD_CONST               7 (('LoraConfig', 'get_peft_model'))
+                IMPORT_NAME             13 (peft)
+                IMPORT_FROM             14 (LoraConfig)
+                STORE_FAST               7 (LoraConfig)
+                IMPORT_FROM             15 (get_peft_model)
+                STORE_FAST               8 (get_peft_model)
+                POP_TOP
+
+ 755            LOAD_FAST                0 (torch)
+                LOAD_ATTR               33 (device + NULL|self)
+                LOAD_FAST                0 (torch)
+                LOAD_ATTR               34 (cuda)
+                LOAD_ATTR               37 (is_available + NULL|self)
+                CALL                     0
+                TO_BOOL
+                POP_JUMP_IF_FALSE        3 (to L4)
+                NOT_TAKEN
+                LOAD_CONST               8 ('cuda')
+                JUMP_FORWARD             1 (to L5)
+        L4:     LOAD_CONST               5 ('cpu')
+        L5:     CALL                     1
+                STORE_FAST               9 (device)
+
+ 756            LOAD_CONST               9 ('d:\\DoAn_DaLieu\\9_VQA\\models\\dermavqa_gpt2_joint_best.pth')
+                STORE_FAST              10 (model_path)
+
+ 757            LOAD_GLOBAL             38 (os)
+                LOAD_ATTR               10 (path)
+                LOAD_ATTR               41 (exists + NULL|self)
+                LOAD_FAST               10 (model_path)
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_TRUE         6 (to L6)
+                NOT_TAKEN
+
+ 758            LOAD_CONST               1 (None)
+                LOAD_CONST               1 (None)
+                LOAD_FAST                9 (device)
+                BUILD_TUPLE              3
+                RETURN_VALUE
+
+ 760    L6:     LOAD_FAST                4 (VisionBackbone)
+                PUSH_NULL
+                CALL                     0
+                LOAD_ATTR               43 (to + NULL|self)
+                LOAD_FAST                9 (device)
+                CALL                     1
+                STORE_FAST              11 (vision_backbone)
+
+ 761            LOAD_FAST                5 (CPUMedicalVQAModel)
+                PUSH_NULL
+                LOAD_FAST               11 (vision_backbone)
+                CALL                     1
+                LOAD_ATTR               43 (to + NULL|self)
+                LOAD_FAST                9 (device)
+                CALL                     1
+                STORE_FAST              12 (model)
+
+ 763            NOP
+
+ 764    L7:     LOAD_FAST                7 (LoraConfig)
+                PUSH_NULL
+
+ 765            LOAD_SMALL_INT           8
+                LOAD_SMALL_INT          16
+                LOAD_CONST              10 ('c_attn')
+                BUILD_LIST               1
+
+ 766            LOAD_CONST              11 (0.05)
+                LOAD_CONST              12 ('none')
+                LOAD_CONST              13 ('CAUSAL_LM')
+
+ 764            LOAD_CONST              14 (('r', 'lora_alpha', 'target_modules', 'lora_dropout', 'bias', 'task_type'))
+                CALL_KW                  6
+                STORE_FAST              13 (peft_config)
+
+ 768            LOAD_FAST                8 (get_peft_model)
+                PUSH_NULL
+                LOAD_FAST               12 (model)
+                LOAD_ATTR               44 (llm)
+                LOAD_FAST               13 (peft_config)
+                CALL                     2
+                LOAD_FAST               12 (model)
+                STORE_ATTR              22 (llm)
+
+ 772    L8:     LOAD_FAST                0 (torch)
+                LOAD_ATTR               49 (load + NULL|self)
+                LOAD_FAST_LOAD_FAST    169 (model_path, device)
+                LOAD_CONST              15 (('map_location',))
+                CALL_KW                  2
+                STORE_FAST              14 (checkpoint)
+
+ 773            LOAD_FAST               14 (checkpoint)
+                LOAD_ATTR               51 (get + NULL|self)
+                LOAD_CONST              16 ('use_spatial_tokens')
+                LOAD_CONST              17 (False)
+                CALL                     2
+                STORE_FAST              15 (use_spatial_tokens)
+
+ 774            LOAD_FAST_LOAD_FAST    252 (use_spatial_tokens, model)
+                STORE_ATTR              26 (use_spatial_tokens)
+
+ 775            LOAD_FAST_LOAD_FAST    252 (use_spatial_tokens, model)
+                LOAD_ATTR               54 (vision_backbone)
+                STORE_ATTR              26 (use_spatial_tokens)
+
+ 776            LOAD_GLOBAL             56 (any)
+                COPY                     1
+                LOAD_COMMON_CONSTANT     4 (<built-in function any>)
+                IS_OP                    0 (is)
+                POP_JUMP_IF_FALSE       49 (to L12)
+                NOT_TAKEN
+                POP_TOP
+                LOAD_CONST              18 (<code object <genexpr> at 0x000002602A43C4B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 776>)
+                MAKE_FUNCTION
+                LOAD_FAST               14 (checkpoint)
+                LOAD_CONST              19 ('model_state_dict')
+                BINARY_OP               26 ([])
+                LOAD_ATTR               59 (keys + NULL|self)
+                CALL                     0
+                GET_ITER
+                CALL                     0
+        L9:     FOR_ITER                12 (to L11)
+                TO_BOOL
+                POP_JUMP_IF_TRUE         3 (to L10)
+                NOT_TAKEN
+                JUMP_BACKWARD           11 (to L9)
+       L10:     POP_ITER
+                LOAD_CONST              20 (True)
+                JUMP_FORWARD            38 (to L13)
+       L11:     END_FOR
+                POP_ITER
+                LOAD_CONST              17 (False)
+                JUMP_FORWARD            34 (to L13)
+       L12:     PUSH_NULL
+                LOAD_CONST              18 (<code object <genexpr> at 0x000002602A43C4B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 776>)
+                MAKE_FUNCTION
+                LOAD_FAST               14 (checkpoint)
+                LOAD_CONST              19 ('model_state_dict')
+                BINARY_OP               26 ([])
+                LOAD_ATTR               59 (keys + NULL|self)
+                CALL                     0
+                GET_ITER
+                CALL                     0
+                CALL                     1
+       L13:     STORE_FAST              16 (has_prefix)
+
+ 777            LOAD_FAST               16 (has_prefix)
+                LOAD_FAST               12 (model)
+                STORE_ATTR              30 (has_prefix)
+
+ 778            LOAD_FAST               12 (model)
+                LOAD_ATTR               63 (load_state_dict + NULL|self)
+                LOAD_FAST               14 (checkpoint)
+                LOAD_CONST              19 ('model_state_dict')
+                BINARY_OP               26 ([])
+                LOAD_CONST              17 (False)
+                LOAD_CONST              21 (('strict',))
+                CALL_KW                  2
+                POP_TOP
+
+ 779            LOAD_FAST               12 (model)
+                LOAD_ATTR               65 (eval + NULL|self)
+                CALL                     0
+                POP_TOP
+
+ 781            LOAD_FAST                6 (AutoTokenizer)
+                LOAD_ATTR               67 (from_pretrained + NULL|self)
+                LOAD_CONST              22 ('distilgpt2')
+                CALL                     1
+                STORE_FAST              17 (tokenizer)
+
+ 782            LOAD_FAST               17 (tokenizer)
+                LOAD_ATTR               68 (pad_token)
+                POP_JUMP_IF_NOT_NONE    18 (to L14)
+                NOT_TAKEN
+
+ 783            LOAD_FAST               17 (tokenizer)
+                LOAD_ATTR               70 (eos_token)
+                LOAD_FAST               17 (tokenizer)
+                STORE_ATTR              34 (pad_token)
+
+ 785   L14:     LOAD_FAST               12 (model)
+                LOAD_FAST               17 (tokenizer)
+                LOAD_FAST                9 (device)
+                BUILD_TUPLE              3
+                RETURN_VALUE
+
+  --   L15:     PUSH_EXC_INFO
+
+ 749            LOAD_GLOBAL             20 (ImportError)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        6 (to L17)
+                NOT_TAKEN
+                POP_TOP
+
+ 750            LOAD_CONST              23 ((None, None, 'cpu'))
+                SWAP                     2
+       L16:     POP_EXCEPT
+                RETURN_VALUE
+
+ 749   L17:     RERAISE                  0
+
+  --   L18:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+       L19:     PUSH_EXC_INFO
+
+ 769            LOAD_GLOBAL             46 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        5 (to L21)
+                NOT_TAKEN
+                POP_TOP
+
+ 770   L20:     POP_EXCEPT
+                EXTENDED_ARG             1
+                JUMP_BACKWARD_NO_INTERRUPT 287 (to L8)
+
+ 769   L21:     RERAISE                  0
+
+  --   L22:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L2 to L3 -> L15 [0]
+  L7 to L8 -> L19 [0]
+  L15 to L16 -> L18 [1] lasti
+  L17 to L18 -> L18 [1] lasti
+  L19 to L20 -> L22 [1] lasti
+  L21 to L22 -> L22 [1] lasti
+
+Disassembly of <code object <genexpr> at 0x000002602A43C4B0, file "D:\DoAn_DaLieu\app_streamlit.py", line 776>:
+ 776           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+       L2:     FOR_ITER                21 (to L3)
+               STORE_FAST_LOAD_FAST    17 (k, k)
+               LOAD_ATTR                1 (startswith + NULL|self)
+               LOAD_CONST               0 ('clinical_prefix.')
+               CALL                     1
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           23 (to L2)
+       L3:     END_FOR
+               POP_ITER
+               LOAD_CONST               1 (None)
+               RETURN_VALUE
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti

@@ -1,0 +1,8 @@
+2561           RESUME                   0
+
+2562           LOAD_GLOBAL              1 (glass_alert + NULL)
+               LOAD_FAST                0 (msg)
+               LOAD_CONST               1 ('warning')
+               CALL                     2
+               POP_TOP
+               RETURN_CONST             0 (None)

@@ -1,0 +1,116 @@
+  --           MAKE_CELL                0 (__class__)
+               MAKE_CELL                1 (__classdict__)
+
+ 318           RESUME                   0
+               LOAD_NAME                0 (__name__)
+               STORE_NAME               1 (__module__)
+               LOAD_CONST               0 ('_NumpySafeEncoder')
+               STORE_NAME               2 (__qualname__)
+               LOAD_CONST               1 (318)
+               STORE_NAME               3 (__firstlineno__)
+               LOAD_LOCALS
+               STORE_DEREF              1 (__classdict__)
+
+ 319           LOAD_CONST               2 ('Custom JSON encoder để xử lý numpy scalar/array không thể serialize bình thường.')
+               STORE_NAME               4 (__doc__)
+
+ 320           LOAD_FAST_BORROW         0 (__class__)
+               BUILD_TUPLE              1
+               LOAD_CONST               3 (<code object default at 0x000002602A180EE0, file "D:\DoAn_DaLieu\app_streamlit.py", line 320>)
+               MAKE_FUNCTION
+               SET_FUNCTION_ATTRIBUTE   8 (closure)
+               STORE_NAME               5 (default)
+               LOAD_CONST               4 (())
+               STORE_NAME               6 (__static_attributes__)
+               LOAD_FAST_BORROW         1 (__classdict__)
+               STORE_NAME               7 (__classdictcell__)
+               LOAD_FAST_BORROW         0 (__class__)
+               COPY                     1
+               STORE_NAME               8 (__classcell__)
+               RETURN_VALUE
+
+Disassembly of <code object default at 0x000002602A180EE0, file "D:\DoAn_DaLieu\app_streamlit.py", line 320>:
+  --            COPY_FREE_VARS           1
+
+ 320            RESUME                   0
+
+ 321            NOP
+
+ 322    L1:     LOAD_SMALL_INT           0
+                LOAD_CONST               1 (None)
+                IMPORT_NAME              0 (numpy)
+                STORE_FAST               2 (np)
+
+ 323            LOAD_GLOBAL              3 (isinstance + NULL)
+                LOAD_FAST_BORROW_LOAD_FAST_BORROW 18 (obj, np)
+                LOAD_ATTR                4 (integer)
+                BUILD_TUPLE              1
+                CALL                     2
+                TO_BOOL
+                POP_JUMP_IF_FALSE       12 (to L3)
+                NOT_TAKEN
+
+ 324            LOAD_GLOBAL              7 (int + NULL)
+                LOAD_FAST_BORROW         1 (obj)
+                CALL                     1
+        L2:     RETURN_VALUE
+
+ 325    L3:     LOAD_GLOBAL              3 (isinstance + NULL)
+                LOAD_FAST_BORROW_LOAD_FAST_BORROW 18 (obj, np)
+                LOAD_ATTR                8 (floating)
+                BUILD_TUPLE              1
+                CALL                     2
+                TO_BOOL
+                POP_JUMP_IF_FALSE       12 (to L5)
+                NOT_TAKEN
+
+ 326            LOAD_GLOBAL             11 (float + NULL)
+                LOAD_FAST_BORROW         1 (obj)
+                CALL                     1
+        L4:     RETURN_VALUE
+
+ 327    L5:     LOAD_GLOBAL              3 (isinstance + NULL)
+                LOAD_FAST_BORROW_LOAD_FAST_BORROW 18 (obj, np)
+                LOAD_ATTR               12 (ndarray)
+                CALL                     2
+                TO_BOOL
+                POP_JUMP_IF_FALSE       17 (to L7)
+                NOT_TAKEN
+
+ 328            LOAD_FAST_BORROW         1 (obj)
+                LOAD_ATTR               15 (tolist + NULL|self)
+                CALL                     0
+        L6:     RETURN_VALUE
+
+ 327    L7:     NOP
+
+ 331    L8:     LOAD_GLOBAL             18 (super)
+                LOAD_DEREF               3 (__class__)
+                LOAD_FAST_BORROW         0 (self)
+                LOAD_SUPER_ATTR         41 (default + NULL|self)
+                LOAD_FAST_BORROW         1 (obj)
+                CALL                     1
+                RETURN_VALUE
+
+  --    L9:     PUSH_EXC_INFO
+
+ 329            LOAD_GLOBAL             16 (ImportError)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        4 (to L11)
+                NOT_TAKEN
+                POP_TOP
+
+ 330   L10:     POP_EXCEPT
+                JUMP_BACKWARD_NO_INTERRUPT 28 (to L8)
+
+ 329   L11:     RERAISE                  0
+
+  --   L12:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L9 [0]
+  L3 to L4 -> L9 [0]
+  L5 to L6 -> L9 [0]
+  L9 to L10 -> L12 [1] lasti
+  L11 to L12 -> L12 [1] lasti

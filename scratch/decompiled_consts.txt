@@ -1,0 +1,83 @@
+Const 0 (type: <class 'str'>):
+Streamlit Multi-modal Medical EHR Dashboard — Hybrid VQA v2.0
+Nâng cấp: Fusion Prompt, Safety Gate UI, LLM Logging, Plotly Charts, ABCD Metrics.
+
+
+Const 107 (type: <class 'str'>):
+**TUYÊN BỐ MIỄN TRỪ TRÁCH NHIỆM:** Hệ thống này chỉ cấu thành một công cụ hỗ trợ sàng lọc sơ bộ bằng công nghệ AI, hoàn toàn **không thay thế** cho các chẩn đoán y khoa chuyên môn của bác sĩ da liễu.
+
+Const 191 (type: <class 'str'>):
+TUYÊN BỐ MIỄN TRỪ TRÁCH NHIỆM: Hệ thống này chỉ cấu thành một công cụ hỗ trợ sàng lọc sơ bộ bằng công nghệ AI, hoàn toàn không thay thế cho các chẩn đoán y khoa chuyên môn của bác sĩ da liễu.
+
+Const 228 (type: <class 'str'>):
+Ngưỡng kiểm soát chất lượng ảnh đầu vào. Nếu ảnh có chất lượng/độ tin cậy thấp hơn ngưỡng này, hệ thống sẽ kích hoạt Cổng lọc chất lượng.
+
+Const 232 (type: <class 'str'>):
+Ngưỡng xác suất để phát hiện và cảnh báo bệnh lý ác tính. Khi xác suất tính toán vượt quá ngưỡng này, hệ thống sẽ hiển thị cảnh báo để bác sĩ lưu ý thực hiện sinh thiết.
+
+Const 236 (type: <class 'str'>):
+Trọng số điều chỉnh độ ưu tiên giữa đặc trưng hình ảnh và dữ liệu dịch tễ. Giá trị 1.0 là chỉ chẩn đoán bằng ảnh, 0.5 là kết hợp 50-50 giữa ảnh và thông tin dịch tễ.
+
+Const 240 (type: <class 'str'>):
+1. Nhận tệp ảnh hoặc phim DICOM
+
+2. Đánh giá chất lượng ảnh chụp
+
+3. Khoanh vùng tự động hoặc tương tác u
+
+4. Phân tích bệnh lý kết hợp thông tin bệnh nhân
+
+5. Tra cứu phác đồ điều trị y văn
+
+6. Tư vấn hỗ trợ chẩn đoán da liễu
+
+Const 244 (type: <class 'str'>):
+**Phân đoạn:** DeepLabV3+ / MobileSAM
+
+**Phân loại:** EfficientNet-B1 + CBAM
+
+**VQA Chat:** GPT-4o-mini / Local SLM
+
+**Chuyển giọng nói:** Whisper-tiny
+
+**Độ trễ trung bình:** ~1.2 giây / ca
+
+Const 360 (type: <class 'str'>):
+Nhập từ khóa bệnh lý hoặc mã bệnh (ví dụ: MEL, BCC, AKIEC) để truy vấn hướng dẫn điều trị chính thức:
+
+Const 435 (type: <class 'str'>):
+DISCLAIMER: This system is a preliminary screening tool powered by AI. It does not replace professional medical diagnosis by a dermatologist.
+
+Const 452 (type: <class 'str'>):
+Input image quality control threshold. If the image quality/confidence is below this, the Safety Gate activates.
+
+Const 454 (type: <class 'str'>):
+Probability threshold to flag and warn of malignant lesions. If exceeded, a warning is shown for biopsy reference.
+
+Const 456 (type: <class 'str'>):
+Weight adjustment between image features and demographic data. 1.0 relies only on image, 0.5 balances 50-50 with demographic data.
+
+Const 458 (type: <class 'str'>):
+1. Upload clinical image or DICOM
+
+2. Run quality screening (blur/exposure)
+
+3. Automatic or interactive segmentation
+
+4. Pathological classification and demographic fusion
+
+5. Medical literature guidelines search
+
+6. AI generated clinical consult
+
+Const 460 (type: <class 'str'>):
+**Segmentation:** DeepLabV3+ / MobileSAM
+
+**Classification:** EfficientNet-B1 + CBAM
+
+**VQA Chat:** GPT-4o-mini / Local SLM
+
+**Speech-to-Text:** Whisper-tiny
+
+**Avg Latency:** ~1.2s / case
+

@@ -1,0 +1,41 @@
+1448           RESUME                   0
+
+1449           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                1 (set_y + NULL|self)
+               LOAD_CONST               8 (-15)
+               CALL                     1
+               POP_TOP
+
+1450           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                3 (set_font + NULL|self)
+               LOAD_CONST               1 ('helvetica')
+               LOAD_CONST               2 ('I')
+               LOAD_SMALL_INT           8
+               CALL                     3
+               POP_TOP
+
+1451           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                5 (set_text_color + NULL|self)
+               LOAD_SMALL_INT         128
+               LOAD_SMALL_INT         128
+               LOAD_SMALL_INT         128
+               CALL                     3
+               POP_TOP
+
+1452           LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                7 (cell + NULL|self)
+               LOAD_SMALL_INT           0
+               LOAD_SMALL_INT          10
+               LOAD_CONST               3 ('Trang ')
+               LOAD_FAST_BORROW         0 (self)
+               LOAD_ATTR                9 (page_no + NULL|self)
+               CALL                     0
+               FORMAT_SIMPLE
+               LOAD_CONST               4 ('/{nb} | Tai lieu y te bao mat')
+               BUILD_STRING             3
+               LOAD_CONST               5 ('C')
+               LOAD_CONST               6 (('align',))
+               CALL_KW                  4
+               POP_TOP
+               LOAD_CONST               7 (None)
+               RETURN_VALUE

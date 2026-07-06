@@ -1,0 +1,170 @@
+1431           RESUME                   0
+
+1433           LOAD_GLOBAL              1 (float + NULL)
+               LOAD_FAST                0 (metrics)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               1 ('area_ratio')
+               LOAD_CONST               2 (0.0)
+               CALL                     2
+               CALL                     1
+               STORE_FAST               1 (area)
+
+1434           LOAD_GLOBAL              1 (float + NULL)
+               LOAD_FAST                0 (metrics)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               3 ('border_complexity')
+               LOAD_CONST               2 (0.0)
+               CALL                     2
+               CALL                     1
+               STORE_FAST               2 (border_raw)
+
+1435           LOAD_GLOBAL              1 (float + NULL)
+               LOAD_FAST                0 (metrics)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               4 ('asymmetry')
+               LOAD_CONST               2 (0.0)
+               CALL                     2
+               CALL                     1
+               STORE_FAST               3 (asymmetry)
+
+1436           LOAD_GLOBAL              1 (float + NULL)
+               LOAD_FAST                0 (metrics)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               5 ('circularity')
+               LOAD_CONST               2 (0.0)
+               CALL                     2
+               CALL                     1
+               STORE_FAST               4 (circularity)
+
+1439           LOAD_GLOBAL              5 (min + NULL)
+               LOAD_FAST                2 (border_raw)
+               LOAD_CONST               6 (8.0)
+               BINARY_OP               11 (/)
+               LOAD_CONST               7 (1.0)
+               CALL                     2
+               STORE_FAST               5 (border_norm)
+
+1441           LOAD_GLOBAL              5 (min + NULL)
+               LOAD_FAST                1 (area)
+               LOAD_CONST               8 (0.75)
+               BINARY_OP               11 (/)
+               LOAD_CONST               7 (1.0)
+               CALL                     2
+               STORE_FAST               6 (area_norm)
+
+1443           BUILD_LIST               0
+               LOAD_CONST               9 (('Diện tích<br>(Area ratio)', 'Độ phức tạp bờ<br>(Border)', 'Bất đối xứng<br>(Asymmetry)', 'Độ tròn<br>(Circularity)'))
+               LIST_EXTEND              1
+               STORE_FAST               7 (categories)
+
+1444           LOAD_FAST_LOAD_FAST    101 (area_norm, border_norm)
+               LOAD_FAST_LOAD_FAST     52 (asymmetry, circularity)
+               BUILD_LIST               4
+               STORE_FAST               8 (values_norm)
+
+1445           LOAD_FAST_LOAD_FAST    136 (values_norm, values_norm)
+               LOAD_CONST              10 (0)
+               BINARY_SUBSCR
+               BUILD_LIST               1
+               BINARY_OP                0 (+)
+               STORE_FAST               9 (values_norm_closed)
+
+1446           LOAD_FAST_LOAD_FAST    119 (categories, categories)
+               LOAD_CONST              10 (0)
+               BINARY_SUBSCR
+               BUILD_LIST               1
+               BINARY_OP                0 (+)
+               STORE_FAST              10 (categories_closed)
+
+1448           LOAD_GLOBAL              6 (go)
+               LOAD_ATTR                8 (Figure)
+               PUSH_NULL
+               CALL                     0
+               STORE_FAST              11 (fig)
+
+1449           LOAD_FAST               11 (fig)
+               LOAD_ATTR               11 (add_trace + NULL|self)
+               LOAD_GLOBAL              6 (go)
+               LOAD_ATTR               12 (Scatterpolar)
+               PUSH_NULL
+
+1450           LOAD_FAST                9 (values_norm_closed)
+
+1451           LOAD_FAST               10 (categories_closed)
+
+1452           LOAD_CONST              11 ('toself')
+
+1453           LOAD_CONST              12 ('rgba(99,179,237,0.2)')
+
+1454           LOAD_GLOBAL             15 (dict + NULL)
+               LOAD_CONST              13 ('rgba(99,179,237,0.9)')
+               LOAD_CONST              14 (2)
+               LOAD_CONST              15 (('color', 'width'))
+               CALL_KW                  2
+
+1455           LOAD_CONST              16 ('Chỉ số ABCD')
+
+1449           LOAD_CONST              17 (('r', 'theta', 'fill', 'fillcolor', 'line', 'name'))
+               CALL_KW                  6
+               CALL                     1
+               POP_TOP
+
+1457           LOAD_FAST               11 (fig)
+               LOAD_ATTR               17 (update_layout + NULL|self)
+
+1458           LOAD_GLOBAL             15 (dict + NULL)
+
+1459           LOAD_CONST              18 ('rgba(255,255,255,0.6)')
+
+1460           LOAD_GLOBAL             15 (dict + NULL)
+               LOAD_CONST              19 (True)
+               LOAD_CONST              10 (0)
+               LOAD_CONST              20 (1)
+               BUILD_LIST               2
+               LOAD_CONST              21 ('#1e293b')
+               LOAD_CONST              22 ('rgba(0,0,0,0.08)')
+               LOAD_CONST              23 (('visible', 'range', 'color', 'gridcolor'))
+               CALL_KW                  4
+
+1461           LOAD_GLOBAL             15 (dict + NULL)
+               LOAD_CONST              21 ('#1e293b')
+               LOAD_CONST              22 ('rgba(0,0,0,0.08)')
+               LOAD_CONST              24 (('color', 'gridcolor'))
+               CALL_KW                  2
+
+1458           LOAD_CONST              25 (('bgcolor', 'radialaxis', 'angularaxis'))
+               CALL_KW                  3
+
+1463           LOAD_CONST              18 ('rgba(255,255,255,0.6)')
+
+1464           LOAD_GLOBAL             15 (dict + NULL)
+               LOAD_CONST              21 ('#1e293b')
+               LOAD_CONST              26 (10)
+               LOAD_CONST              27 (('color', 'size'))
+               CALL_KW                  2
+
+1465           LOAD_CONST              28 (False)
+
+1466           LOAD_GLOBAL             15 (dict + NULL)
+               LOAD_CONST              29 (40)
+               LOAD_CONST              29 (40)
+               LOAD_CONST              30 (30)
+               LOAD_CONST              30 (30)
+               LOAD_CONST              31 (('l', 'r', 't', 'b'))
+               CALL_KW                  4
+
+1467           LOAD_CONST              32 (280)
+
+1457           LOAD_CONST              33 (('polar', 'paper_bgcolor', 'font', 'showlegend', 'margin', 'height'))
+               CALL_KW                  6
+               POP_TOP
+
+1469           LOAD_GLOBAL             18 (st)
+               LOAD_ATTR               20 (plotly_chart)
+               PUSH_NULL
+               LOAD_FAST               11 (fig)
+               LOAD_CONST              19 (True)
+               LOAD_CONST              34 (('use_container_width',))
+               CALL_KW                  2
+               POP_TOP
+               RETURN_CONST             0 (None)

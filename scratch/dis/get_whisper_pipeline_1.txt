@@ -1,0 +1,54 @@
+186           RESUME                   0
+
+188           LOAD_SMALL_INT           0
+              LOAD_CONST               1 (('pipeline',))
+              IMPORT_NAME              0 (transformers)
+              IMPORT_FROM              1 (pipeline)
+              STORE_FAST               0 (pipeline)
+              POP_TOP
+
+189           LOAD_SMALL_INT           0
+              LOAD_CONST               2 (None)
+              IMPORT_NAME              2 (torch)
+              STORE_FAST               1 (torch)
+
+190           LOAD_FAST_BORROW         1 (torch)
+              LOAD_ATTR                6 (cuda)
+              LOAD_ATTR                9 (is_available + NULL|self)
+              CALL                     0
+              TO_BOOL
+              POP_JUMP_IF_FALSE        3 (to L1)
+              NOT_TAKEN
+              LOAD_SMALL_INT           0
+              JUMP_FORWARD             1 (to L2)
+      L1:     LOAD_CONST               7 (-1)
+      L2:     STORE_FAST               2 (device)
+
+192           LOAD_CONST               3 ('d:/DoAn_DaLieu/4_Models/whisper-tiny')
+              STORE_FAST               3 (local_path)
+
+193           LOAD_GLOBAL             10 (os)
+              LOAD_ATTR               12 (path)
+              LOAD_ATTR               15 (exists + NULL|self)
+              LOAD_FAST_BORROW         3 (local_path)
+              CALL                     1
+              TO_BOOL
+              POP_JUMP_IF_FALSE       11 (to L3)
+              NOT_TAKEN
+
+194           LOAD_FAST_BORROW         0 (pipeline)
+              PUSH_NULL
+              LOAD_CONST               4 ('automatic-speech-recognition')
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 50 (local_path, device)
+              LOAD_CONST               5 (('model', 'device'))
+              CALL_KW                  3
+              RETURN_VALUE
+
+195   L3:     LOAD_FAST_BORROW         0 (pipeline)
+              PUSH_NULL
+              LOAD_CONST               4 ('automatic-speech-recognition')
+              LOAD_CONST               6 ('openai/whisper-tiny')
+              LOAD_FAST_BORROW         2 (device)
+              LOAD_CONST               5 (('model', 'device'))
+              CALL_KW                  3
+              RETURN_VALUE

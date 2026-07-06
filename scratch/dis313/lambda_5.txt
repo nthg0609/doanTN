@@ -1,0 +1,5 @@
+1582           RESUME                   0
+               LOAD_FAST                0 (x)
+               LOAD_CONST               1 (1)
+               BINARY_SUBSCR
+               RETURN_VALUE

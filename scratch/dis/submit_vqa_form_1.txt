@@ -1,0 +1,22 @@
+3787           RESUME                   0
+
+3788           LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_ATTR                5 (get + NULL|self)
+               LOAD_CONST               0 ('chat_input_val')
+               LOAD_CONST               1 ('')
+               CALL                     2
+               LOAD_ATTR                7 (strip + NULL|self)
+               CALL                     0
+               LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST               2 ('submitted_vqa_query')
+               STORE_SUBSCR
+
+3789           LOAD_CONST               1 ('')
+               LOAD_GLOBAL              0 (st)
+               LOAD_ATTR                2 (session_state)
+               LOAD_CONST               0 ('chat_input_val')
+               STORE_SUBSCR
+               LOAD_CONST               3 (None)
+               RETURN_VALUE

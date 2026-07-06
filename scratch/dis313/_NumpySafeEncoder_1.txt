@@ -1,0 +1,104 @@
+  --           MAKE_CELL                0 (__class__)
+
+ 483           RESUME                   0
+               LOAD_NAME                0 (__name__)
+               STORE_NAME               1 (__module__)
+               LOAD_CONST               0 ('_NumpySafeEncoder')
+               STORE_NAME               2 (__qualname__)
+               LOAD_CONST               1 (483)
+               STORE_NAME               3 (__firstlineno__)
+
+ 485           LOAD_FAST                0 (__class__)
+               BUILD_TUPLE              1
+               LOAD_CONST               2 (<code object default at 0x000001813F0A42A0, file "D:\DoAn_DaLieu\app_streamlit.py", line 485>)
+               MAKE_FUNCTION
+               SET_FUNCTION_ATTRIBUTE   8 (closure)
+               STORE_NAME               4 (default)
+               LOAD_CONST               3 (())
+               STORE_NAME               5 (__static_attributes__)
+               LOAD_FAST                0 (__class__)
+               COPY                     1
+               STORE_NAME               6 (__classcell__)
+               RETURN_VALUE
+
+Disassembly of <code object default at 0x000001813F0A42A0, file "D:\DoAn_DaLieu\app_streamlit.py", line 485>:
+  --            COPY_FREE_VARS           1
+
+ 485            RESUME                   0
+
+ 486            NOP
+
+ 487    L1:     LOAD_CONST               1 (0)
+                LOAD_CONST               0 (None)
+                IMPORT_NAME              0 (numpy)
+                STORE_FAST               2 (np)
+
+ 488            LOAD_GLOBAL              3 (isinstance + NULL)
+                LOAD_FAST_LOAD_FAST     18 (obj, np)
+                LOAD_ATTR                4 (integer)
+                BUILD_TUPLE              1
+                CALL                     2
+                TO_BOOL
+                POP_JUMP_IF_FALSE       11 (to L3)
+
+ 489            LOAD_GLOBAL              7 (int + NULL)
+                LOAD_FAST                1 (obj)
+                CALL                     1
+        L2:     RETURN_VALUE
+
+ 490    L3:     LOAD_GLOBAL              3 (isinstance + NULL)
+                LOAD_FAST_LOAD_FAST     18 (obj, np)
+                LOAD_ATTR                8 (floating)
+                BUILD_TUPLE              1
+                CALL                     2
+                TO_BOOL
+                POP_JUMP_IF_FALSE       11 (to L5)
+
+ 491            LOAD_GLOBAL             11 (float + NULL)
+                LOAD_FAST                1 (obj)
+                CALL                     1
+        L4:     RETURN_VALUE
+
+ 492    L5:     LOAD_GLOBAL              3 (isinstance + NULL)
+                LOAD_FAST_LOAD_FAST     18 (obj, np)
+                LOAD_ATTR               12 (ndarray)
+                CALL                     2
+                TO_BOOL
+                POP_JUMP_IF_FALSE       16 (to L7)
+
+ 493            LOAD_FAST                1 (obj)
+                LOAD_ATTR               15 (tolist + NULL|self)
+                CALL                     0
+        L6:     RETURN_VALUE
+
+ 492    L7:     NOP
+
+ 496    L8:     LOAD_GLOBAL             18 (super)
+                LOAD_DEREF               3 (__class__)
+                LOAD_FAST                0 (self)
+                LOAD_SUPER_ATTR         41 (default + NULL|self)
+                LOAD_FAST                1 (obj)
+                CALL                     1
+                RETURN_VALUE
+
+  --    L9:     PUSH_EXC_INFO
+
+ 494            LOAD_GLOBAL             16 (ImportError)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        3 (to L11)
+                POP_TOP
+
+ 495   L10:     POP_EXCEPT
+                JUMP_BACKWARD_NO_INTERRUPT 27 (to L8)
+
+ 494   L11:     RERAISE                  0
+
+  --   L12:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L1 to L2 -> L9 [0]
+  L3 to L4 -> L9 [0]
+  L5 to L6 -> L9 [0]
+  L9 to L10 -> L12 [1] lasti
+  L11 to L12 -> L12 [1] lasti

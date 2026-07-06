@@ -1,0 +1,95 @@
+ 363            RESUME                   0
+
+ 364            LOAD_FAST_BORROW         0 (patient_name)
+                LOAD_ATTR                1 (strip + NULL|self)
+                CALL                     0
+                TO_BOOL
+                POP_JUMP_IF_TRUE         3 (to L1)
+                NOT_TAKEN
+
+ 365            LOAD_CONST               0 (False)
+                RETURN_VALUE
+
+ 366    L1:     NOP
+
+ 367    L2:     LOAD_CONST               1 ('gcp-credentials.json')
+                STORE_FAST               1 (cred_path)
+
+ 368            LOAD_GLOBAL              2 (os)
+                LOAD_ATTR                4 (path)
+                LOAD_ATTR                7 (exists + NULL|self)
+                LOAD_FAST_BORROW         1 (cred_path)
+                CALL                     1
+                TO_BOOL
+                POP_JUMP_IF_FALSE      181 (to L6)
+        L3:     NOT_TAKEN
+
+ 369    L4:     LOAD_GLOBAL              8 (service_account)
+                LOAD_ATTR               10 (Credentials)
+                LOAD_ATTR               13 (from_service_account_file + NULL|self)
+                LOAD_FAST_BORROW         1 (cred_path)
+                CALL                     1
+                STORE_FAST               2 (creds)
+
+ 370            LOAD_GLOBAL             14 (gcp_firestore)
+                LOAD_ATTR               16 (Client)
+                PUSH_NULL
+                LOAD_FAST_BORROW_LOAD_FAST_BORROW 34 (creds, creds)
+                LOAD_ATTR               18 (project_id)
+                LOAD_CONST               2 ('(default)')
+                LOAD_CONST               3 (('credentials', 'project', 'database'))
+                CALL_KW                  3
+                STORE_FAST               3 (db)
+
+ 371            LOAD_CONST               4 ('')
+                LOAD_ATTR               21 (join + NULL|self)
+                LOAD_FAST_BORROW         0 (patient_name)
+                LOAD_ATTR                1 (strip + NULL|self)
+                CALL                     0
+                LOAD_ATTR               23 (upper + NULL|self)
+                CALL                     0
+                LOAD_ATTR               25 (split + NULL|self)
+                CALL                     0
+                CALL                     1
+                STORE_FAST               4 (doc_id)
+
+ 372            LOAD_FAST_BORROW         3 (db)
+                LOAD_ATTR               27 (collection + NULL|self)
+                LOAD_CONST               5 ('medical_records')
+                CALL                     1
+                LOAD_ATTR               29 (document + NULL|self)
+                LOAD_FAST_BORROW         4 (doc_id)
+                CALL                     1
+                LOAD_ATTR               31 (get + NULL|self)
+                CALL                     0
+                LOAD_ATTR                6 (exists)
+        L5:     RETURN_VALUE
+
+ 368    L6:     NOP
+
+ 375            LOAD_CONST               0 (False)
+                RETURN_VALUE
+
+  --    L7:     PUSH_EXC_INFO
+
+ 373            LOAD_GLOBAL             32 (Exception)
+                CHECK_EXC_MATCH
+                POP_JUMP_IF_FALSE        5 (to L9)
+                NOT_TAKEN
+                POP_TOP
+
+ 374    L8:     POP_EXCEPT
+
+ 375            LOAD_CONST               0 (False)
+                RETURN_VALUE
+
+ 373    L9:     RERAISE                  0
+
+  --   L10:     COPY                     3
+                POP_EXCEPT
+                RERAISE                  1
+ExceptionTable:
+  L2 to L3 -> L7 [0]
+  L4 to L5 -> L7 [0]
+  L7 to L8 -> L10 [1] lasti
+  L9 to L10 -> L10 [1] lasti

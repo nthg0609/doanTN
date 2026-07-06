@@ -1,0 +1,1831 @@
+  --             MAKE_CELL               70 (q_l)
+                 MAKE_CELL               71 (q_lower)
+
+ 966             RETURN_GENERATOR
+                 POP_TOP
+         L1:     RESUME                   0
+
+ 975             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (session_state)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               1 ('language_select')
+                 CALL                     1
+                 LOAD_CONST               2 ('English')
+                 COMPARE_OP              72 (==)
+                 STORE_FAST               6 (is_eng)
+
+ 976             LOAD_FAST                6 (is_eng)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        2 (to L2)
+                 LOAD_CONST               3 ('en')
+                 JUMP_FORWARD             1 (to L3)
+         L2:     LOAD_CONST               4 ('vi')
+         L3:     STORE_FAST               7 (lang_code)
+
+ 977             LOAD_FAST                1 (result)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               5 ('classification')
+                 CALL                     1
+                 COPY                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L4)
+                 POP_TOP
+                 BUILD_MAP                0
+         L4:     LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               6 ('prediction')
+                 LOAD_CONST               7 ('NV')
+                 CALL                     2
+                 STORE_FAST               8 (pred_class)
+
+ 978             LOAD_CONST               8 ('general')
+                 STORE_FAST               9 (category)
+
+ 992             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (session_state)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               1 ('language_select')
+                 CALL                     1
+                 LOAD_CONST               2 ('English')
+                 COMPARE_OP              72 (==)
+                 STORE_FAST               6 (is_eng)
+
+ 993             LOAD_FAST                6 (is_eng)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        2 (to L5)
+                 LOAD_CONST               3 ('en')
+                 JUMP_FORWARD             1 (to L6)
+         L5:     LOAD_CONST               4 ('vi')
+         L6:     STORE_FAST               7 (lang_code)
+
+ 995             LOAD_FAST                0 (question)
+                 LOAD_ATTR                7 (lower + NULL|self)
+                 CALL                     0
+                 STORE_DEREF             70 (q_l)
+
+ 996             LOAD_CONST               8 ('general')
+                 STORE_FAST               9 (category)
+
+ 997             LOAD_GLOBAL              9 (any + NULL)
+                 LOAD_FAST               70 (q_l)
+                 BUILD_TUPLE              1
+                 LOAD_CONST               9 (<code object <genexpr> at 0x000001813F017030, file "D:\DoAn_DaLieu\app_streamlit.py", line 997>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+                 LOAD_CONST              10 (('triệu chứng', 'symptom', 'biểu hiện', 'dấu hiệu', 'lâm sàng', 'clinical'))
+                 GET_ITER
+                 CALL                     0
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        3 (to L7)
+
+ 998             LOAD_CONST              11 ('symptoms')
+                 STORE_FAST               9 (category)
+                 JUMP_FORWARD            86 (to L10)
+
+ 999     L7:     LOAD_GLOBAL              9 (any + NULL)
+                 LOAD_FAST               70 (q_l)
+                 BUILD_TUPLE              1
+                 LOAD_CONST              12 (<code object <genexpr> at 0x000001813F017130, file "D:\DoAn_DaLieu\app_streamlit.py", line 999>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+                 LOAD_CONST              13 (('chăm sóc', 'phác đồ', 'care', 'dưỡng', 'bôi', 'vệ sinh', 'rửa', 'điều trị', 'treatment'))
+                 GET_ITER
+                 CALL                     0
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        3 (to L8)
+
+1000             LOAD_CONST              14 ('care')
+                 STORE_FAST               9 (category)
+                 JUMP_FORWARD            57 (to L10)
+
+1001     L8:     LOAD_GLOBAL              9 (any + NULL)
+                 LOAD_FAST               70 (q_l)
+                 BUILD_TUPLE              1
+                 LOAD_CONST              15 (<code object <genexpr> at 0x000001813F017230, file "D:\DoAn_DaLieu\app_streamlit.py", line 1001>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+                 LOAD_CONST              16 (('abcd', 'chỉ số', 'độ tròn', 'bờ', 'đối xứng', 'asymmetry', 'circularity', 'border'))
+                 GET_ITER
+                 CALL                     0
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        3 (to L9)
+
+1002             LOAD_CONST              17 ('abcd')
+                 STORE_FAST               9 (category)
+                 JUMP_FORWARD            28 (to L10)
+
+1003     L9:     LOAD_GLOBAL              9 (any + NULL)
+                 LOAD_FAST               70 (q_l)
+                 BUILD_TUPLE              1
+                 LOAD_CONST              18 (<code object <genexpr> at 0x000001813F017330, file "D:\DoAn_DaLieu\app_streamlit.py", line 1003>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+                 LOAD_CONST              19 (('sinh thiết', 'xét nghiệm', 'biopsy', 'test', 'khám', 'tiếp theo', 'next step'))
+                 GET_ITER
+                 CALL                     0
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        2 (to L10)
+
+1004             LOAD_CONST              20 ('biopsy')
+                 STORE_FAST               9 (category)
+
+1006    L10:     LOAD_FAST                1 (result)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               5 ('classification')
+                 CALL                     1
+                 COPY                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L11)
+                 POP_TOP
+                 BUILD_MAP                0
+        L11:     STORE_FAST              10 (c_data)
+
+1008             LOAD_FAST                1 (result)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              21 ('status')
+                 CALL                     1
+                 LOAD_CONST              22 ('triage')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE       59 (to L14)
+
+1009             LOAD_FAST                1 (result)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              23 ('triage_reason')
+                 LOAD_CONST              24 ('unknown')
+                 CALL                     2
+                 STORE_FAST              11 (triage_reason_raw)
+
+1010             LOAD_GLOBAL             10 (TRIAGE_REASON_VI)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST_LOAD_FAST    187 (triage_reason_raw, triage_reason_raw)
+                 CALL                     2
+                 STORE_FAST              12 (triage_reason_vi)
+
+1012             LOAD_CONST              25 (' **Safety Gate đã kích hoạt** — Hệ thống không thể đưa ra tư vấn vì:\n\n> _')
+
+1013             LOAD_FAST               12 (triage_reason_vi)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              26 ('_\n\nVui lòng chụp lại ảnh tổn thương với ánh sáng tốt hơn, hoặc liên hệ trực tiếp với bác sĩ da liễu để được thăm khám chính xác.')
+
+1012             BUILD_STRING             3
+
+1011             STORE_FAST              13 (fallback)
+
+1017             LOAD_FAST               13 (fallback)
+                 GET_ITER
+        L12:     FOR_ITER                 7 (to L13)
+                 STORE_FAST              14 (char)
+
+1018             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   5
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L12)
+
+1017    L13:     END_FOR
+                 POP_TOP
+
+1019             RETURN_CONST             0 (None)
+
+1022    L14:     LOAD_FAST                4 (vqa_mode)
+                 LOAD_CONST              27 (('Nội bộ (Offline - CPUMedicalVQAModel)', 'Offline (Custom CPUMedicalVQAModel)'))
+                 CONTAINS_OP              0
+                 EXTENDED_ARG             5
+                 POP_JUMP_IF_FALSE     1293 (to L61)
+
+1023    L15:     NOP
+
+1025    L16:     LOAD_FAST                0 (question)
+                 LOAD_ATTR                7 (lower + NULL|self)
+                 CALL                     0
+                 STORE_DEREF             71 (q_lower)
+
+1026             LOAD_CONST               8 ('general')
+                 STORE_FAST               9 (category)
+
+1027             LOAD_GLOBAL              9 (any + NULL)
+                 LOAD_FAST               71 (q_lower)
+                 BUILD_TUPLE              1
+                 LOAD_CONST              28 (<code object <genexpr> at 0x000001813F017430, file "D:\DoAn_DaLieu\app_streamlit.py", line 1027>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+                 LOAD_CONST              10 (('triệu chứng', 'symptom', 'biểu hiện', 'dấu hiệu', 'lâm sàng', 'clinical'))
+                 GET_ITER
+                 CALL                     0
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        3 (to L17)
+
+1028             LOAD_CONST              11 ('symptoms')
+                 STORE_FAST               9 (category)
+                 JUMP_FORWARD            86 (to L20)
+
+1029    L17:     LOAD_GLOBAL              9 (any + NULL)
+                 LOAD_FAST               71 (q_lower)
+                 BUILD_TUPLE              1
+                 LOAD_CONST              29 (<code object <genexpr> at 0x000001813F017530, file "D:\DoAn_DaLieu\app_streamlit.py", line 1029>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+                 LOAD_CONST              13 (('chăm sóc', 'phác đồ', 'care', 'dưỡng', 'bôi', 'vệ sinh', 'rửa', 'điều trị', 'treatment'))
+                 GET_ITER
+                 CALL                     0
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        3 (to L18)
+
+1030             LOAD_CONST              14 ('care')
+                 STORE_FAST               9 (category)
+                 JUMP_FORWARD            57 (to L20)
+
+1031    L18:     LOAD_GLOBAL              9 (any + NULL)
+                 LOAD_FAST               71 (q_lower)
+                 BUILD_TUPLE              1
+                 LOAD_CONST              30 (<code object <genexpr> at 0x000001813F017630, file "D:\DoAn_DaLieu\app_streamlit.py", line 1031>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+                 LOAD_CONST              16 (('abcd', 'chỉ số', 'độ tròn', 'bờ', 'đối xứng', 'asymmetry', 'circularity', 'border'))
+                 GET_ITER
+                 CALL                     0
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        3 (to L19)
+
+1032             LOAD_CONST              17 ('abcd')
+                 STORE_FAST               9 (category)
+                 JUMP_FORWARD            28 (to L20)
+
+1033    L19:     LOAD_GLOBAL              9 (any + NULL)
+                 LOAD_FAST               71 (q_lower)
+                 BUILD_TUPLE              1
+                 LOAD_CONST              31 (<code object <genexpr> at 0x000001813F017730, file "D:\DoAn_DaLieu\app_streamlit.py", line 1033>)
+                 MAKE_FUNCTION
+                 SET_FUNCTION_ATTRIBUTE   8 (closure)
+                 LOAD_CONST              19 (('sinh thiết', 'xét nghiệm', 'biopsy', 'test', 'khám', 'tiếp theo', 'next step'))
+                 GET_ITER
+                 CALL                     0
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        2 (to L20)
+
+1034             LOAD_CONST              20 ('biopsy')
+                 STORE_FAST               9 (category)
+
+1036    L20:     LOAD_FAST                1 (result)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               5 ('classification')
+                 CALL                     1
+                 COPY                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L21)
+                 POP_TOP
+                 BUILD_MAP                0
+        L21:     STORE_FAST              15 (cls_data)
+
+1037             LOAD_FAST               15 (cls_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               6 ('prediction')
+                 LOAD_CONST               7 ('NV')
+                 CALL                     2
+                 STORE_FAST               8 (pred_class)
+
+1040             NOP
+
+1041             LOAD_FAST                6 (is_eng)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        2 (to L22)
+                 LOAD_CONST               3 ('en')
+                 JUMP_FORWARD             1 (to L23)
+        L22:     LOAD_CONST               4 ('vi')
+        L23:     STORE_FAST               7 (lang_code)
+
+1042             LOAD_GLOBAL             12 (CLINICAL_KB)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST                8 (pred_class)
+                 LOAD_GLOBAL             12 (CLINICAL_KB)
+                 LOAD_CONST               7 ('NV')
+                 BINARY_SUBSCR
+                 CALL                     2
+                 STORE_FAST              16 (kb_block)
+
+1043             LOAD_FAST               16 (kb_block)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST                9 (category)
+                 LOAD_FAST               16 (kb_block)
+                 LOAD_CONST               8 ('general')
+                 BINARY_SUBSCR
+                 CALL                     2
+                 LOAD_FAST                7 (lang_code)
+                 BINARY_SUBSCR
+                 STORE_FAST              17 (expert_answer)
+
+1046             LOAD_CONST              32 (0)
+                 LOAD_CONST               0 (None)
+                 IMPORT_NAME              7 (torch)
+                 STORE_FAST              18 (torch)
+
+1047             LOAD_GLOBAL             17 (load_custom_vqa_model + NULL)
+                 CALL                     0
+                 UNPACK_SEQUENCE          3
+                 STORE_FAST              19 (model)
+                 STORE_FAST              20 (tokenizer)
+                 STORE_FAST              21 (device)
+
+1048             LOAD_FAST               19 (model)
+                 POP_JUMP_IF_NONE         3 (to L24)
+                 LOAD_FAST               20 (tokenizer)
+                 POP_JUMP_IF_NOT_NONE    14 (to L28)
+
+1050    L24:     LOAD_FAST               17 (expert_answer)
+                 GET_ITER
+        L25:     FOR_ITER                 7 (to L26)
+                 STORE_FAST              14 (char)
+
+1051             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L25)
+
+1050    L26:     END_FOR
+                 POP_TOP
+
+1052    L27:     RETURN_CONST             0 (None)
+
+1054    L28:     LOAD_CONST              32 (0)
+                 LOAD_CONST               0 (None)
+                 IMPORT_NAME              9 (torchvision.transforms)
+                 IMPORT_FROM             10 (transforms)
+                 STORE_FAST              22 (transforms)
+                 POP_TOP
+
+1056             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (session_state)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              33 ('saved_local_img_path')
+                 CALL                     1
+                 STORE_FAST              23 (img_path)
+
+1057             LOAD_FAST               23 (img_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       36 (to L29)
+                 LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               24 (path)
+                 LOAD_ATTR               27 (exists + NULL|self)
+                 LOAD_FAST               23 (img_path)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        14 (to L33)
+
+1058    L29:     LOAD_FAST               17 (expert_answer)
+                 GET_ITER
+        L30:     FOR_ITER                 7 (to L31)
+                 STORE_FAST              14 (char)
+
+1059             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L30)
+
+1058    L31:     END_FOR
+                 POP_TOP
+
+1060    L32:     RETURN_CONST             0 (None)
+
+1062    L33:     LOAD_GLOBAL             28 (Image)
+                 LOAD_ATTR               30 (open)
+                 PUSH_NULL
+                 LOAD_FAST               23 (img_path)
+                 CALL                     1
+                 LOAD_ATTR               33 (convert + NULL|self)
+                 LOAD_CONST              34 ('RGB')
+                 CALL                     1
+                 STORE_FAST              24 (image)
+
+1063             LOAD_FAST               22 (transforms)
+                 LOAD_ATTR               35 (Compose + NULL|self)
+
+1064             LOAD_FAST               22 (transforms)
+                 LOAD_ATTR               37 (Resize + NULL|self)
+                 LOAD_CONST              35 ((224, 224))
+                 CALL                     1
+
+1065             LOAD_FAST               22 (transforms)
+                 LOAD_ATTR               39 (ToTensor + NULL|self)
+                 CALL                     0
+
+1066             LOAD_FAST               22 (transforms)
+                 LOAD_ATTR               41 (Normalize + NULL|self)
+                 BUILD_LIST               0
+                 LOAD_CONST              36 ((0.485, 0.456, 0.406))
+                 LIST_EXTEND              1
+                 BUILD_LIST               0
+                 LOAD_CONST              37 ((0.229, 0.224, 0.225))
+                 LIST_EXTEND              1
+                 LOAD_CONST              38 (('mean', 'std'))
+                 CALL_KW                  2
+
+1063             BUILD_LIST               3
+                 CALL                     1
+                 STORE_FAST              25 (transform)
+
+1068             LOAD_FAST               25 (transform)
+                 PUSH_NULL
+                 LOAD_FAST               24 (image)
+                 CALL                     1
+                 LOAD_ATTR               43 (unsqueeze + NULL|self)
+                 LOAD_CONST              32 (0)
+                 CALL                     1
+                 LOAD_ATTR               45 (to + NULL|self)
+                 LOAD_FAST               21 (device)
+                 CALL                     1
+                 STORE_FAST              26 (img_tensor)
+
+1071             LOAD_CONST              39 ('What is the diagnosis for this skin condition?')
+                 STORE_FAST              27 (english_question)
+
+1072             LOAD_FAST                9 (category)
+                 LOAD_CONST              11 ('symptoms')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE        3 (to L34)
+
+1073             LOAD_CONST              40 ('What are the typical clinical symptoms of this pathology?')
+                 STORE_FAST              27 (english_question)
+                 JUMP_FORWARD            26 (to L37)
+
+1074    L34:     LOAD_FAST                9 (category)
+                 LOAD_CONST              14 ('care')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE        3 (to L35)
+
+1075             LOAD_CONST              41 ('What is the recommended skin care protocol for this lesion?')
+                 STORE_FAST              27 (english_question)
+                 JUMP_FORWARD            17 (to L37)
+
+1076    L35:     LOAD_FAST                9 (category)
+                 LOAD_CONST              17 ('abcd')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE        3 (to L36)
+
+1077             LOAD_CONST              42 ('Explain the ABCD abnormalities of this lesion.')
+                 STORE_FAST              27 (english_question)
+                 JUMP_FORWARD             8 (to L37)
+
+1078    L36:     LOAD_FAST                9 (category)
+                 LOAD_CONST              20 ('biopsy')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE        2 (to L37)
+
+1079             LOAD_CONST              43 ('What are the next recommended biopsy and clinical diagnostic tests?')
+                 STORE_FAST              27 (english_question)
+
+1081    L37:     LOAD_CONST              44 ('<|user|>: ')
+                 LOAD_FAST               27 (english_question)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              45 (' <|doctor|>:')
+                 BUILD_STRING             3
+                 STORE_FAST              28 (prompt)
+
+1082             LOAD_FAST               20 (tokenizer)
+                 PUSH_NULL
+                 LOAD_FAST               28 (prompt)
+                 LOAD_CONST              46 ('pt')
+                 LOAD_CONST              47 (('return_tensors',))
+                 CALL_KW                  2
+                 LOAD_ATTR               45 (to + NULL|self)
+                 LOAD_FAST               21 (device)
+                 CALL                     1
+                 STORE_FAST              29 (inputs)
+
+1084             LOAD_FAST               18 (torch)
+                 LOAD_ATTR               47 (no_grad + NULL|self)
+                 CALL                     0
+                 BEFORE_WITH
+        L38:     POP_TOP
+
+1085             LOAD_GLOBAL             49 (hasattr + NULL)
+                 LOAD_FAST               19 (model)
+                 LOAD_ATTR               50 (llm)
+                 LOAD_CONST              48 ('transformer')
+                 CALL                     2
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       41 (to L39)
+
+1086             LOAD_FAST               19 (model)
+                 LOAD_ATTR               50 (llm)
+                 LOAD_ATTR               52 (transformer)
+                 LOAD_ATTR               55 (wte + NULL|self)
+                 LOAD_FAST               29 (inputs)
+                 LOAD_CONST              49 ('input_ids')
+                 BINARY_SUBSCR
+                 CALL                     1
+                 STORE_FAST              30 (text_embeds)
+                 JUMP_FORWARD            90 (to L41)
+
+1087    L39:     LOAD_GLOBAL             49 (hasattr + NULL)
+                 LOAD_FAST               19 (model)
+                 LOAD_ATTR               50 (llm)
+                 LOAD_CONST              50 ('base_model')
+                 CALL                     2
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       61 (to L40)
+
+1088             LOAD_FAST               19 (model)
+                 LOAD_ATTR               50 (llm)
+                 LOAD_ATTR               56 (base_model)
+                 LOAD_ATTR               58 (model)
+                 LOAD_ATTR               52 (transformer)
+                 LOAD_ATTR               55 (wte + NULL|self)
+                 LOAD_FAST               29 (inputs)
+                 LOAD_CONST              49 ('input_ids')
+                 BINARY_SUBSCR
+                 CALL                     1
+                 STORE_FAST              30 (text_embeds)
+                 JUMP_FORWARD             2 (to L41)
+
+1090    L40:     LOAD_CONST               0 (None)
+                 STORE_FAST              30 (text_embeds)
+
+1092    L41:     LOAD_GLOBAL             49 (hasattr + NULL)
+                 LOAD_FAST               19 (model)
+                 LOAD_CONST              51 ('get_image_embeddings')
+                 CALL                     2
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       17 (to L42)
+
+1093             LOAD_FAST               19 (model)
+                 LOAD_ATTR               61 (get_image_embeddings + NULL|self)
+                 LOAD_FAST               26 (img_tensor)
+                 LOAD_FAST               30 (text_embeds)
+                 LOAD_CONST              52 (('text_embeds',))
+                 CALL_KW                  2
+                 STORE_FAST              31 (img_embeds)
+                 JUMP_FORWARD            47 (to L43)
+
+1095    L42:     LOAD_FAST               19 (model)
+                 LOAD_ATTR               63 (projection + NULL|self)
+                 LOAD_FAST               19 (model)
+                 LOAD_ATTR               65 (vision_backbone + NULL|self)
+                 LOAD_FAST               26 (img_tensor)
+                 CALL                     1
+                 CALL                     1
+                 LOAD_ATTR               43 (unsqueeze + NULL|self)
+                 LOAD_CONST              53 (1)
+                 CALL                     1
+                 STORE_FAST              31 (img_embeds)
+
+1098    L43:     LOAD_GLOBAL             49 (hasattr + NULL)
+                 LOAD_FAST               19 (model)
+                 LOAD_CONST              54 ('clinical_prefix')
+                 CALL                     2
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       81 (to L44)
+                 LOAD_GLOBAL             67 (getattr + NULL)
+                 LOAD_FAST               19 (model)
+                 LOAD_CONST              55 ('has_prefix')
+                 LOAD_CONST              56 (True)
+                 CALL                     3
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       63 (to L44)
+
+1099             LOAD_FAST               19 (model)
+                 LOAD_ATTR               69 (clinical_prefix + NULL|self)
+                 LOAD_FAST               26 (img_tensor)
+                 LOAD_ATTR               71 (size + NULL|self)
+                 LOAD_CONST              32 (0)
+                 CALL                     1
+                 LOAD_FAST               26 (img_tensor)
+                 LOAD_ATTR               72 (device)
+                 CALL                     2
+                 STORE_FAST              32 (prefix_embeds)
+
+1100             LOAD_FAST               18 (torch)
+                 LOAD_ATTR               75 (cat + NULL|self)
+                 LOAD_FAST               32 (prefix_embeds)
+                 LOAD_FAST               31 (img_embeds)
+                 LOAD_FAST               30 (text_embeds)
+                 BUILD_LIST               3
+                 LOAD_CONST              53 (1)
+                 LOAD_CONST              57 (('dim',))
+                 CALL_KW                  2
+                 STORE_FAST              33 (inputs_embeds)
+                 JUMP_FORWARD            18 (to L45)
+
+1102    L44:     LOAD_FAST               18 (torch)
+                 LOAD_ATTR               75 (cat + NULL|self)
+                 LOAD_FAST               31 (img_embeds)
+                 LOAD_FAST               30 (text_embeds)
+                 BUILD_LIST               2
+                 LOAD_CONST              53 (1)
+                 LOAD_CONST              57 (('dim',))
+                 CALL_KW                  2
+                 STORE_FAST              33 (inputs_embeds)
+
+1103    L45:     LOAD_FAST               18 (torch)
+                 LOAD_ATTR               77 (ones + NULL|self)
+                 LOAD_FAST               33 (inputs_embeds)
+                 LOAD_ATTR               78 (shape)
+                 LOAD_CONST               0 (None)
+                 LOAD_CONST              58 (2)
+                 BINARY_SLICE
+                 LOAD_FAST               21 (device)
+                 LOAD_FAST               18 (torch)
+                 LOAD_ATTR               80 (long)
+                 LOAD_CONST              59 (('device', 'dtype'))
+                 CALL_KW                  3
+                 STORE_FAST              34 (attention_mask)
+
+1105             LOAD_FAST               19 (model)
+                 LOAD_ATTR               50 (llm)
+                 LOAD_ATTR               83 (generate + NULL|self)
+
+1106             LOAD_FAST               33 (inputs_embeds)
+
+1107             LOAD_FAST               34 (attention_mask)
+
+1108             LOAD_CONST              60 (256)
+
+1111             LOAD_CONST              61 (0.85)
+
+1112             LOAD_FAST               20 (tokenizer)
+                 LOAD_ATTR               84 (eos_token_id)
+
+1113             LOAD_CONST              56 (True)
+
+1105             LOAD_CONST              62 (('inputs_embeds', 'attention_mask', 'max_new_tokens', 'top_p', 'pad_token_id', 'do_sample'))
+                 CALL_KW                  6
+                 STORE_FAST              35 (generated_ids)
+
+1084    L46:     LOAD_CONST               0 (None)
+                 LOAD_CONST               0 (None)
+                 LOAD_CONST               0 (None)
+                 CALL                     2
+                 POP_TOP
+
+1116    L47:     LOAD_FAST               20 (tokenizer)
+                 LOAD_ATTR               87 (decode + NULL|self)
+                 LOAD_FAST_CHECK         35 (generated_ids)
+                 LOAD_CONST              32 (0)
+                 BINARY_SUBSCR
+                 LOAD_CONST              56 (True)
+                 LOAD_CONST              63 (('skip_special_tokens',))
+                 CALL_KW                  2
+                 STORE_FAST              36 (output_text)
+
+1117             LOAD_FAST               28 (prompt)
+                 LOAD_FAST               36 (output_text)
+                 CONTAINS_OP              0
+                 POP_JUMP_IF_FALSE       18 (to L48)
+
+1118             LOAD_FAST               36 (output_text)
+                 LOAD_ATTR               89 (replace + NULL|self)
+                 LOAD_FAST               28 (prompt)
+                 LOAD_CONST              64 ('')
+                 CALL                     2
+                 STORE_FAST              36 (output_text)
+
+1120    L48:     LOAD_FAST               36 (output_text)
+                 LOAD_ATTR               91 (split + NULL|self)
+                 LOAD_CONST              65 ('<|')
+                 CALL                     1
+                 LOAD_CONST              32 (0)
+                 BINARY_SUBSCR
+                 LOAD_ATTR               93 (strip + NULL|self)
+                 CALL                     0
+                 STORE_FAST              37 (output_clean)
+
+1123             LOAD_FAST                6 (is_eng)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        13 (to L49)
+
+1124             LOAD_GLOBAL             95 (translate_text + NULL)
+                 LOAD_FAST               37 (output_clean)
+                 LOAD_CONST              66 ('Vietnamese')
+                 CALL                     2
+                 STORE_FAST              38 (vietnamese_answer)
+                 JUMP_FORWARD             2 (to L50)
+
+1126    L49:     LOAD_FAST               37 (output_clean)
+                 STORE_FAST              38 (vietnamese_answer)
+
+1130    L50:     LOAD_GLOBAL             97 (len + NULL)
+                 LOAD_FAST               38 (vietnamese_answer)
+                 LOAD_ATTR               93 (strip + NULL|self)
+                 CALL                     0
+                 CALL                     1
+                 LOAD_CONST              67 (15)
+                 COMPARE_OP              18 (bool(<))
+                 POP_JUMP_IF_TRUE        60 (to L51)
+                 LOAD_CONST              68 ('prozac')
+                 LOAD_FAST               38 (vietnamese_answer)
+                 LOAD_ATTR                7 (lower + NULL|self)
+                 CALL                     0
+                 CONTAINS_OP              0
+                 POP_JUMP_IF_TRUE        40 (to L51)
+                 LOAD_CONST              69 ('diphtheria')
+                 LOAD_FAST               38 (vietnamese_answer)
+                 LOAD_ATTR                7 (lower + NULL|self)
+                 CALL                     0
+                 CONTAINS_OP              0
+                 POP_JUMP_IF_TRUE        20 (to L51)
+                 LOAD_CONST              70 ('allergic')
+                 LOAD_FAST               38 (vietnamese_answer)
+                 LOAD_ATTR                7 (lower + NULL|self)
+                 CALL                     0
+                 CONTAINS_OP              0
+                 POP_JUMP_IF_FALSE        3 (to L52)
+
+1131    L51:     LOAD_FAST               17 (expert_answer)
+                 STORE_FAST              39 (final_answer)
+                 JUMP_FORWARD            46 (to L57)
+
+1134    L52:     LOAD_FAST                6 (is_eng)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L53)
+                 LOAD_CONST              71 ('Theo mô hình VQA nội bộ kết hợp phân tích hình ảnh: ')
+                 JUMP_FORWARD             1 (to L54)
+        L53:     LOAD_CONST              72 ('According to the local VQA vision analysis: ')
+        L54:     STORE_FAST              40 (prefix)
+
+1135             LOAD_FAST               40 (prefix)
+                 FORMAT_SIMPLE
+                 LOAD_FAST               38 (vietnamese_answer)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              73 ('\n\n👉 **')
+                 LOAD_CONST              74 ('t')
+                 LOAD_GLOBAL             99 (locals + NULL)
+                 CALL                     0
+                 CONTAINS_OP              0
+                 POP_JUMP_IF_FALSE        9 (to L55)
+                 LOAD_GLOBAL            100 (t)
+                 LOAD_CONST              75 ('clinical_warning')
+                 BINARY_SUBSCR
+                 JUMP_FORWARD             1 (to L56)
+        L55:     LOAD_CONST              76 ('Tư vấn y tế bổ sung')
+        L56:     FORMAT_SIMPLE
+                 LOAD_CONST              77 ('**: ')
+                 LOAD_FAST               17 (expert_answer)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             6
+                 STORE_FAST              39 (final_answer)
+
+1137    L57:     LOAD_FAST               39 (final_answer)
+                 GET_ITER
+        L58:     FOR_ITER                 7 (to L59)
+                 STORE_FAST              14 (char)
+
+1138             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L58)
+
+1137    L59:     END_FOR
+                 POP_TOP
+
+1139    L60:     RETURN_CONST             0 (None)
+
+1148    L61:     LOAD_FAST                1 (result)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               5 ('classification')
+                 CALL                     1
+                 COPY                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L62)
+                 POP_TOP
+                 BUILD_MAP                0
+        L62:     STORE_FAST              15 (cls_data)
+
+1150             LOAD_FAST               15 (cls_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               6 ('prediction')
+                 LOAD_CONST              78 ('N/A')
+                 CALL                     2
+
+1151             LOAD_GLOBAL            105 (float + NULL)
+                 LOAD_FAST               15 (cls_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              79 ('confidence')
+                 LOAD_CONST              80 (0.0)
+                 CALL                     2
+                 CALL                     1
+
+1152             LOAD_FAST               15 (cls_data)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              81 ('probabilities')
+                 BUILD_MAP                0
+                 CALL                     2
+
+1153             LOAD_FAST                1 (result)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              82 ('metrics')
+                 BUILD_MAP                0
+                 CALL                     2
+
+1149             LOAD_CONST              83 (('prediction', 'confidence', 'probabilities', 'metrics'))
+                 BUILD_CONST_KEY_MAP      4
+                 STORE_FAST              43 (cv_context)
+
+1157             LOAD_GLOBAL            107 (_build_fusion_system_prompt + NULL)
+                 LOAD_FAST               43 (cv_context)
+                 CALL                     1
+                 STORE_FAST              44 (system_prompt)
+
+1160             LOAD_CONST              64 ('')
+                 STORE_FAST              45 (rag_context)
+
+1161             LOAD_GLOBAL            109 (get_rag_engine + NULL)
+                 CALL                     0
+                 STORE_FAST              46 (rag_engine)
+
+1162             LOAD_FAST               46 (rag_engine)
+                 POP_JUMP_IF_NONE        57 (to L65)
+
+1163    L63:     NOP
+
+1164    L64:     LOAD_FAST                0 (question)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              84 (' ')
+                 LOAD_FAST               43 (cv_context)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST               6 ('prediction')
+                 LOAD_CONST              64 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             3
+                 STORE_FAST              47 (query_str)
+
+1165             LOAD_FAST               46 (rag_engine)
+                 LOAD_ATTR              111 (retrieve + NULL|self)
+                 LOAD_FAST               47 (query_str)
+                 LOAD_CONST              53 (1)
+                 LOAD_CONST              85 (('n_results',))
+                 CALL_KW                  2
+                 STORE_FAST              48 (retrieved_docs)
+
+1166             LOAD_FAST               48 (retrieved_docs)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       10 (to L65)
+
+1167             LOAD_FAST               48 (retrieved_docs)
+                 LOAD_CONST              32 (0)
+                 BINARY_SUBSCR
+                 LOAD_CONST              86 ('text')
+                 BINARY_SUBSCR
+                 STORE_FAST              49 (doc_text)
+
+1176             LOAD_CONST              87 ("LƯU Ý QUAN TRỌNG: Hãy sử dụng thông tin từ tài liệu y khoa tham khảo trên để làm cơ sở trả lời và trích dẫn nguồn cụ thể (ví dụ: 'Theo Hướng dẫn chẩn đoán và điều trị của Bộ Y tế...').")
+
+1168             STORE_FAST              45 (rag_context)
+
+1182    L65:     LOAD_FAST               45 (rag_context)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE        5 (to L66)
+
+1183             LOAD_FAST               44 (system_prompt)
+                 LOAD_FAST               45 (rag_context)
+                 BINARY_OP               13 (+=)
+                 STORE_FAST              44 (system_prompt)
+
+1186    L66:     LOAD_FAST                3 (history)
+                 COPY                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L67)
+                 POP_TOP
+                 BUILD_LIST               0
+        L67:     STORE_FAST               3 (history)
+
+1189             LOAD_FAST                3 (history)
+                 GET_ITER
+
+1187             LOAD_FAST_AND_CLEAR     51 (msg)
+                 SWAP                     2
+        L68:     BUILD_LIST               0
+                 SWAP                     2
+
+1189             GET_ITER
+        L69:     FOR_ITER                61 (to L74)
+                 STORE_FAST              51 (msg)
+
+1190             LOAD_FAST               51 (msg)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              89 ('role')
+                 CALL                     1
+                 LOAD_CONST              90 (('user', 'assistant'))
+                 CONTAINS_OP              0
+
+1188    L70:     POP_JUMP_IF_TRUE         2 (to L71)
+                 JUMP_BACKWARD           26 (to L69)
+
+1190    L71:     LOAD_FAST               51 (msg)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              91 ('content')
+                 CALL                     1
+                 TO_BOOL
+
+1188    L72:     POP_JUMP_IF_TRUE         2 (to L73)
+                 JUMP_BACKWARD           50 (to L69)
+        L73:     LOAD_FAST               51 (msg)
+                 LOAD_CONST              89 ('role')
+                 BINARY_SUBSCR
+                 LOAD_FAST               51 (msg)
+                 LOAD_CONST              91 ('content')
+                 BINARY_SUBSCR
+                 LOAD_CONST              92 (('role', 'content'))
+                 BUILD_CONST_KEY_MAP      2
+                 LIST_APPEND              2
+                 JUMP_BACKWARD           63 (to L69)
+
+1189    L74:     END_FOR
+                 POP_TOP
+
+1187    L75:     STORE_FAST              52 (valid_history)
+                 STORE_FAST              51 (msg)
+
+1192             LOAD_FAST               52 (valid_history)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       17 (to L76)
+                 LOAD_FAST               52 (valid_history)
+                 LOAD_CONST              93 (-1)
+                 BINARY_SUBSCR
+                 LOAD_CONST              89 ('role')
+                 BINARY_SUBSCR
+                 LOAD_CONST              94 ('user')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE        5 (to L76)
+
+1193             LOAD_FAST               52 (valid_history)
+                 LOAD_CONST               0 (None)
+                 LOAD_CONST              93 (-1)
+                 BINARY_SLICE
+                 STORE_FAST              52 (valid_history)
+
+1196    L76:     LOAD_CONST              95 ('system')
+                 LOAD_FAST               44 (system_prompt)
+                 LOAD_CONST              92 (('role', 'content'))
+                 BUILD_CONST_KEY_MAP      2
+
+1195             BUILD_LIST               1
+
+1197             LOAD_FAST               52 (valid_history)
+
+1195             LIST_EXTEND              1
+
+1198             LOAD_CONST              94 ('user')
+                 LOAD_FAST                0 (question)
+                 LOAD_CONST              92 (('role', 'content'))
+                 BUILD_CONST_KEY_MAP      2
+
+1195             LIST_APPEND              1
+                 STORE_FAST              53 (messages)
+
+1202             LOAD_FAST                4 (vqa_mode)
+                 LOAD_CONST              96 ('Offline (Local Ollama)')
+                 COMPARE_OP              72 (==)
+                 COPY                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        17 (to L77)
+                 POP_TOP
+                 LOAD_FAST                4 (vqa_mode)
+                 LOAD_CONST              97 ('Nội bộ (Offline)')
+                 COMPARE_OP              72 (==)
+                 COPY                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         5 (to L77)
+                 POP_TOP
+                 LOAD_CONST              98 ('Ollama')
+                 LOAD_FAST                4 (vqa_mode)
+                 CONTAINS_OP              0
+        L77:     STORE_FAST              54 (is_offline)
+
+1203             LOAD_CONST              99 ('gpt-4o-mini')
+                 STORE_FAST              55 (model_to_use)
+
+1205    L78:     NOP
+
+1206    L79:     LOAD_FAST               54 (is_offline)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       15 (to L80)
+
+1207             LOAD_GLOBAL            115 (OpenAI + NULL)
+                 LOAD_CONST             100 ('http://127.0.0.1:11434/v1')
+                 LOAD_CONST               0 (None)
+                 LOAD_CONST             101 ('ollama')
+                 LOAD_CONST             102 (60.0)
+                 LOAD_CONST             103 (('base_url', 'http_client', 'api_key', 'timeout'))
+                 CALL_KW                  4
+                 STORE_FAST              56 (client)
+
+1208             LOAD_FAST                5 (local_model)
+                 STORE_FAST              55 (model_to_use)
+                 JUMP_FORWARD           103 (to L87)
+
+1210    L80:     LOAD_FAST                2 (api_key)
+                 COPY                     1
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        22 (to L81)
+                 POP_TOP
+                 LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR              116 (getenv)
+                 PUSH_NULL
+                 LOAD_CONST             104 ('OPENAI_API_KEY')
+                 CALL                     1
+        L81:     STORE_FAST               2 (api_key)
+
+1211             LOAD_GLOBAL            114 (OpenAI)
+                 POP_JUMP_IF_NONE         7 (to L82)
+                 LOAD_FAST                2 (api_key)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        25 (to L86)
+
+1212    L82:     LOAD_GLOBAL            119 (_fallback_response + NULL)
+                 LOAD_FAST_LOAD_FAST      1 (question, result)
+                 CALL                     2
+                 STORE_FAST              13 (fallback)
+
+1213             LOAD_FAST               13 (fallback)
+                 GET_ITER
+        L83:     FOR_ITER                 7 (to L84)
+                 STORE_FAST              14 (char)
+
+1214             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L83)
+
+1213    L84:     END_FOR
+                 POP_TOP
+
+1215    L85:     RETURN_CONST             0 (None)
+
+1216    L86:     LOAD_GLOBAL            115 (OpenAI + NULL)
+                 LOAD_FAST                2 (api_key)
+                 LOAD_CONST             102 (60.0)
+                 LOAD_CONST             105 (('api_key', 'timeout'))
+                 CALL_KW                  2
+                 STORE_FAST              56 (client)
+
+1217             LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR              116 (getenv)
+                 PUSH_NULL
+                 LOAD_CONST             106 ('OPENAI_MODEL')
+                 LOAD_CONST              99 ('gpt-4o-mini')
+                 CALL                     2
+                 STORE_FAST              55 (model_to_use)
+
+1220    L87:     LOAD_CONST              64 ('')
+                 STORE_FAST              57 (base64_image)
+
+1221             LOAD_FAST               54 (is_offline)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE       147 (to L92)
+
+1222             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (session_state)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_CONST              33 ('saved_local_img_path')
+                 CALL                     1
+                 STORE_FAST              23 (img_path)
+
+1223             LOAD_FAST               23 (img_path)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      109 (to L92)
+                 LOAD_GLOBAL             22 (os)
+                 LOAD_ATTR               24 (path)
+                 LOAD_ATTR               27 (exists + NULL|self)
+                 LOAD_FAST               23 (img_path)
+                 CALL                     1
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       73 (to L92)
+
+1224    L88:     NOP
+
+1225    L89:     LOAD_CONST              32 (0)
+                 LOAD_CONST               0 (None)
+                 IMPORT_NAME             60 (base64)
+                 STORE_FAST              58 (base64)
+
+1226             LOAD_GLOBAL             31 (open + NULL)
+                 LOAD_FAST               23 (img_path)
+                 LOAD_CONST             107 ('rb')
+                 CALL                     2
+                 BEFORE_WITH
+        L90:     STORE_FAST              59 (img_f)
+
+1227             LOAD_FAST               58 (base64)
+                 LOAD_ATTR              122 (b64encode)
+                 PUSH_NULL
+                 LOAD_FAST               59 (img_f)
+                 LOAD_ATTR              125 (read + NULL|self)
+                 CALL                     0
+                 CALL                     1
+                 LOAD_ATTR               87 (decode + NULL|self)
+                 LOAD_CONST             108 ('utf-8')
+                 CALL                     1
+                 STORE_FAST              57 (base64_image)
+
+1226    L91:     LOAD_CONST               0 (None)
+                 LOAD_CONST               0 (None)
+                 LOAD_CONST               0 (None)
+                 CALL                     2
+                 POP_TOP
+
+1232    L92:     LOAD_FAST               53 (messages)
+                 STORE_FAST              60 (final_messages)
+
+1233             LOAD_FAST               54 (is_offline)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        94 (to L96)
+                 LOAD_FAST               57 (base64_image)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       87 (to L96)
+
+1234             BUILD_LIST               0
+                 STORE_FAST              60 (final_messages)
+
+1235             LOAD_FAST               53 (messages)
+                 GET_ITER
+        L93:     FOR_ITER                78 (to L95)
+                 STORE_FAST              51 (msg)
+
+1236             LOAD_FAST               51 (msg)
+                 LOAD_CONST              89 ('role')
+                 BINARY_SUBSCR
+                 LOAD_CONST              94 ('user')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE       49 (to L94)
+                 LOAD_FAST               51 (msg)
+                 LOAD_FAST               53 (messages)
+                 LOAD_CONST              93 (-1)
+                 BINARY_SUBSCR
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE       40 (to L94)
+
+1238             LOAD_CONST              86 ('text')
+                 LOAD_FAST               51 (msg)
+                 LOAD_CONST              91 ('content')
+                 BINARY_SUBSCR
+                 LOAD_CONST             110 (('type', 'text'))
+                 BUILD_CONST_KEY_MAP      2
+
+1240             LOAD_CONST             111 ('image_url')
+
+1242             LOAD_CONST             112 ('url')
+                 LOAD_CONST             113 ('data:image/jpeg;base64,')
+                 LOAD_FAST               57 (base64_image)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+
+1241             BUILD_MAP                1
+
+1239             LOAD_CONST             114 (('type', 'image_url'))
+                 BUILD_CONST_KEY_MAP      2
+
+1237             BUILD_LIST               2
+                 STORE_FAST              61 (user_content)
+
+1246             LOAD_FAST               60 (final_messages)
+                 LOAD_ATTR              127 (append + NULL|self)
+                 LOAD_CONST              94 ('user')
+                 LOAD_FAST               61 (user_content)
+                 LOAD_CONST              92 (('role', 'content'))
+                 BUILD_CONST_KEY_MAP      2
+                 CALL                     1
+                 POP_TOP
+                 JUMP_BACKWARD           61 (to L93)
+
+1248    L94:     LOAD_FAST               60 (final_messages)
+                 LOAD_ATTR              127 (append + NULL|self)
+                 LOAD_FAST               51 (msg)
+                 CALL                     1
+                 POP_TOP
+                 JUMP_BACKWARD           80 (to L93)
+
+1235    L95:     END_FOR
+                 POP_TOP
+                 JUMP_FORWARD             2 (to L97)
+
+1250    L96:     LOAD_FAST               53 (messages)
+                 STORE_FAST              60 (final_messages)
+
+1252    L97:     LOAD_FAST               56 (client)
+                 LOAD_ATTR              128 (chat)
+                 LOAD_ATTR              130 (completions)
+                 LOAD_ATTR              133 (create + NULL|self)
+
+1253             LOAD_FAST               55 (model_to_use)
+
+1254             LOAD_CONST             115 (0.2)
+
+1255             LOAD_CONST             116 (800)
+
+1256             LOAD_FAST               60 (final_messages)
+
+1257             LOAD_CONST              56 (True)
+
+1252             LOAD_CONST             117 (('model', 'temperature', 'max_tokens', 'messages', 'stream'))
+                 CALL_KW                  5
+                 STORE_FAST              62 (resp)
+
+1260             BUILD_LIST               0
+                 STORE_FAST              63 (raw_response_list)
+
+1261             LOAD_FAST               62 (resp)
+                 GET_ITER
+        L98:     FOR_ITER                95 (to L103)
+                 STORE_FAST              64 (chunk)
+
+1262             LOAD_GLOBAL             97 (len + NULL)
+                 LOAD_FAST               64 (chunk)
+                 LOAD_ATTR              134 (choices)
+                 CALL                     1
+                 LOAD_CONST              32 (0)
+                 COMPARE_OP             148 (bool(>))
+        L99:     POP_JUMP_IF_TRUE         2 (to L100)
+                 JUMP_BACKWARD           30 (to L98)
+
+1263   L100:     LOAD_FAST_CHECK         64 (chunk)
+                 LOAD_ATTR              134 (choices)
+                 LOAD_CONST              32 (0)
+                 BINARY_SUBSCR
+                 LOAD_ATTR              136 (delta)
+                 LOAD_ATTR              138 (content)
+                 STORE_FAST              65 (content)
+
+1264             LOAD_FAST               65 (content)
+                 TO_BOOL
+       L101:     POP_JUMP_IF_TRUE         2 (to L102)
+                 JUMP_BACKWARD           74 (to L98)
+
+1265   L102:     LOAD_FAST               63 (raw_response_list)
+                 LOAD_ATTR              127 (append + NULL|self)
+                 LOAD_FAST_CHECK         65 (content)
+                 CALL                     1
+                 POP_TOP
+
+1266             LOAD_FAST               65 (content)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD           97 (to L98)
+
+1261   L103:     END_FOR
+                 POP_TOP
+
+1306   L104:     LOAD_CONST              64 ('')
+                 LOAD_ATTR              145 (join + NULL|self)
+                 LOAD_FAST               63 (raw_response_list)
+                 CALL                     1
+                 STORE_FAST              69 (raw_response)
+
+1307             LOAD_GLOBAL            141 (write_dev_log + NULL)
+
+1309             LOAD_FAST               44 (system_prompt)
+
+1310             LOAD_FAST                0 (question)
+
+1311             LOAD_GLOBAL             97 (len + NULL)
+                 LOAD_FAST               52 (valid_history)
+                 CALL                     1
+
+1312             LOAD_FAST               69 (raw_response)
+
+1313             LOAD_FAST               43 (cv_context)
+
+1314             LOAD_FAST                4 (vqa_mode)
+
+1315             LOAD_FAST               55 (model_to_use)
+
+1308             LOAD_CONST             122 (('system_prompt', 'user_message', 'chat_history_len', 'raw_response', 'cv_context', 'vqa_mode', 'model_used'))
+                 BUILD_CONST_KEY_MAP      7
+
+1317             LOAD_CONST             123 ('LLM_VQA_EXCHANGE')
+
+1307             LOAD_CONST             120 (('action_type',))
+                 CALL_KW                  2
+                 POP_TOP
+                 RETURN_CONST             0 (None)
+
+1084   L105:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         1 (to L106)
+                 RERAISE                  2
+       L106:     POP_TOP
+       L107:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             4
+                 JUMP_BACKWARD_NO_INTERRUPT 1194 (to L47)
+
+  --   L108:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L109:     PUSH_EXC_INFO
+
+1140             LOAD_GLOBAL            102 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE       81 (to L115)
+                 STORE_FAST              41 (custom_vqa_err)
+
+1142   L110:     LOAD_GLOBAL             12 (CLINICAL_KB)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST                8 (pred_class)
+                 LOAD_GLOBAL             12 (CLINICAL_KB)
+                 LOAD_CONST               7 ('NV')
+                 BINARY_SUBSCR
+                 CALL                     2
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST                9 (category)
+                 LOAD_GLOBAL             12 (CLINICAL_KB)
+                 LOAD_CONST               7 ('NV')
+                 BINARY_SUBSCR
+                 LOAD_CONST               8 ('general')
+                 BINARY_SUBSCR
+                 CALL                     2
+                 LOAD_FAST                7 (lang_code)
+                 BINARY_SUBSCR
+                 STORE_FAST              42 (fallback_ans)
+
+1143             LOAD_FAST               42 (fallback_ans)
+                 GET_ITER
+       L111:     FOR_ITER                 7 (to L112)
+                 STORE_FAST              14 (char)
+
+1144             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L111)
+
+1143   L112:     END_FOR
+                 POP_TOP
+
+1145   L113:     POP_EXCEPT
+                 LOAD_CONST               0 (None)
+                 STORE_FAST              41 (custom_vqa_err)
+                 DELETE_FAST             41 (custom_vqa_err)
+                 RETURN_CONST             0 (None)
+
+  --   L114:     LOAD_CONST               0 (None)
+                 STORE_FAST              41 (custom_vqa_err)
+                 DELETE_FAST             41 (custom_vqa_err)
+                 RERAISE                  1
+
+1140   L115:     RERAISE                  0
+
+  --   L116:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L117:     PUSH_EXC_INFO
+
+1179             LOAD_GLOBAL            102 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE       25 (to L121)
+                 STORE_FAST              50 (e)
+
+1180   L118:     LOAD_GLOBAL            113 (print + NULL)
+                 LOAD_CONST              88 ('RAG Error during query: ')
+                 LOAD_FAST               50 (e)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     1
+                 POP_TOP
+       L119:     POP_EXCEPT
+                 LOAD_CONST               0 (None)
+                 STORE_FAST              50 (e)
+                 DELETE_FAST             50 (e)
+                 EXTENDED_ARG             3
+                 JUMP_BACKWARD_NO_INTERRUPT 881 (to L65)
+
+  --   L120:     LOAD_CONST               0 (None)
+                 STORE_FAST              50 (e)
+                 DELETE_FAST             50 (e)
+                 RERAISE                  1
+
+1179   L121:     RERAISE                  0
+
+  --   L122:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L123:     SWAP                     2
+                 POP_TOP
+
+1187             SWAP                     2
+                 STORE_FAST              51 (msg)
+                 RERAISE                  0
+
+1226   L124:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         1 (to L125)
+                 RERAISE                  2
+       L125:     POP_TOP
+       L126:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+       L127:     EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 462 (to L92)
+
+  --   L128:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L129:     PUSH_EXC_INFO
+
+1228             LOAD_GLOBAL            102 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE       25 (to L133)
+                 STORE_FAST              50 (e)
+
+1229   L130:     LOAD_GLOBAL            113 (print + NULL)
+                 LOAD_CONST             109 ('Error encoding image to base64: ')
+                 LOAD_FAST               50 (e)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     1
+                 POP_TOP
+       L131:     POP_EXCEPT
+                 LOAD_CONST               0 (None)
+                 STORE_FAST              50 (e)
+                 DELETE_FAST             50 (e)
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 495 (to L92)
+
+  --   L132:     LOAD_CONST               0 (None)
+                 STORE_FAST              50 (e)
+                 DELETE_FAST             50 (e)
+                 RERAISE                  1
+
+1228   L133:     RERAISE                  0
+
+  --   L134:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L135:     PUSH_EXC_INFO
+
+1268             LOAD_GLOBAL            102 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE      145 (to L146)
+                 STORE_FAST              66 (exc)
+
+1269   L136:     LOAD_GLOBAL            141 (write_dev_log + NULL)
+                 LOAD_GLOBAL            143 (str + NULL)
+                 LOAD_FAST               66 (exc)
+                 CALL                     1
+                 LOAD_FAST_LOAD_FAST      4 (question, vqa_mode)
+                 LOAD_CONST             118 (('error', 'question', 'vqa_mode'))
+                 BUILD_CONST_KEY_MAP      3
+                 LOAD_CONST             119 ('LLM_ERROR')
+                 LOAD_CONST             120 (('action_type',))
+                 CALL_KW                  2
+                 POP_TOP
+
+1271             LOAD_FAST               54 (is_offline)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       82 (to L141)
+
+1273             LOAD_CONST             121 (())
+                 STORE_FAST              67 (error_msg)
+
+1291             LOAD_FAST               67 (error_msg)
+                 GET_ITER
+       L137:     FOR_ITER                 7 (to L138)
+                 STORE_FAST              14 (char)
+
+1292             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L137)
+
+1291   L138:     END_FOR
+                 POP_TOP
+
+1295             LOAD_GLOBAL             12 (CLINICAL_KB)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST                8 (pred_class)
+                 LOAD_GLOBAL             12 (CLINICAL_KB)
+                 LOAD_CONST               7 ('NV')
+                 BINARY_SUBSCR
+                 CALL                     2
+                 STORE_FAST              16 (kb_block)
+
+1296             LOAD_FAST               16 (kb_block)
+                 LOAD_ATTR                5 (get + NULL|self)
+                 LOAD_FAST                9 (category)
+                 LOAD_FAST               16 (kb_block)
+                 LOAD_CONST               8 ('general')
+                 BINARY_SUBSCR
+                 CALL                     2
+                 LOAD_FAST                7 (lang_code)
+                 BINARY_SUBSCR
+                 STORE_FAST              68 (fallback_clinical)
+
+1297             LOAD_FAST               68 (fallback_clinical)
+                 GET_ITER
+       L139:     FOR_ITER                 7 (to L140)
+                 STORE_FAST              14 (char)
+
+1298             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L139)
+
+1297   L140:     END_FOR
+                 POP_TOP
+                 JUMP_FORWARD            24 (to L144)
+
+1300   L141:     LOAD_GLOBAL            119 (_fallback_response + NULL)
+                 LOAD_FAST_LOAD_FAST      1 (question, result)
+                 CALL                     2
+                 STORE_FAST              13 (fallback)
+
+1301             LOAD_FAST               13 (fallback)
+                 GET_ITER
+       L142:     FOR_ITER                 7 (to L143)
+                 STORE_FAST              14 (char)
+
+1302             LOAD_FAST               14 (char)
+                 YIELD_VALUE              0
+                 RESUME                   1
+                 POP_TOP
+                 JUMP_BACKWARD            9 (to L142)
+
+1301   L143:     END_FOR
+                 POP_TOP
+
+1303   L144:     POP_EXCEPT
+                 LOAD_CONST               0 (None)
+                 STORE_FAST              66 (exc)
+                 DELETE_FAST             66 (exc)
+                 RETURN_CONST             0 (None)
+
+  --   L145:     LOAD_CONST               0 (None)
+                 STORE_FAST              66 (exc)
+                 DELETE_FAST             66 (exc)
+                 RERAISE                  1
+
+1268   L146:     RERAISE                  0
+
+  --   L147:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+       L148:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+                 RERAISE                  1
+ExceptionTable:
+  L1 to L15 -> L148 [0] lasti
+  L16 to L27 -> L109 [0]
+  L27 to L28 -> L148 [0] lasti
+  L28 to L32 -> L109 [0]
+  L32 to L33 -> L148 [0] lasti
+  L33 to L38 -> L109 [0]
+  L38 to L46 -> L105 [1] lasti
+  L46 to L60 -> L109 [0]
+  L60 to L63 -> L148 [0] lasti
+  L64 to L65 -> L117 [0]
+  L65 to L68 -> L148 [0] lasti
+  L68 to L70 -> L123 [2]
+  L71 to L72 -> L123 [2]
+  L73 to L75 -> L123 [2]
+  L75 to L78 -> L148 [0] lasti
+  L79 to L85 -> L135 [0]
+  L85 to L86 -> L148 [0] lasti
+  L86 to L88 -> L135 [0]
+  L89 to L90 -> L129 [0]
+  L90 to L91 -> L124 [1] lasti
+  L91 to L92 -> L129 [0]
+  L92 to L99 -> L135 [0]
+  L100 to L101 -> L135 [0]
+  L102 to L104 -> L135 [0]
+  L104 to L105 -> L148 [0] lasti
+  L105 to L107 -> L108 [3] lasti
+  L107 to L109 -> L109 [0]
+  L109 to L110 -> L116 [1] lasti
+  L110 to L113 -> L114 [1] lasti
+  L113 to L114 -> L148 [0] lasti
+  L114 to L116 -> L116 [1] lasti
+  L116 to L117 -> L148 [0] lasti
+  L117 to L118 -> L122 [1] lasti
+  L118 to L119 -> L120 [1] lasti
+  L119 to L120 -> L148 [0] lasti
+  L120 to L122 -> L122 [1] lasti
+  L122 to L124 -> L148 [0] lasti
+  L124 to L126 -> L128 [3] lasti
+  L126 to L127 -> L129 [0]
+  L127 to L128 -> L135 [0]
+  L128 to L129 -> L129 [0]
+  L129 to L130 -> L134 [1] lasti
+  L130 to L131 -> L132 [1] lasti
+  L131 to L132 -> L135 [0]
+  L132 to L134 -> L134 [1] lasti
+  L134 to L135 -> L135 [0]
+  L135 to L136 -> L147 [1] lasti
+  L136 to L144 -> L145 [1] lasti
+  L144 to L145 -> L148 [0] lasti
+  L145 to L147 -> L147 [1] lasti
+  L147 to L148 -> L148 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813F017030, file "D:\DoAn_DaLieu\app_streamlit.py", line 997>:
+  --           COPY_FREE_VARS           1
+
+ 997           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                 9 (to L3)
+               STORE_FAST_LOAD_FAST    17 (w, w)
+               LOAD_DEREF               2 (q_l)
+               CONTAINS_OP              0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           11 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813F017130, file "D:\DoAn_DaLieu\app_streamlit.py", line 999>:
+  --           COPY_FREE_VARS           1
+
+ 999           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                 9 (to L3)
+               STORE_FAST_LOAD_FAST    17 (w, w)
+               LOAD_DEREF               2 (q_l)
+               CONTAINS_OP              0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           11 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813F017230, file "D:\DoAn_DaLieu\app_streamlit.py", line 1001>:
+  --           COPY_FREE_VARS           1
+
+1001           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                 9 (to L3)
+               STORE_FAST_LOAD_FAST    17 (w, w)
+               LOAD_DEREF               2 (q_l)
+               CONTAINS_OP              0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           11 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813F017330, file "D:\DoAn_DaLieu\app_streamlit.py", line 1003>:
+  --           COPY_FREE_VARS           1
+
+1003           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                 9 (to L3)
+               STORE_FAST_LOAD_FAST    17 (w, w)
+               LOAD_DEREF               2 (q_l)
+               CONTAINS_OP              0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           11 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813F017430, file "D:\DoAn_DaLieu\app_streamlit.py", line 1027>:
+  --           COPY_FREE_VARS           1
+
+1027           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                 9 (to L3)
+               STORE_FAST_LOAD_FAST    17 (w, w)
+               LOAD_DEREF               2 (q_lower)
+               CONTAINS_OP              0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           11 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813F017530, file "D:\DoAn_DaLieu\app_streamlit.py", line 1029>:
+  --           COPY_FREE_VARS           1
+
+1029           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                 9 (to L3)
+               STORE_FAST_LOAD_FAST    17 (w, w)
+               LOAD_DEREF               2 (q_lower)
+               CONTAINS_OP              0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           11 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813F017630, file "D:\DoAn_DaLieu\app_streamlit.py", line 1031>:
+  --           COPY_FREE_VARS           1
+
+1031           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                 9 (to L3)
+               STORE_FAST_LOAD_FAST    17 (w, w)
+               LOAD_DEREF               2 (q_lower)
+               CONTAINS_OP              0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           11 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <genexpr> at 0x000001813F017730, file "D:\DoAn_DaLieu\app_streamlit.py", line 1033>:
+  --           COPY_FREE_VARS           1
+
+1033           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+               GET_ITER
+       L2:     FOR_ITER                 9 (to L3)
+               STORE_FAST_LOAD_FAST    17 (w, w)
+               LOAD_DEREF               2 (q_lower)
+               CONTAINS_OP              0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           11 (to L2)
+       L3:     END_FOR
+               POP_TOP
+               RETURN_CONST             0 (None)
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti

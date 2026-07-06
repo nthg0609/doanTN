@@ -1,0 +1,104 @@
+155           RESUME                   0
+
+159           LOAD_FAST_BORROW         0 (img_rgb)
+              LOAD_ATTR                1 (copy + NULL|self)
+              CALL                     0
+              STORE_FAST               2 (annotated)
+
+160           LOAD_FAST_BORROW         1 (lesions)
+              GET_ITER
+      L1:     FOR_ITER               239 (to L2)
+              STORE_FAST               3 (les)
+
+161           LOAD_FAST_BORROW         3 (les)
+              LOAD_CONST               1 ('bbox')
+              BINARY_OP               26 ([])
+              UNPACK_SEQUENCE          4
+              STORE_FAST_STORE_FAST   69 (x, y)
+              STORE_FAST_STORE_FAST  103 (w, h)
+
+163           LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR                4 (rectangle)
+              PUSH_NULL
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 36 (annotated, x)
+              LOAD_FAST_BORROW         5 (y)
+              BUILD_TUPLE              2
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 70 (x, w)
+              BINARY_OP                0 (+)
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 87 (y, h)
+              BINARY_OP                0 (+)
+              BUILD_TUPLE              2
+              LOAD_CONST               5 ((56, 161, 105))
+              LOAD_SMALL_INT           3
+              CALL                     5
+              POP_TOP
+
+165           LOAD_CONST               2 ('Not ')
+              LOAD_FAST_BORROW         3 (les)
+              LOAD_CONST               3 ('id')
+              BINARY_OP               26 ([])
+              FORMAT_SIMPLE
+              BUILD_STRING             2
+              STORE_FAST               8 (label)
+
+166           LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR                6 (getTextSize)
+              PUSH_NULL
+              LOAD_FAST_BORROW         8 (label)
+              LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR                8 (FONT_HERSHEY_SIMPLEX)
+              LOAD_CONST               4 (0.7)
+              LOAD_SMALL_INT           2
+              CALL                     4
+              UNPACK_SEQUENCE          2
+              UNPACK_SEQUENCE          2
+              STORE_FAST_STORE_FAST  154 (label_w, label_h)
+              STORE_FAST              11 (baseline)
+
+167           LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR                4 (rectangle)
+              PUSH_NULL
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 36 (annotated, x)
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 90 (y, label_h)
+              BINARY_OP               10 (-)
+              LOAD_SMALL_INT          10
+              BINARY_OP               10 (-)
+              BUILD_TUPLE              2
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 73 (x, label_w)
+              BINARY_OP                0 (+)
+              LOAD_SMALL_INT          10
+              BINARY_OP                0 (+)
+              LOAD_FAST_BORROW         5 (y)
+              BUILD_TUPLE              2
+              LOAD_CONST               5 ((56, 161, 105))
+              LOAD_CONST               6 (-1)
+              CALL                     5
+              POP_TOP
+
+168           LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR               10 (putText)
+              PUSH_NULL
+              LOAD_FAST_BORROW_LOAD_FAST_BORROW 40 (annotated, label)
+              LOAD_FAST_BORROW         4 (x)
+              LOAD_SMALL_INT           5
+              BINARY_OP                0 (+)
+              LOAD_FAST_BORROW         5 (y)
+              LOAD_SMALL_INT           5
+              BINARY_OP               10 (-)
+              BUILD_TUPLE              2
+              LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR                8 (FONT_HERSHEY_SIMPLEX)
+              LOAD_CONST               4 (0.7)
+              LOAD_CONST               7 ((255, 255, 255))
+              LOAD_SMALL_INT           2
+              LOAD_GLOBAL              2 (cv2)
+              LOAD_ATTR               12 (LINE_AA)
+              CALL                     8
+              POP_TOP
+              JUMP_BACKWARD          241 (to L1)
+
+160   L2:     END_FOR
+              POP_ITER
+
+169           LOAD_FAST_BORROW         2 (annotated)
+              RETURN_VALUE

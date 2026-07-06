@@ -1,0 +1,1393 @@
+1845             RESUME                   0
+
+1846             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                2 (header)
+                 PUSH_NULL
+                 LOAD_CONST               0 (' Hệ thống Tra cứu Hồ sơ Bệnh án Điện tử (Đa mốc thời gian)')
+                 CALL                     1
+                 POP_TOP
+
+1847             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                4 (info)
+                 PUSH_NULL
+                 LOAD_CONST               1 ('Hỗ trợ hiển thị lịch sử tiến triển lâm sàng đa phương thức (nhiều ảnh ở các thời điểm khác nhau).')
+                 CALL                     1
+                 POP_TOP
+
+1849             LOAD_GLOBAL              7 (fetch_all_medical_records + NULL)
+                 CALL                     0
+                 STORE_FAST               0 (all_records)
+
+1850             LOAD_FAST_BORROW         0 (all_records)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        25 (to L1)
+                 NOT_TAKEN
+
+1851             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                8 (warning)
+                 PUSH_NULL
+                 LOAD_CONST               2 ('📭 Hiện tại kho lưu trữ đám mây chưa có dữ liệu bệnh án nào hợp lệ.')
+                 CALL                     1
+                 POP_TOP
+
+1852             LOAD_CONST               3 (None)
+                 RETURN_VALUE
+
+1854     L1:     BUILD_MAP                0
+                 STORE_FAST               1 (patient_options)
+
+1855             LOAD_FAST_BORROW         0 (all_records)
+                 GET_ITER
+         L2:     FOR_ITER               121 (to L3)
+                 STORE_FAST               2 (r)
+
+1856             LOAD_FAST_BORROW         2 (r)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST               4 ('patient_info')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST               3 (p_info)
+
+1857             LOAD_FAST_BORROW         3 (p_info)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST               5 ('name')
+                 LOAD_CONST               6 ('Ẩn danh')
+                 CALL                     2
+                 STORE_FAST               4 (p_name)
+
+1858             LOAD_FAST_BORROW         3 (p_info)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST               7 ('age')
+                 LOAD_CONST               8 ('??')
+                 CALL                     2
+                 STORE_FAST               5 (p_age)
+
+1859             LOAD_FAST_BORROW         2 (r)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST               9 ('patient_id')
+                 LOAD_CONST              10 ('N/A')
+                 CALL                     2
+                 STORE_FAST               6 (p_id)
+
+1860             LOAD_GLOBAL             13 (len + NULL)
+                 LOAD_FAST_BORROW         2 (r)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              11 ('visits')
+                 BUILD_LIST               0
+                 CALL                     2
+                 CALL                     1
+                 STORE_FAST               7 (total)
+
+1861             LOAD_CONST              12 (' BN: ')
+                 LOAD_FAST_BORROW         4 (p_name)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              13 (' (')
+                 LOAD_FAST_BORROW         5 (p_age)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              14 (' tuổi) | Mã: ')
+                 LOAD_FAST_BORROW         6 (p_id)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              15 (' — [')
+                 LOAD_FAST_BORROW         7 (total)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              16 (' mốc ảnh bệnh án]')
+                 BUILD_STRING             9
+                 STORE_FAST               8 (label)
+
+1862             LOAD_FAST_BORROW_LOAD_FAST_BORROW 33 (r, patient_options)
+                 LOAD_FAST_BORROW         8 (label)
+                 STORE_SUBSCR
+                 JUMP_BACKWARD          123 (to L2)
+
+1855     L3:     END_FOR
+                 POP_ITER
+
+1864             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               14 (selectbox)
+                 PUSH_NULL
+                 LOAD_CONST              17 (' Chọn bệnh nhân cần tra cứu:')
+                 LOAD_GLOBAL             17 (list + NULL)
+                 LOAD_FAST_BORROW         1 (patient_options)
+                 LOAD_ATTR               19 (keys + NULL|self)
+                 CALL                     0
+                 CALL                     1
+                 CALL                     2
+                 STORE_FAST               9 (selected_key)
+
+1865             LOAD_FAST_BORROW         9 (selected_key)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         3 (to L4)
+                 NOT_TAKEN
+
+1866             LOAD_CONST               3 (None)
+                 RETURN_VALUE
+
+1868     L4:     LOAD_FAST_BORROW_LOAD_FAST_BORROW 25 (patient_options, selected_key)
+                 BINARY_OP               26 ([])
+                 STORE_FAST              10 (record)
+
+1869             LOAD_FAST_BORROW        10 (record)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST               4 ('patient_info')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST               3 (p_info)
+
+1870             LOAD_GLOBAL             21 (sorted + NULL)
+                 LOAD_FAST_BORROW        10 (record)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              11 ('visits')
+                 BUILD_LIST               0
+                 CALL                     2
+                 LOAD_CONST              18 (<code object <lambda> at 0x000002602A3F6B30, file "D:\DoAn_DaLieu\app_streamlit.py", line 1870>)
+                 MAKE_FUNCTION
+                 LOAD_CONST              19 (True)
+                 LOAD_CONST              20 (('key', 'reverse'))
+                 CALL_KW                  3
+                 STORE_FAST              11 (visits)
+
+1872             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              21 ('---')
+                 CALL                     1
+                 POP_TOP
+
+1873             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               24 (subheader)
+                 PUSH_NULL
+                 LOAD_CONST              22 (' Thông tin hành chính bệnh nhân')
+                 CALL                     1
+                 POP_TOP
+
+1874             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           3
+                 CALL                     1
+                 UNPACK_SEQUENCE          3
+                 STORE_FAST_STORE_FAST  205 (cc1, cc2)
+                 STORE_FAST              14 (cc3)
+
+1875             LOAD_FAST_BORROW        12 (cc1)
+                 LOAD_ATTR               23 (markdown + NULL|self)
+                 LOAD_CONST              23 ('**Họ và tên:** `')
+                 LOAD_FAST_BORROW         3 (p_info)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST               5 ('name')
+                 LOAD_CONST              24 ('')
+                 CALL                     2
+                 LOAD_ATTR               29 (upper + NULL|self)
+                 CALL                     0
+                 FORMAT_SIMPLE
+                 LOAD_CONST              25 ('`')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+1876             LOAD_FAST_BORROW        13 (cc2)
+                 LOAD_ATTR               23 (markdown + NULL|self)
+                 LOAD_CONST              26 ('**Tuổi lâm sàng:** `')
+                 LOAD_FAST_BORROW         3 (p_info)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST               7 ('age')
+                 LOAD_CONST              10 ('N/A')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 LOAD_CONST              25 ('`')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+1877             LOAD_FAST_BORROW        14 (cc3)
+                 LOAD_ATTR               23 (markdown + NULL|self)
+                 LOAD_CONST              27 ('**Địa chỉ thường trú:** `')
+                 LOAD_FAST_BORROW         3 (p_info)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              28 ('hometown')
+                 LOAD_CONST              10 ('N/A')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 LOAD_CONST              25 ('`')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+1879             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              21 ('---')
+                 CALL                     1
+                 POP_TOP
+
+1880             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               24 (subheader)
+                 PUSH_NULL
+                 LOAD_CONST              29 (' Lọc theo Vị trí Tổn thương')
+                 CALL                     1
+                 POP_TOP
+
+1882             LOAD_GLOBAL             21 (sorted + NULL)
+                 LOAD_GLOBAL             17 (list + NULL)
+                 LOAD_GLOBAL             31 (set + NULL)
+                 LOAD_CONST              30 (<code object <genexpr> at 0x000002602A351790, file "D:\DoAn_DaLieu\app_streamlit.py", line 1882>)
+                 MAKE_FUNCTION
+
+1883             LOAD_FAST_BORROW        11 (visits)
+                 GET_ITER
+
+1882             CALL                     0
+                 CALL                     1
+                 CALL                     1
+                 CALL                     1
+                 STORE_FAST              15 (unique_locations)
+
+1885             LOAD_CONST              31 ('Tất cả vị trí')
+                 BUILD_LIST               1
+                 LOAD_FAST_BORROW        15 (unique_locations)
+                 BINARY_OP                0 (+)
+                 STORE_FAST              16 (filter_options)
+
+1886             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               14 (selectbox)
+                 PUSH_NULL
+                 LOAD_CONST              32 ('Chọn vị trí tổn thương để xem tiến triển:')
+                 LOAD_FAST_BORROW        16 (filter_options)
+                 LOAD_CONST              33 ('dashboard_location_filter')
+                 LOAD_CONST              34 (('key',))
+                 CALL_KW                  3
+                 STORE_FAST              17 (selected_location)
+
+1889             LOAD_FAST_BORROW        17 (selected_location)
+                 LOAD_CONST              31 ('Tất cả vị trí')
+                 COMPARE_OP             119 (bool(!=))
+                 POP_JUMP_IF_FALSE       81 (to L11)
+                 NOT_TAKEN
+
+1890             LOAD_FAST_BORROW        11 (visits)
+                 GET_ITER
+                 LOAD_FAST_AND_CLEAR     18 (v)
+                 SWAP                     2
+         L5:     BUILD_LIST               0
+                 SWAP                     2
+         L6:     FOR_ITER                67 (to L9)
+                 STORE_FAST              18 (v)
+                 LOAD_GLOBAL             33 (str + NULL)
+                 LOAD_FAST_BORROW        18 (v)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              35 ('location')
+                 LOAD_CONST              36 ('Không rõ')
+                 CALL                     2
+                 CALL                     1
+                 LOAD_ATTR               35 (strip + NULL|self)
+                 CALL                     0
+                 LOAD_ATTR               37 (capitalize + NULL|self)
+                 CALL                     0
+                 LOAD_FAST_BORROW        17 (selected_location)
+                 COMPARE_OP              88 (bool(==))
+         L7:     POP_JUMP_IF_TRUE         3 (to L8)
+                 NOT_TAKEN
+                 JUMP_BACKWARD           65 (to L6)
+         L8:     LOAD_FAST_BORROW        18 (v)
+                 LIST_APPEND              2
+                 JUMP_BACKWARD           69 (to L6)
+         L9:     END_FOR
+                 POP_ITER
+        L10:     STORE_FAST              19 (filtered_visits)
+                 STORE_FAST              18 (v)
+                 JUMP_FORWARD             2 (to L12)
+
+1892    L11:     LOAD_FAST               11 (visits)
+                 STORE_FAST              19 (filtered_visits)
+
+1894    L12:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              21 ('---')
+                 CALL                     1
+                 POP_TOP
+
+1895             LOAD_GLOBAL             39 (render_evolution_chart + NULL)
+                 LOAD_FAST_BORROW        19 (filtered_visits)
+                 LOAD_FAST_BORROW        17 (selected_location)
+                 CALL                     2
+                 POP_TOP
+
+1897             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              21 ('---')
+                 CALL                     1
+                 POP_TOP
+
+1898             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               24 (subheader)
+                 PUSH_NULL
+                 LOAD_CONST              37 (' Biên niên sử hình ảnh & Chẩn đoán qua các thời kỳ')
+                 CALL                     1
+                 POP_TOP
+
+1900             LOAD_GLOBAL             41 (enumerate + NULL)
+                 LOAD_FAST_BORROW        19 (filtered_visits)
+                 CALL                     1
+                 GET_ITER
+        L13:     EXTENDED_ARG             6
+                 FOR_ITER              1663 (to L58)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              20 (idx)
+                 STORE_FAST              21 (visit)
+
+1901             LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              38 ('created_at')
+                 LOAD_CONST              10 ('N/A')
+                 CALL                     2
+                 STORE_FAST              22 (v_time)
+
+1902             LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              35 ('location')
+                 LOAD_CONST              36 ('Không rõ')
+                 CALL                     2
+                 STORE_FAST              23 (v_loc)
+
+1903             LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              39 ('ai_extracted_metrics')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST              24 (ai_metrics)
+
+1904             LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              40 ('image_url')
+                 CALL                     1
+                 STORE_FAST              25 (image_url)
+
+1905             LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              41 ('vqa_conversations')
+                 BUILD_LIST               0
+                 CALL                     2
+                 STORE_FAST              26 (conversations)
+
+1906             LOAD_FAST_BORROW        24 (ai_metrics)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              42 ('prediction')
+                 LOAD_CONST              10 ('N/A')
+                 CALL                     2
+                 STORE_FAST              27 (v_pred)
+
+1907             LOAD_GLOBAL             43 (get_vietnamese_diagnosis + NULL)
+                 LOAD_FAST_BORROW        27 (v_pred)
+                 CALL                     1
+                 STORE_FAST              28 (v_vi_name)
+
+1910             LOAD_GLOBAL             13 (len + NULL)
+                 LOAD_FAST_BORROW        11 (visits)
+                 CALL                     1
+                 LOAD_FAST_BORROW        11 (visits)
+                 LOAD_ATTR               45 (index + NULL|self)
+                 LOAD_FAST_BORROW        21 (visit)
+                 CALL                     1
+                 BINARY_OP               10 (-)
+                 STORE_FAST              29 (visit_index)
+
+1912             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               46 (expander)
+                 PUSH_NULL
+                 LOAD_CONST              43 (' LẦN KHÁM THỨ ')
+                 LOAD_FAST_BORROW        29 (visit_index)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              44 (' — Ngày: ')
+                 LOAD_FAST_BORROW        22 (v_time)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              45 (' — Vị trí: ')
+                 LOAD_FAST_BORROW        23 (v_loc)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             6
+                 LOAD_FAST_BORROW        20 (idx)
+                 LOAD_SMALL_INT           0
+                 COMPARE_OP              72 (==)
+                 LOAD_CONST              46 (('expanded',))
+                 CALL_KW                  2
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L14:     POP_TOP
+
+1913             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           1
+                 LOAD_CONST              47 (1.2)
+                 BUILD_LIST               2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              30 (col_img)
+                 STORE_FAST              31 (col_data)
+
+1914             LOAD_FAST               30 (col_img)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L15:     POP_TOP
+
+1915             LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              48 ('mask_url')
+                 CALL                     1
+                 STORE_FAST              32 (mask_url)
+
+1916             LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              49 ('gradcam_url')
+                 CALL                     1
+                 STORE_FAST              33 (grad_url)
+
+1917             LOAD_FAST_BORROW        32 (mask_url)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         9 (to L17)
+                 NOT_TAKEN
+                 LOAD_FAST_BORROW        33 (grad_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      252 (to L29)
+        L16:     NOT_TAKEN
+
+1918    L17:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               48 (tabs)
+                 PUSH_NULL
+                 BUILD_LIST               0
+                 LOAD_CONST             106 ((' Ảnh gốc', ' Mặt nạ', ' Grad-CAM'))
+                 LIST_EXTEND              1
+                 CALL                     1
+                 UNPACK_SEQUENCE          3
+                 STORE_FAST              34 (tab_img)
+                 STORE_FAST              35 (tab_mask)
+                 STORE_FAST              36 (tab_grad)
+
+1919             LOAD_FAST               34 (tab_img)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L18:     POP_TOP
+
+1920             LOAD_FAST_BORROW        25 (image_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L19)
+                 NOT_TAKEN
+
+1921             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               50 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        25 (image_url)
+                 LOAD_CONST              19 (True)
+                 LOAD_CONST              50 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            22 (to L20)
+
+1923    L19:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                8 (warning)
+                 PUSH_NULL
+                 LOAD_CONST              51 ('Không có ảnh gốc.')
+                 CALL                     1
+                 POP_TOP
+
+1919    L20:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+
+1924    L21:     LOAD_FAST               35 (tab_mask)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L22:     POP_TOP
+
+1925             LOAD_FAST_BORROW        32 (mask_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L23)
+                 NOT_TAKEN
+
+1926             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               50 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        32 (mask_url)
+                 LOAD_CONST              19 (True)
+                 LOAD_CONST              50 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            22 (to L24)
+
+1928    L23:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                8 (warning)
+                 PUSH_NULL
+                 LOAD_CONST              52 ('Không có ảnh mặt nạ.')
+                 CALL                     1
+                 POP_TOP
+
+1924    L24:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+
+1929    L25:     LOAD_FAST               36 (tab_grad)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L26:     POP_TOP
+
+1930             LOAD_FAST_BORROW        33 (grad_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       26 (to L27)
+                 NOT_TAKEN
+
+1931             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               50 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        33 (grad_url)
+                 LOAD_CONST              19 (True)
+                 LOAD_CONST              50 (('use_container_width',))
+                 CALL_KW                  2
+                 POP_TOP
+                 JUMP_FORWARD            22 (to L28)
+
+1933    L27:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                8 (warning)
+                 PUSH_NULL
+                 LOAD_CONST              53 ('Không có ảnh Grad-CAM.')
+                 CALL                     1
+                 POP_TOP
+
+1929    L28:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+                 JUMP_FORWARD            59 (to L33)
+
+1935    L29:     LOAD_FAST_BORROW        25 (image_url)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       30 (to L32)
+        L30:     NOT_TAKEN
+
+1936    L31:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               50 (image)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        25 (image_url)
+                 LOAD_CONST              54 ('Ảnh tổn thương: ')
+                 LOAD_FAST_BORROW        22 (v_time)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 LOAD_CONST              19 (True)
+                 LOAD_CONST              55 (('caption', 'use_container_width'))
+                 CALL_KW                  3
+                 POP_TOP
+                 JUMP_FORWARD            22 (to L33)
+
+1938    L32:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR                8 (warning)
+                 PUSH_NULL
+                 LOAD_CONST              56 ('Không có tệp ảnh cho lần khám này.')
+                 CALL                     1
+                 POP_TOP
+
+1914    L33:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+
+1939    L34:     LOAD_FAST               31 (col_data)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L35:     POP_TOP
+
+1940             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              57 ('####  Kết quả phân tích AI')
+                 CALL                     1
+                 POP_TOP
+
+1941             LOAD_FAST_BORROW        24 (ai_metrics)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              58 ('confidence')
+                 LOAD_CONST              59 (0.0)
+                 CALL                     2
+                 STORE_FAST              37 (conf_val)
+
+1942             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              38 (m1)
+                 STORE_FAST              39 (m2)
+
+1943             LOAD_FAST_BORROW        38 (m1)
+                 LOAD_ATTR               53 (metric + NULL|self)
+                 LOAD_CONST              60 ('Nhãn dự đoán')
+                 LOAD_FAST_BORROW        27 (v_pred)
+                 CALL                     2
+                 POP_TOP
+
+1944             LOAD_FAST_BORROW        39 (m2)
+                 LOAD_ATTR               53 (metric + NULL|self)
+                 LOAD_CONST              61 ('Độ tin cậy')
+                 LOAD_GLOBAL             55 (float + NULL)
+                 LOAD_FAST_BORROW        37 (conf_val)
+                 CALL                     1
+                 LOAD_SMALL_INT         100
+                 BINARY_OP                5 (*)
+                 LOAD_CONST              62 ('.1f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              63 ('%')
+                 BUILD_STRING             2
+                 CALL                     2
+                 POP_TOP
+
+1945             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+
+1946             LOAD_CONST              64 ("**Giải nghĩa:** <span style='color:#63b3ed;font-weight:bold;'>")
+                 LOAD_FAST_BORROW        28 (v_vi_name)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              65 ('</span>')
+                 BUILD_STRING             3
+
+1947             LOAD_CONST              19 (True)
+
+1945             LOAD_CONST              66 (('unsafe_allow_html',))
+                 CALL_KW                  2
+                 POP_TOP
+
+1951             LOAD_FAST_BORROW        24 (ai_metrics)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              67 ('probabilities')
+                 BUILD_MAP                0
+                 CALL                     2
+                 STORE_FAST              40 (probs)
+
+1952             LOAD_FAST_BORROW        40 (probs)
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE      112 (to L38)
+                 NOT_TAKEN
+
+1953             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              68 ('**Phân phối xác suất (Top 5):**')
+                 CALL                     1
+                 POP_TOP
+
+1954             LOAD_GLOBAL             21 (sorted + NULL)
+                 LOAD_FAST_BORROW        40 (probs)
+                 LOAD_ATTR               57 (items + NULL|self)
+                 CALL                     0
+                 LOAD_CONST              69 (<code object <lambda> at 0x000002602A35BA50, file "D:\DoAn_DaLieu\app_streamlit.py", line 1954>)
+                 MAKE_FUNCTION
+                 LOAD_CONST              34 (('key',))
+                 CALL_KW                  2
+                 LOAD_CONST              70 (slice(None, 5, None))
+                 BINARY_OP               26 ([])
+                 STORE_FAST              41 (sorted_probs)
+
+1955             LOAD_FAST_BORROW        41 (sorted_probs)
+                 GET_ITER
+        L36:     FOR_ITER                48 (to L37)
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              42 (label_key)
+                 STORE_FAST              43 (val)
+
+1956             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              71 ('- `')
+                 LOAD_FAST_BORROW        42 (label_key)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              72 ('` (')
+                 LOAD_GLOBAL             43 (get_vietnamese_diagnosis + NULL)
+                 LOAD_FAST_BORROW        42 (label_key)
+                 CALL                     1
+                 FORMAT_SIMPLE
+                 LOAD_CONST              73 ('): `')
+                 LOAD_FAST_BORROW        43 (val)
+                 LOAD_CONST              74 ('.2%')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              25 ('`')
+                 BUILD_STRING             7
+                 CALL                     1
+                 POP_TOP
+                 JUMP_BACKWARD           50 (to L36)
+
+1955    L37:     END_FOR
+                 POP_ITER
+
+1958    L38:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              75 ('**Chỉ số hình học:**')
+                 CALL                     1
+                 POP_TOP
+
+1959             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               58 (write)
+                 PUSH_NULL
+                 LOAD_CONST              76 ('- Area ratio: `')
+                 LOAD_FAST_BORROW        24 (ai_metrics)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              77 ('area_ratio')
+                 LOAD_CONST              59 (0.0)
+                 CALL                     2
+                 LOAD_CONST              78 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              25 ('`')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+1960             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               58 (write)
+                 PUSH_NULL
+                 LOAD_CONST              79 ('- Border complexity: `')
+                 LOAD_FAST_BORROW        24 (ai_metrics)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              80 ('border_complexity')
+                 LOAD_CONST              59 (0.0)
+                 CALL                     2
+                 LOAD_CONST              78 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              25 ('`')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+1961             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               58 (write)
+                 PUSH_NULL
+                 LOAD_CONST              81 ('- Asymmetry: `')
+                 LOAD_FAST_BORROW        24 (ai_metrics)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              82 ('asymmetry')
+                 LOAD_CONST              59 (0.0)
+                 CALL                     2
+                 LOAD_CONST              78 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              25 ('`')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+1962             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               58 (write)
+                 PUSH_NULL
+                 LOAD_CONST              83 ('- Circularity: `')
+                 LOAD_FAST_BORROW        24 (ai_metrics)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              84 ('circularity')
+                 LOAD_CONST              59 (0.0)
+                 CALL                     2
+                 LOAD_CONST              78 ('.4f')
+                 FORMAT_WITH_SPEC
+                 LOAD_CONST              25 ('`')
+                 BUILD_STRING             3
+                 CALL                     1
+                 POP_TOP
+
+1939    L39:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+
+1964    L40:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              85 ('#####  Nhật ký tư vấn y khoa (VQA)')
+                 CALL                     1
+                 POP_TOP
+
+1965             LOAD_FAST_BORROW        26 (conversations)
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE        24 (to L43)
+        L41:     NOT_TAKEN
+
+1966    L42:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               60 (caption)
+                 PUSH_NULL
+                 LOAD_CONST              86 ('Lần khám này không thực hiện hội thoại phụ.')
+                 CALL                     1
+                 POP_TOP
+                 JUMP_FORWARD           106 (to L47)
+
+1968    L43:     LOAD_CONST              24 ('')
+                 STORE_FAST              44 (chat_html)
+
+1969             LOAD_FAST_BORROW        26 (conversations)
+                 GET_ITER
+        L44:     FOR_ITER                74 (to L46)
+                 STORE_FAST              45 (msg)
+
+1970             LOAD_FAST_BORROW        45 (msg)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              87 ('role')
+                 LOAD_CONST              24 ('')
+                 CALL                     2
+                 STORE_FAST              46 (role)
+
+1971             LOAD_FAST_BORROW        45 (msg)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              88 ('content')
+                 LOAD_CONST              24 ('')
+                 CALL                     2
+                 STORE_FAST              47 (content)
+
+1972             LOAD_FAST_BORROW        46 (role)
+                 LOAD_CONST              89 ('user')
+                 COMPARE_OP              88 (bool(==))
+                 POP_JUMP_IF_FALSE       16 (to L45)
+                 NOT_TAKEN
+
+1973             LOAD_FAST_BORROW        44 (chat_html)
+
+1974             LOAD_CONST              90 ("<div style='background:rgba(99,179,237,0.15);border-left:3px solid #63b3ed;padding:6px 10px;margin:4px 0;border-radius:4px;overflow-wrap:break-word;'><b> Hỏi:</b> ")
+
+1976             LOAD_FAST_BORROW        47 (content)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              91 ('</div>')
+
+1974             BUILD_STRING             3
+
+1973             BINARY_OP               13 (+=)
+                 STORE_FAST              44 (chat_html)
+                 JUMP_BACKWARD           61 (to L44)
+
+1979    L45:     LOAD_FAST_BORROW        44 (chat_html)
+
+1980             LOAD_CONST              92 ("<div style='background:rgba(72,187,120,0.12);border-left:3px solid #48bb78;padding:6px 10px;margin:4px 0;border-radius:4px;overflow-wrap:break-word;max-height:200px;overflow-y:auto;'><b> Đáp:</b> ")
+
+1983             LOAD_FAST_BORROW        47 (content)
+                 FORMAT_SIMPLE
+                 LOAD_CONST              91 ('</div>')
+
+1980             BUILD_STRING             3
+
+1979             BINARY_OP               13 (+=)
+                 STORE_FAST              44 (chat_html)
+                 JUMP_BACKWARD           76 (to L44)
+
+1969    L46:     END_FOR
+                 POP_ITER
+
+1985             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_FAST_BORROW        44 (chat_html)
+                 LOAD_CONST              19 (True)
+                 LOAD_CONST              66 (('unsafe_allow_html',))
+                 CALL_KW                  2
+                 POP_TOP
+
+1988    L47:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               22 (markdown)
+                 PUSH_NULL
+                 LOAD_CONST              21 ('---')
+                 CALL                     1
+                 POP_TOP
+
+1989             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               26 (columns)
+                 PUSH_NULL
+                 LOAD_SMALL_INT           1
+                 LOAD_SMALL_INT           1
+                 BUILD_LIST               2
+                 CALL                     1
+                 UNPACK_SEQUENCE          2
+                 STORE_FAST              48 (col_pdf_btn)
+                 STORE_FAST              49 (col_pdf_download)
+
+1990             LOAD_FAST               48 (col_pdf_btn)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L48:     POP_TOP
+
+1991             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               62 (button)
+                 PUSH_NULL
+                 LOAD_CONST              93 (' Tạo báo cáo PDF')
+                 LOAD_CONST              94 ('gen_btn_')
+                 LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              95 ('timestamp_id')
+                 LOAD_CONST              24 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 LOAD_CONST              34 (('key',))
+                 CALL_KW                  2
+                 TO_BOOL
+                 POP_JUMP_IF_FALSE       91 (to L53)
+                 NOT_TAKEN
+
+1992             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               64 (spinner)
+                 PUSH_NULL
+                 LOAD_CONST              96 ('Đang khởi tạo PDF (tải dữ liệu từ máy chủ đám mây)...')
+                 CALL                     1
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L49:     POP_TOP
+
+1993    L50:     NOP
+
+1994    L51:     LOAD_GLOBAL             67 (generate_pdf_report + NULL)
+                 LOAD_FAST_BORROW         3 (p_info)
+                 LOAD_FAST_BORROW        21 (visit)
+                 CALL                     2
+                 STORE_FAST              50 (pdf_data)
+
+1995             LOAD_FAST_BORROW        50 (pdf_data)
+                 LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               68 (session_state)
+                 LOAD_CONST              97 ('pdf_data_')
+                 LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              95 ('timestamp_id')
+                 LOAD_CONST              24 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 STORE_SUBSCR
+
+1992    L52:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+
+1990    L53:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+
+1999    L54:     LOAD_FAST               49 (col_pdf_download)
+                 COPY                     1
+                 LOAD_SPECIAL             1 (__exit__)
+                 SWAP                     2
+                 SWAP                     3
+                 LOAD_SPECIAL             0 (__enter__)
+                 CALL                     0
+        L55:     POP_TOP
+
+2000             LOAD_CONST              97 ('pdf_data_')
+                 LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              95 ('timestamp_id')
+                 LOAD_CONST              24 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 STORE_FAST              52 (pdf_data_key)
+
+2001             LOAD_FAST_BORROW        52 (pdf_data_key)
+                 LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               68 (session_state)
+                 CONTAINS_OP              0 (in)
+                 POP_JUMP_IF_FALSE      121 (to L56)
+                 NOT_TAKEN
+
+2002             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               74 (download_button)
+                 PUSH_NULL
+
+2003             LOAD_CONST              99 (' Tải xuống báo cáo PDF')
+
+2004             LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               68 (session_state)
+                 LOAD_FAST_BORROW        52 (pdf_data_key)
+                 BINARY_OP               26 ([])
+
+2005             LOAD_CONST             100 ('EHR_Report_')
+                 LOAD_FAST_BORROW         3 (p_info)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST               5 ('name')
+                 LOAD_CONST              10 ('N/A')
+                 CALL                     2
+                 LOAD_ATTR               29 (upper + NULL|self)
+                 CALL                     0
+                 FORMAT_SIMPLE
+                 LOAD_CONST             101 ('_')
+                 LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              95 ('timestamp_id')
+                 LOAD_CONST              24 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 LOAD_CONST             102 ('.pdf')
+                 BUILD_STRING             5
+
+2006             LOAD_CONST             103 ('application/pdf')
+
+2007             LOAD_CONST             104 ('download_btn_')
+                 LOAD_FAST_BORROW        21 (visit)
+                 LOAD_ATTR               11 (get + NULL|self)
+                 LOAD_CONST              95 ('timestamp_id')
+                 LOAD_CONST              24 ('')
+                 CALL                     2
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+
+2002             LOAD_CONST             105 (('label', 'data', 'file_name', 'mime', 'key'))
+                 CALL_KW                  5
+                 POP_TOP
+
+1999    L56:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+
+1912    L57:     LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 LOAD_CONST               3 (None)
+                 CALL                     3
+                 POP_TOP
+                 EXTENDED_ARG             6
+                 JUMP_BACKWARD         1666 (to L13)
+
+1900    L58:     END_FOR
+                 POP_ITER
+                 LOAD_CONST               3 (None)
+                 RETURN_VALUE
+
+  --    L59:     SWAP                     2
+                 POP_TOP
+
+1890             SWAP                     2
+                 STORE_FAST              18 (v)
+                 RERAISE                  0
+
+1919    L60:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L61)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L61:     POP_TOP
+        L62:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             5
+                 JUMP_BACKWARD_NO_INTERRUPT 1299 (to L21)
+
+  --    L63:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1924    L64:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L65)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L65:     POP_TOP
+        L66:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             4
+                 JUMP_BACKWARD_NO_INTERRUPT 1245 (to L25)
+
+  --    L67:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1929    L68:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L69)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L69:     POP_TOP
+        L70:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             4
+                 JUMP_BACKWARD_NO_INTERRUPT 1131 (to L33)
+
+  --    L71:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1914    L72:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L73)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L73:     POP_TOP
+        L74:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             4
+                 JUMP_BACKWARD_NO_INTERRUPT 1143 (to L34)
+
+  --    L75:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1939    L76:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L77)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L77:     POP_TOP
+        L78:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             2
+                 JUMP_BACKWARD_NO_INTERRUPT 664 (to L40)
+
+  --    L79:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+        L80:     PUSH_EXC_INFO
+
+1996             LOAD_GLOBAL             70 (Exception)
+                 CHECK_EXC_MATCH
+                 POP_JUMP_IF_FALSE       37 (to L84)
+                 NOT_TAKEN
+                 STORE_FAST              51 (pdf_err)
+
+1997    L81:     LOAD_GLOBAL              0 (st)
+                 LOAD_ATTR               72 (error)
+                 PUSH_NULL
+                 LOAD_CONST              98 (' Lỗi tạo báo cáo PDF: ')
+                 LOAD_FAST               51 (pdf_err)
+                 FORMAT_SIMPLE
+                 BUILD_STRING             2
+                 CALL                     1
+                 POP_TOP
+        L82:     POP_EXCEPT
+                 LOAD_CONST               3 (None)
+                 STORE_FAST              51 (pdf_err)
+                 DELETE_FAST             51 (pdf_err)
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 359 (to L52)
+
+  --    L83:     LOAD_CONST               3 (None)
+                 STORE_FAST              51 (pdf_err)
+                 DELETE_FAST             51 (pdf_err)
+                 RERAISE                  1
+
+1996    L84:     RERAISE                  0
+
+  --    L85:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1992    L86:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L87)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L87:     POP_TOP
+        L88:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 376 (to L53)
+
+  --    L89:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1990    L90:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L91)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L91:     POP_TOP
+        L92:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             1
+                 JUMP_BACKWARD_NO_INTERRUPT 388 (to L54)
+
+  --    L93:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1999    L94:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L95)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L95:     POP_TOP
+        L96:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 JUMP_BACKWARD_NO_INTERRUPT 226 (to L57)
+
+  --    L97:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+
+1912    L98:     PUSH_EXC_INFO
+                 WITH_EXCEPT_START
+                 TO_BOOL
+                 POP_JUMP_IF_TRUE         2 (to L99)
+                 NOT_TAKEN
+                 RERAISE                  2
+        L99:     POP_TOP
+       L100:     POP_EXCEPT
+                 POP_TOP
+                 POP_TOP
+                 POP_TOP
+                 EXTENDED_ARG             7
+                 JUMP_BACKWARD         1902 (to L13)
+
+  --   L101:     COPY                     3
+                 POP_EXCEPT
+                 RERAISE                  1
+ExceptionTable:
+  L5 to L7 -> L59 [2]
+  L8 to L10 -> L59 [2]
+  L14 to L15 -> L98 [3] lasti
+  L15 to L16 -> L72 [5] lasti
+  L17 to L18 -> L72 [5] lasti
+  L18 to L20 -> L60 [7] lasti
+  L20 to L22 -> L72 [5] lasti
+  L22 to L24 -> L64 [7] lasti
+  L24 to L26 -> L72 [5] lasti
+  L26 to L28 -> L68 [7] lasti
+  L28 to L30 -> L72 [5] lasti
+  L31 to L33 -> L72 [5] lasti
+  L33 to L35 -> L98 [3] lasti
+  L35 to L39 -> L76 [5] lasti
+  L39 to L41 -> L98 [3] lasti
+  L42 to L48 -> L98 [3] lasti
+  L48 to L49 -> L90 [5] lasti
+  L49 to L50 -> L86 [7] lasti
+  L51 to L52 -> L80 [7]
+  L52 to L53 -> L90 [5] lasti
+  L53 to L55 -> L98 [3] lasti
+  L55 to L56 -> L94 [5] lasti
+  L56 to L57 -> L98 [3] lasti
+  L60 to L62 -> L63 [9] lasti
+  L62 to L64 -> L72 [5] lasti
+  L64 to L66 -> L67 [9] lasti
+  L66 to L68 -> L72 [5] lasti
+  L68 to L70 -> L71 [9] lasti
+  L70 to L72 -> L72 [5] lasti
+  L72 to L74 -> L75 [7] lasti
+  L74 to L76 -> L98 [3] lasti
+  L76 to L78 -> L79 [7] lasti
+  L78 to L80 -> L98 [3] lasti
+  L80 to L81 -> L85 [8] lasti
+  L81 to L82 -> L83 [8] lasti
+  L82 to L83 -> L86 [7] lasti
+  L83 to L85 -> L85 [8] lasti
+  L85 to L86 -> L86 [7] lasti
+  L86 to L88 -> L89 [9] lasti
+  L88 to L90 -> L90 [5] lasti
+  L90 to L92 -> L93 [7] lasti
+  L92 to L94 -> L98 [3] lasti
+  L94 to L96 -> L97 [7] lasti
+  L96 to L98 -> L98 [3] lasti
+  L98 to L100 -> L101 [5] lasti
+
+Disassembly of <code object <lambda> at 0x000002602A3F6B30, file "D:\DoAn_DaLieu\app_streamlit.py", line 1870>:
+1870           RESUME                   0
+               LOAD_FAST_BORROW         0 (x)
+               LOAD_ATTR                1 (get + NULL|self)
+               LOAD_CONST               0 ('timestamp_id')
+               LOAD_CONST               1 ('')
+               CALL                     2
+               RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x000002602A351790, file "D:\DoAn_DaLieu\app_streamlit.py", line 1882>:
+1882           RETURN_GENERATOR
+               POP_TOP
+       L1:     RESUME                   0
+               LOAD_FAST                0 (.0)
+
+1883   L2:     FOR_ITER                60 (to L3)
+               STORE_FAST               1 (v)
+               LOAD_GLOBAL              1 (str + NULL)
+               LOAD_FAST_BORROW         1 (v)
+               LOAD_ATTR                3 (get + NULL|self)
+               LOAD_CONST               0 ('location')
+               LOAD_CONST               1 ('Không rõ')
+               CALL                     2
+               CALL                     1
+               LOAD_ATTR                5 (strip + NULL|self)
+               CALL                     0
+               LOAD_ATTR                7 (capitalize + NULL|self)
+               CALL                     0
+               YIELD_VALUE              0
+               RESUME                   5
+               POP_TOP
+               JUMP_BACKWARD           62 (to L2)
+       L3:     END_FOR
+               POP_ITER
+               LOAD_CONST               2 (None)
+               RETURN_VALUE
+
+  --   L4:     CALL_INTRINSIC_1         3 (INTRINSIC_STOPITERATION_ERROR)
+               RERAISE                  1
+ExceptionTable:
+  L1 to L4 -> L4 [0] lasti
+
+Disassembly of <code object <lambda> at 0x000002602A35BA50, file "D:\DoAn_DaLieu\app_streamlit.py", line 1954>:
+1954           RESUME                   0
+               LOAD_FAST_BORROW         0 (x)
+               LOAD_SMALL_INT           1
+               BINARY_OP               26 ([])
+               UNARY_NEGATIVE
+               RETURN_VALUE
