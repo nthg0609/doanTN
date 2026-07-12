@@ -49,16 +49,28 @@ def custom_st_canvas(
     
     background_image_url = None
     if background_image:
-        background_image = _resize_img(background_image, height, width)
-        background_image_url = st_image.image_to_url(
-            background_image, width, True, "RGB", "PNG", f"drawable-canvas-bg-{md5(background_image.tobytes()).hexdigest()}-{key}" 
-        )
-        background_image_url = st._config.get_option("server.baseUrlPath") + background_image_url
+        # Check if we have public CORS image URL
+        pub_url = st.session_state.get("public_image_url")
+        if not pub_url:
+            local_path = st.session_state.get("canvas_local_img_path")
+            if local_path and os.path.exists(local_path):
+                # Try upload to ImgBB
+                pub_url = upload_image_to_imgbb(local_path)
+                if pub_url:
+                    st.session_state["public_image_url"] = pub_url
         
-        # Sửa đường dẫn tương đối để iframe của component React có thể truy cập được từ root domain
-        if background_image_url.startswith("/"):
-            background_image_url = "../../../" + background_image_url.lstrip("/")
-            
+        if pub_url:
+            background_image_url = pub_url
+        else:
+            # Fallback to local image URL path
+            background_image = _resize_img(background_image, height, width)
+            background_image_url = st_image.image_to_url(
+                background_image, width, True, "RGB", "PNG", f"drawable-canvas-bg-{md5(background_image.tobytes()).hexdigest()}-{key}" 
+            )
+            background_image_url = st._config.get_option("server.baseUrlPath") + background_image_url
+            if background_image_url.startswith("/"):
+                background_image_url = "../../../" + background_image_url.lstrip("/")
+        
         background_color = ""
 
     initial_drawing = {"version": "4.4.0"} if initial_drawing is None else initial_drawing
@@ -2095,6 +2107,8 @@ def main() -> None:
         "show_delete_confirm":     False,
         "has_rag_queries":         False,
         "dicom_meta":              None,
+        "public_image_url":        None,
+        "canvas_local_img_path":   None,
     }
     for k, v in _ss_defaults.items():
         if k not in st.session_state:
@@ -2215,7 +2229,7 @@ def main() -> None:
                 "**VRAM:** ~8 192 MB  \n"
                 "**Biên ROI:** delta = 10 px"
             )
-        st.sidebar.caption("Phiên bản: vqa-canvas-final-v6")
+        st.sidebar.caption("Phiên bản: vqa-canvas-final-v7")
 
     # ============================================================
     # TABS CHÍNH
@@ -2249,6 +2263,13 @@ def main() -> None:
                 st.session_state["saved_local_img_path"]    = None
                 st.session_state["sam_point"]               = None
                 st.session_state["custom_mask"]             = None
+                st.session_state["public_image_url"]        = None
+                # Clean up old canvas temp file if exists
+                old_path = st.session_state.get("canvas_local_img_path")
+                if old_path and os.path.exists(old_path):
+                     try: os.remove(old_path)
+                     except Exception: pass
+                st.session_state["canvas_local_img_path"]   = None
 
             if uploaded.name.lower().endswith(".dcm"):
                 image, dicom_meta = load_dicom(uploaded)
@@ -2277,6 +2298,11 @@ def main() -> None:
                 image = Image.open(uploaded).convert("RGB")
 
         if image is not None:
+            # Lưu tạm ảnh gốc để làm ảnh nền canvas (tải lên ImgBB để hỗ trợ CORS trên Streamlit Cloud)
+            if st.session_state.get("canvas_local_img_path") is None or not os.path.exists(st.session_state["canvas_local_img_path"]):
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
+                    image.save(tmp.name)
+                    st.session_state["canvas_local_img_path"] = tmp.name
             img_rgb = np.array(image)
             orig_w, orig_h = image.size
 
