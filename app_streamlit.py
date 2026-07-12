@@ -2259,27 +2259,35 @@ def main() -> None:
                 "**Biên ROI:** delta = 10 px"
             )
         # Check patch status
-        # Check patch status
         patched_status = "Lỗi"
         try:
             import streamlit_drawable_canvas
             import glob
             package_dir = os.path.dirname(streamlit_drawable_canvas.__file__)
-            js_pattern = os.path.join(package_dir, "frontend", "build", "static", "js", "main.*.js")
+            js_dir = os.path.join(package_dir, "frontend", "build", "static", "js")
+            files_found = os.listdir(js_dir) if os.path.exists(js_dir) else []
+            
+            js_pattern = os.path.join(js_dir, "main.*.js")
             js_files = glob.glob(js_pattern)
             if js_files:
                 with open(js_files[0], "r", encoding="utf-8") as f:
                     js_content = f.read()
                 if 'h.startsWith("http")' in js_content:
-                    patched_status = "Đã kích hoạt"
+                    patched_status = f"Đã vá ({os.path.basename(js_files[0])})"
                 else:
-                    patched_status = "Chưa kích hoạt"
+                    # Let's check if the target string "e.src=n+h" is even in this file!
+                    if "e.src=n+h" in js_content:
+                        patched_status = f"Chưa vá. Tìm thấy target in ({os.path.basename(js_files[0])})"
+                    else:
+                        # Print some snippet of the file to see what it contains
+                        snippet = js_content[:50]
+                        patched_status = f"Chưa vá. Target không tìm thấy. Snippet: {snippet}"
             else:
-                patched_status = "Không tìm thấy file JS"
+                patched_status = f"Không có main JS. Files: {files_found}. Package dir: {package_dir}"
         except Exception as e:
             patched_status = f"Lỗi: {e}"
             
-        st.sidebar.caption(f"Phiên bản: vqa-canvas-final-v10 | Canvas: {patched_status}")
+        st.sidebar.caption(f"Phiên bản: vqa-canvas-final-v11 | Canvas: {patched_status}")
 
     # ============================================================
     # TABS CHÍNH
