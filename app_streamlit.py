@@ -1720,62 +1720,109 @@ def render_doctor_dashboard() -> None:
 def download_weights_if_missing() -> None:
     import os
     import requests
+    import re
     from pathlib import Path
     import streamlit as st
 
     weights_info = {
-        "deeplabv3plus_best.pth": {
-            "path": Path("4_Models/deeplabv3plus/deeplabv3plus_best.pth"),
-            "id": "1crKDYmFVt3rsfHMmIrLdhAlMg4cDCpfT"
-        },
-        "efficientnet_attention_best.pth": {
-            "path": Path("4_Models/classification/efficientnet_attention_best.pth"),
-            "id": "1nquxwVeZRoawedzuP4H0wULF-e03fTMs"
-        },
-        "dermavqa_gpt2_joint_best.pth": {
-            "path": Path("9_VQA/models/dermavqa_gpt2_joint_best.pth"),
-            "id": "1kTiNvqtQI6qtueDE3zGcTFFoDWio6STa"
-        }
+        "deeplabv3plus_best.pth": Path("4_Models/deeplabv3plus/deeplabv3plus_best.pth"),
+        "efficientnet_attention_best.pth": Path("4_Models/classification/efficientnet_attention_best.pth"),
+        "dermavqa_gpt2_joint_best.pth": Path("9_VQA/models/dermavqa_gpt2_joint_best.pth")
     }
 
-    to_download = {}
-    for filename, info in weights_info.items():
-        if not info["path"].exists():
-            to_download[filename] = info
+    # Bất kỳ file nào chưa tồn tại hoặc dung lượng < 1MB (do lỗi trang HTML cảnh báo từ trước) đều coi là thiếu
+    missing = []
+    for filename, path in weights_info.items():
+        if not path.exists() or path.stat().st_size < 1024 * 1024:
+            missing.append(filename)
 
-    if not to_download:
+    if not missing:
         return
 
-    def download_file_from_google_drive(file_id, dest_path):
+    # Danh sách File ID từ Google Drive của bạn
+    drive_ids = [
+        "1crKDYmFVt3rsfHMmIrLdhAlMg4cDCpfT",
+        "1nquxwVeZRoawedzuP4H0wULF-e03fTMs",
+        "1kTiNvqtQI6qtueDE3zGcTFFoDWio6STa"
+    ]
+
+    def download_file_from_google_drive(file_id, temp_dest):
         URL = "https://docs.google.com/uc?export=download"
         session = requests.Session()
         response = session.get(URL, params={'id': file_id}, stream=True)
+        html = response.text
         
-        token = None
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                token = value
-                break
+        confirm = None
+        uuid = None
+        confirm_match = re.search(r'name="confirm" value="([^"]+)"', html)
+        if confirm_match:
+            confirm = confirm_match.group(1)
+            
+        uuid_match = re.search(r'name="uuid" value="([^"]+)"', html)
+        if uuid_match:
+            uuid = uuid_match.group(1)
 
-        if token:
-            params = {'id': file_id, 'confirm': token}
-            response = session.get(URL, params=params, stream=True)
+        if confirm:
+            download_url = "https://drive.usercontent.google.com/download"
+            params = {
+                'id': file_id,
+                'export': 'download',
+                'confirm': confirm
+            }
+            if uuid:
+                params['uuid'] = uuid
+            response = session.get(download_url, params=params, stream=True)
 
-        os.makedirs(dest_path.parent, exist_ok=True)
+        os.makedirs(os.path.dirname(temp_dest) if os.path.dirname(temp_dest) else ".", exist_ok=True)
         CHUNK_SIZE = 32768
-        with open(dest_path, "wb") as f:
+        with open(temp_dest, "wb") as f:
             for chunk in response.iter_content(CHUNK_SIZE):
                 if chunk:
                     f.write(chunk)
 
-    with st.spinner("⏳ Đang tải xuống trọng số mô hình từ Google Drive (chỉ tải một lần khi khởi chạy trên Cloud)..."):
-        for filename, info in to_download.items():
-            st.info(f"📥 Đang tải {filename}...")
+    with st.spinner("⏳ Phát hiện thiếu hoặc lỗi tệp trọng số. Đang tiến hành tải xuống trọng số mô hình từ Google Drive (chỉ tải một lần)..."):
+        # Tạo thư mục temp để tải và phân loại theo dung lượng
+        temp_dir = Path("temp_weights")
+        temp_dir.mkdir(exist_ok=True)
+        
+        for fid in drive_ids:
+            st.info(f"📥 Đang tải tài nguyên ID: {fid}...")
+            temp_file = temp_dir / f"download_{fid}.pth"
             try:
-                download_file_from_google_drive(info["id"], info["path"])
-                st.success(f"✅ Tải thành công {filename}!")
+                download_file_from_google_drive(fid, temp_file)
+                if temp_file.exists():
+                    fsize = temp_file.stat().st_size
+                    st.caption(f"Đã tải xong ID {fid}: {fsize / 1024 / 1024:.2f} MB")
+                    
+                    # Phân loại dựa trên kích thước tệp
+                    dest_path = None
+                    if 70 * 1024 * 1024 <= fsize <= 85 * 1024 * 1024:
+                        dest_path = weights_info["efficientnet_attention_best.pth"]
+                    elif 290 * 1024 * 1024 <= fsize <= 320 * 1024 * 1024:
+                        dest_path = weights_info["deeplabv3plus_best.pth"]
+                    elif 330 * 1024 * 1024 <= fsize <= 360 * 1024 * 1024:
+                        dest_path = weights_info["dermavqa_gpt2_joint_best.pth"]
+                        
+                    if dest_path:
+                        dest_path.parent.mkdir(parents=True, exist_ok=True)
+                        if dest_path.exists():
+                            dest_path.unlink()
+                        temp_file.rename(dest_path)
+                        st.success(f"⭐ Đã cấu hình thành công: {dest_path.name}")
+                    else:
+                        st.error(f"❌ Tệp tải xuống từ ID {fid} có kích thước không hợp lệ ({fsize / 1024 / 1024:.2f} MB)")
+                        temp_file.unlink()
             except Exception as e:
-                st.error(f"❌ Lỗi khi tải {filename}: {str(e)}")
+                st.error(f"❌ Lỗi khi tải tài nguyên ID {fid}: {str(e)}")
+                if temp_file.exists():
+                    temp_file.unlink()
+                    
+        # Dọn dẹp thư mục tạm
+        try:
+            if temp_dir.exists():
+                temp_dir.rmdir()
+        except Exception:
+            pass
 
 def main() -> None:
     st.set_page_config(
