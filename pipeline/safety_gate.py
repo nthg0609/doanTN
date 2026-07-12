@@ -70,6 +70,7 @@ class SafetyGate:
         metrics: Dict[str, float],
         cls_confidence: Optional[float],
         image_type: str = "dermoscopy",
+        malignant_threshold: Optional[float] = None,
     ) -> SafetyGateResult:
         """Đánh giá xem kết quả có đủ tin cậy để đưa ra phân tích lâm sàng không.
 
@@ -77,6 +78,7 @@ class SafetyGate:
             metrics: Chỉ số hình học từ segmentation (area_ratio, border_complexity...).
             cls_confidence: Độ tin cậy dự đoán từ mô hình phân loại.
             image_type: Loại ảnh — 'dermoscopy' hoặc 'phone'.
+            malignant_threshold: Ngưỡng cảnh báo ác tính động truyền từ giao diện.
         """
         area_ratio       = float(metrics.get("area_ratio", 0.0))
         lesion_area      = int(metrics.get("lesion_area", 0))
@@ -89,6 +91,7 @@ class SafetyGate:
         eff_min_area_ratio  = cfg.phone_min_area_ratio       if is_phone else cfg.min_area_ratio
         eff_max_area_ratio  = cfg.phone_max_area_ratio       if is_phone else cfg.max_area_ratio
         eff_max_border      = cfg.phone_max_border_complexity if is_phone else cfg.max_border_complexity
+        eff_mal_thresh      = malignant_threshold if malignant_threshold is not None else cfg.malignant_alert_threshold
 
         # ── Bước 1: Kiểm tra mask tổn thương ──────────────────────────────────
         if low_conf or lesion_area < cfg.min_mask_area_px:
@@ -125,7 +128,8 @@ class SafetyGate:
             })
 
         return SafetyGateResult(True, "accepted", {
-            "cls_confidence": float(cls_confidence),
-            "area_ratio":     area_ratio,
-            "image_type":     image_type,
+            "cls_confidence":            float(cls_confidence),
+            "area_ratio":                 area_ratio,
+            "image_type":                 image_type,
+            "malignant_alert_threshold":  eff_mal_thresh,
         })

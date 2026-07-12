@@ -74,29 +74,32 @@ class InteractiveSegmenter:
                 print(f"[InteractiveSegmenter] SAM prediction failed: {e}. Fallback to GrabCut.")
 
         # --- Case B: GrabCut Fallback (Zero-Dependency & Fast CPU performance) ---
-        # Initialize GrabCut mask
-        gc_mask = np.zeros(img_rgb.shape[:2], dtype=np.uint8)
+        # Initialize GrabCut mask: default is probable background
+        gc_mask = np.ones(img_rgb.shape[:2], dtype=np.uint8) * cv2.GC_PR_BGD
         
-        # Define a bounding box centered around the click point as a probable foreground region
-        box_w, box_h = int(w * 0.35), int(h * 0.35)
-        x_min = max(0, point_x - box_w // 2)
-        y_min = max(0, point_y - box_h // 2)
-        x_max = min(w, point_x + box_w // 2)
-        y_max = min(h, point_y + box_h // 2)
+        # Mark outer border (5px) as definite background
+        border = 5
+        gc_mask[:border, :] = cv2.GC_BGD
+        gc_mask[-border:, :] = cv2.GC_BGD
+        gc_mask[:, :border] = cv2.GC_BGD
+        gc_mask[:, -border:] = cv2.GC_BGD
         
-        rect = (x_min, y_min, x_max - x_min, y_max - y_min)
+        # Mark region around the click point as probable foreground
+        fg_r = max(10, int(min(w, h) * 0.08))
+        cv2.circle(gc_mask, (point_x, point_y), fg_r, cv2.GC_PR_FGD, -1)
+        # Mark the exact seed point as definite foreground to anchor the segmentation
+        cv2.circle(gc_mask, (point_x, point_y), 2, cv2.GC_FGD, -1)
         
         bgd_model = np.zeros((1, 65), dtype=np.float64)
         fgd_model = np.zeros((1, 65), dtype=np.float64)
         
         # Run GrabCut
         try:
-            cv2.grabCut(img_rgb, gc_mask, rect, bgd_model, fgd_model, 3, cv2.GC_INIT_WITH_RECT)
+            cv2.grabCut(img_rgb, gc_mask, None, bgd_model, fgd_model, 5, cv2.GC_INIT_WITH_MASK)
             # 0, 2 are background; 1, 3 are foreground
             mask = np.where((gc_mask == cv2.GC_FGD) | (gc_mask == cv2.GC_PR_FGD), 1, 0).astype(np.uint8)
             
             # Postprocess to ensure the clicked point is connected
-            # Keep the component that contains the clicked point
             num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
             if num_labels > 1:
                 target_label = labels[point_y, point_x]
@@ -110,7 +113,7 @@ class InteractiveSegmenter:
             if int(mask.sum()) < 100:
                 raise ValueError("GrabCut mask is too small or empty")
 
-            return mask, {"method": "grabcut_interactive_fallback", "rect": rect}
+            return mask, {"method": "grabcut_interactive_mask_init", "fg_radius": fg_r}
         except Exception as e:
             # Absolute fallback: floodFill starting from the seed point
             mask = np.zeros(img_rgb.shape[:2], dtype=np.uint8)

@@ -85,6 +85,7 @@ class UnifiedDermatologyPipeline:
         lambda_val: float = 0.85,
         interactive_point: Optional[tuple[int, int]] = None,
         custom_mask: Optional[np.ndarray] = None,
+        malignant_threshold: Optional[float] = None,
     ) -> Dict[str, Any]:
         try:
             img_rgb, resolved = self._safe_load_rgb(image_path)
@@ -135,7 +136,7 @@ class UnifiedDermatologyPipeline:
             cls_confidence = None if cls_result is None else cls_result.get("confidence")
 
         # P1-1: Pass img_type vào Safety Gate để áp dụng ngưỡng động theo loại ảnh.
-        gate = self.safety_gate.evaluate(metrics, cls_confidence, image_type=img_type)
+        gate = self.safety_gate.evaluate(metrics, cls_confidence, image_type=img_type, malignant_threshold=malignant_threshold)
         if not gate.accept:
             report = self._safe_fallback_report(metrics, gate.reason)
             result = {
@@ -319,7 +320,7 @@ class UnifiedDermatologyPipeline:
     def _classical_fallback_mask(self, img_rgb: np.ndarray) -> tuple[np.ndarray, Dict[str, Any]]:
         gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
         blur = cv2.medianBlur(gray, 5)
-        _, th = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, th = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
         opened = cv2.morphologyEx(th, cv2.MORPH_OPEN, kernel, iterations=1)
         closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, kernel, iterations=1)

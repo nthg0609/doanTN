@@ -162,30 +162,6 @@ def upload_image_to_imgbb(local_image_path: str) -> Optional[str]:
     return None
 
 
-import hashlib
-
-def encrypt_data(data: str, key: str = "DermaSecureKey2026") -> str:
-    if not data:
-        return ""
-    # Simple XOR encryption encoded in base64
-    xored = "".join(chr(ord(c) ^ ord(key[i % len(key)])) for i, c in enumerate(data))
-    return base64.b64encode(xored.encode('utf-8')).decode('utf-8')
-
-def decrypt_data(enc_data: str, key: str = "DermaSecureKey2026") -> str:
-    if not enc_data:
-        return ""
-    try:
-        decoded = base64.b64decode(enc_data.encode('utf-8')).decode('utf-8')
-        xored = "".join(chr(ord(c) ^ ord(key[i % len(key)])) for i, c in enumerate(decoded))
-        return xored
-    except Exception:
-        return enc_data
-
-def get_patient_doc_id(patient_name: str) -> str:
-    normalized = "".join(patient_name.strip().upper().split())
-    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:16]
-
-
 def check_patient_exists(patient_name: str) -> bool:
     if not patient_name.strip():
         return False
@@ -194,7 +170,7 @@ def check_patient_exists(patient_name: str) -> bool:
         if os.path.exists(cred_path):
             creds = service_account.Credentials.from_service_account_file(cred_path)
             db    = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
-            doc_id = get_patient_doc_id(patient_name)
+            doc_id = "".join(patient_name.strip().upper().split())
             return db.collection("medical_records").document(doc_id).get().exists
     except Exception:
         pass
@@ -211,26 +187,18 @@ def save_medical_record_to_gcp(
         if os.path.exists(cred_path):
             creds  = service_account.Credentials.from_service_account_file(cred_path)
             db     = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
-            doc_id = get_patient_doc_id(patient_name)
+            doc_id = "".join(patient_name.strip().upper().split())
             ref    = db.collection("medical_records").document(doc_id)
             snap   = ref.get()
             now    = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
-            # Encrypt sensitive patient info fields
-            pat_info_enc = patient_info.copy()
-            if "name" in pat_info_enc:
-                pat_info_enc["name"] = encrypt_data(pat_info_enc["name"])
-            if "id" in pat_info_enc:
-                pat_info_enc["id"] = encrypt_data(pat_info_enc["id"])
-                
             if snap.exists:
                 visits = snap.to_dict().get("visits", [])
                 visits.append(visit_data)
-                ref.update({"patient_info": pat_info_enc, "updated_at": now, "visits": visits})
+                ref.update({"patient_info": patient_info, "updated_at": now, "visits": visits})
             else:
                 ref.set({
                     "patient_id":   doc_id,
-                    "patient_info": pat_info_enc,
+                    "patient_info": patient_info,
                     "created_at":   now,
                     "updated_at":   now,
                     "visits":       [visit_data],
@@ -251,7 +219,7 @@ def delete_patient_record_from_gcp(patient_name: str) -> bool:
         if os.path.exists(cred_path):
             creds = service_account.Credentials.from_service_account_file(cred_path)
             db = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
-            doc_id = get_patient_doc_id(patient_name)
+            doc_id = "".join(patient_name.strip().upper().split())
             db.collection("medical_records").document(doc_id).delete()
             return True
     except Exception as e:
@@ -270,14 +238,7 @@ def fetch_all_medical_records() -> List[Dict[str, Any]]:
                 "updated_at", direction=gcp_firestore.Query.DESCENDING
             ).stream()
             for doc in docs:
-                d = doc.to_dict()
-                if "patient_info" in d:
-                    pi = d["patient_info"]
-                    if "name" in pi:
-                        pi["name"] = decrypt_data(pi["name"])
-                    if "id" in pi:
-                        pi["id"] = decrypt_data(pi["id"])
-                records.append(d)
+                records.append(doc.to_dict())
     except Exception:
         pass
     return records
@@ -287,11 +248,7 @@ def fetch_all_medical_records() -> List[Dict[str, Any]]:
 # PIPELINE
 # ==============================================================================
 @st.cache_resource
-def get_pipeline(min_conf: float, reload_token: str = "v2"):
-    import sys
-    for k in list(sys.modules.keys()):
-        if k == "pipeline" or k.startswith("pipeline."):
-            sys.modules.pop(k, None)
+def get_pipeline(min_conf: float):
     from pipeline import UnifiedDermatologyPipeline
     return UnifiedDermatologyPipeline(
         mode="both",
@@ -363,10 +320,6 @@ def load_dicom(file_obj) -> tuple:
             "patient_age":  str(getattr(ds, "PatientAge",  "")),
             "patient_sex":  str(getattr(ds, "PatientSex",  "")),
         }
-        pixel_spacing = getattr(ds, "PixelSpacing", None)
-        if pixel_spacing:
-            meta["pixel_spacing_y"] = float(pixel_spacing[0])
-            meta["pixel_spacing_x"] = float(pixel_spacing[1])
         return img, meta
     except Exception as e:
         return None, {}
@@ -376,6 +329,9 @@ def load_dicom(file_obj) -> tuple:
             except Exception: pass
 
 
+# ==============================================================================
+# VQA ENGINE — Fusion Prompt + Stream
+# ==============================================================================
 # ==============================================================================
 # VQA ENGINE — Fusion Prompt + Stream + RAG + Offline Modes
 # ==============================================================================
@@ -470,7 +426,7 @@ CLINICAL_KB = {
     },
     "NV": {
         "symptoms": {
-            "vi": "Nốt ruồi lành tính (Melanocytic Nevus) biểu hiện dưới dạng dát phẳng hoặc sẩn gồ nhẹ, màu sắc nâu hoặc đen đồng nhất, giới hạn rõ nét, hình tròn hoặc bầu oval đối xứng hoàn hảo.",
+            "vi": "Nốt ruồi lành tính (Melanocytic Nevus) biểu hiện dưới dạng dát phẳng hoặc sẩn gồ nhẹ, màu sắc nâu hoặc đen đồng nhất, giới hạn rõ nét, hình tròn hoặc bầu dục đối xứng hoàn hảo.",
             "en": "A benign Melanocytic Nevus (mole) presents as a flat macule or slightly raised papule with uniform tan, brown, or black color, sharp borders, and symmetric round or oval shape."
         },
         "care": {
@@ -712,11 +668,12 @@ def generate_vqa_response_stream(
     expert_answer = kb_block.get(category, kb_block["general"])["vi"]
 
     # ── XỬ LÝ CHẾ ĐỘ OFFLINE CPU ──────────────────────────────────────
-    if vqa_mode == "Nội bộ (Offline - CPUMedicalVQAModel)" or vqa_mode == "Offline (Custom CPUMedicalVQAModel)":
+    if vqa_mode == "Nội bộ — CPU (LLM local)":
         model, tokenizer, device = load_custom_vqa_model()
         img_path = st.session_state.get("saved_local_img_path")
         
         if model is None or tokenizer is None or not img_path or not os.path.exists(img_path):
+            # Fallback trực tiếp về expert_answer nếu không load được model hoặc thiếu ảnh
             for char in expert_answer:
                 yield char
             return
@@ -786,6 +743,7 @@ def generate_vqa_response_stream(
             # Dịch sang Tiếng Việt
             vietnamese_answer = translate_text(output_clean, "Vietnamese")
             
+            # Kiểm tra chất lượng câu trả lời từ DistilGPT-2 (loại bỏ ảo giác)
             if len(vietnamese_answer.strip()) < 15 or any(w in vietnamese_answer.lower() for w in ("prozac", "diphtheria", "allergic")):
                 final_answer = expert_answer
             else:
@@ -806,8 +764,9 @@ def generate_vqa_response_stream(
     # Tích hợp RAG y văn y khoa tham khảo
     rag = get_rag_engine()
     retrieved_docs = []
-    if rag and ("Trực tuyến" in vqa_mode or "Ollama" in vqa_mode):
+    if rag and vqa_mode in ("Trực tuyến — OpenAI GPT-4o-mini", "Nội bộ — Ollama"):
         try:
+            # Query RAG dựa trên nhãn bệnh chẩn đoán và câu hỏi
             query_str = f"{cv_context['prediction']} {question}"
             retrieved_docs = rag.retrieve(query_str, n_results=1)
             if retrieved_docs:
@@ -832,14 +791,17 @@ def generate_vqa_response_stream(
         {"role": "user",   "content": question},
     ]
 
-    is_ollama = ("Ollama" in vqa_mode)
+    # Cấu hình client theo chế độ VQA
+    is_ollama = (vqa_mode == "Nội bộ — Ollama")
     
     if is_ollama:
+        # Client cho Ollama (localhost:11434)
         try:
             from openai import OpenAI as LocalOpenAI
             client = LocalOpenAI(base_url="http://localhost:11434/v1", api_key="ollama", timeout=5.0)
             model_to_use = "qwen2.5:3b"
         except Exception as e:
+            # Hiện cảnh báo hướng dẫn chi tiết nếu kết nối thất bại
             yield (
                 "⚠️ **Không thể kết nối tới dịch vụ Ollama cục bộ (localhost:11434)**.\n\n"
                 "**Hướng dẫn kích hoạt**:\n"
@@ -890,7 +852,9 @@ def generate_vqa_response_stream(
             yield _fallback_response(question, result)
         return
 
+    # Lưu log và đính kèm tài liệu tham khảo RAG vào tin nhắn cuối nếu có
     if retrieved_docs and history is not None:
+        # Ghi nhận references cho tin nhắn trợ lý sắp được lưu vào messages
         st.session_state["last_vqa_references"] = retrieved_docs
 
     write_dev_log({
@@ -1174,7 +1138,7 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
         pdf.set_font("DejaVu", "I", 8)
         pdf.set_text_color(239, 68, 68)  # Red warning
         dis = (
-            "* TUYÊN BỐ MIỄN TRỪ: Hệ thống AI này chỉ đóng vai trò hỗ trợ sàng lọc lâm sàng sơ bộ dựa trên học máy. "
+            "* TUYÊN BỐ MIỄN TRỪ: Hệ thống AI này chỉ đóng vai trò hỗ trợ sàng lọc sơ bộ dựa trên học máy. "
             "Kết quả phân tích không thể thay thế quyết định chẩn đoán y khoa chuyên môn của bác sĩ da liễu có thẩm quyền."
         )
         pdf.multi_cell(180, 4, dis, align="C")
@@ -1183,223 +1147,216 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
     except Exception as e:
         st.warning(f"Không tạo được PDF: {e}")
         return None
-    except Exception as e:
-        st.warning(f"Không tạo được PDF: {e}")
-        return None
 
 
-# ==============================================================================
-# CSS — Clean, Professional Medical EHR (no comments, no dashes)
-# ==============================================================================
 def _inject_custom_css() -> None:
     st.markdown("""
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-    html, body, [class*="css"], [class*="st-"] {
-        font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif !important;
-    }
-    .ehr-disclaimer {
-        background: rgba(239, 68, 68, 0.08);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: 8px;
-        padding: 10px 16px;
-        margin-bottom: 12px;
-        font-size: 0.81rem;
-        color: #fca5a5;
-        font-weight: 500;
-    }
-    .ehr-page-title {
-        font-size: 1.55rem;
-        font-weight: 700;
-        color: var(--text-color) !important;
-        margin: 0 0 2px 0;
-    }
-    .ehr-page-sub {
-        font-size: 0.83rem;
-        color: #64748b;
-        margin: 0 0 14px 0;
-    }
-    .triage-banner {
-        background: rgba(239, 68, 68, 0.1);
-        border: 2px solid rgba(239, 68, 68, 0.5);
-        border-radius: 10px;
-        padding: 12px 18px;
-        text-align: center;
-        font-size: 0.92rem;
-        color: #fca5a5;
-        font-weight: 600;
-        margin: 10px 0;
-    }
-    .success-banner {
-        background: rgba(34, 197, 94, 0.08);
-        border: 1.5px solid rgba(34, 197, 94, 0.4);
-        border-radius: 8px;
-        padding: 10px 16px;
-        color: #4ade80;
-        font-weight: 600;
-        font-size: 0.9rem;
-        margin: 8px 0;
-    }
-    .clinical-warn {
-        background: rgba(234, 88, 12, 0.09);
-        border: 1.5px solid rgba(234, 88, 12, 0.45);
-        border-radius: 10px;
-        padding: 10px 16px;
-        margin: 8px 0;
-        color: #fdba74;
-        font-size: 0.88rem;
-        line-height: 1.5;
-    }
-    .abcd-card {
-        background: rgba(30, 41, 59, 0.4);
-        border: 1px solid rgba(147, 197, 253, 0.25);
-        border-radius: 8px;
-        padding: 12px 10px;
-        text-align: center;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    .abcd-card.warn {
-        background: rgba(239, 68, 68, 0.08);
-        border-color: rgba(239, 68, 68, 0.35);
-    }
-    .abcd-card .card-label {
-        font-size: 0.68rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #94a3b8;
-        margin-bottom: 4px;
-    }
-    .abcd-card .card-value {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #e2e8f0;
-    }
-    .abcd-card .card-value.warn {
-        color: #f87171;
-    }
-    .abcd-card .card-sublabel {
-        font-size: 0.67rem;
-        color: #64748b;
-        margin-top: 3px;
-    }
-    .diag-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: rgba(30, 58, 138, 0.15);
-        border: 1px solid rgba(96, 165, 250, 0.25);
-        border-radius: 8px;
-        padding: 8px 14px;
-        margin: 10px 0;
-        font-size: 0.9rem;
-    }
-    .diag-badge .conf-label {
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 0.75rem;
-    }
-    .conf-high { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-    .conf-mid  { background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
-    .conf-low  { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-    [data-testid="stChatMessageContent"] p {
-        margin: 0 0 2px 0 !important;
-        line-height: 1.45 !important;
-    }
-    [data-testid="stChatMessageContent"] ol,
-    [data-testid="stChatMessageContent"] ul {
-        margin: 2px 0 4px 0 !important;
-        padding-left: 16px !important;
-    }
-    [data-testid="stChatMessageContent"] li {
-        margin-bottom: 1px !important;
-        line-height: 1.4 !important;
-    }
-    [data-testid="stChatMessage"] {
-        padding: 4px 0 !important;
-    }
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f172a 0%, #111e36 100%);
-    }
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] [data-testid="stWidgetLabel"] p,
-    [data-testid="stSidebar"] [data-testid="stSlider"] p,
-    [data-testid="stSidebar"] [data-testid="stSlider"] span,
-    [data-testid="stSidebar"] [data-testid="stRadio"] label,
-    [data-testid="stSidebar"] [data-testid="stRadio"] p,
-    [data-testid="stSidebar"] [data-testid="stSelectbox"] div,
-    [data-testid="stSidebar"] [data-testid="stNumberInput"] div {
-        color: #e2e8f0 !important;
-    }
-    .sidebar-section {
-        font-size: 0.72rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #94a3b8 !important;
-        padding: 8px 0 4px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 8px;
-    }
-    .step-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 4px 0;
-        font-size: 0.78rem;
-        color: #64748b;
-    }
-    .step-row.done { color: #4ade80; }
-    .step-row.active { color: #60a5fa; font-weight: 600; }
-    .step-dot {
-        width: 16px; height: 16px; flex-shrink: 0;
-        border-radius: 50%;
-        border: 1px solid currentColor;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 0.65rem; font-weight: 700;
-    }
-    .step-dot.done { background: rgba(74, 222, 128, 0.1); }
-    .voice-box {
-        background: rgba(30, 41, 59, 0.25);
-        border: 1px dashed rgba(96, 165, 250, 0.2);
-        border-radius: 8px;
-        padding: 8px;
-        margin: 6px 0;
-    }
-    .voice-box-label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #60a5fa;
-        margin-bottom: 4px;
-    }
-    [data-testid="stTabs"] [role="tab"] {
-        font-size: 0.82rem;
-        font-weight: 600;
-    }
-    div[data-testid="stAppViewContainer"] { opacity: 1 !important; filter: none !important; }
-    [data-st-mode="running"] * { opacity: 1 !important; }
-    div[data-testid="stTextInput"] input {
-        height: 50px !important;
-        font-size: 1.05rem !important;
-        border-radius: 8px !important;
-        background-color: rgba(30, 41, 59, 0.4) !important;
-        border: 1px solid rgba(147, 197, 253, 0.25) !important;
-        color: #f1f5f9 !important;
-    }
-    div[data-testid="stHorizontalBlock"] div[data-testid="column"]:last-child button {
-        height: 50px !important;
-        font-size: 1.45rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        border-radius: 8px !important;
-        background-color: #2563eb !important;
-        color: white !important;
-        margin-top: 0 !important;
-        border: none !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Font & Core Theme ── */
+html, body, [class*="css"], [class*="st-"] {
+    font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif !important;
+}
+
+/* ── Main App Area Styling ONLY (Leave Sidebar completely untouched!) ── */
+[data-testid="stMain"] {
+    background-color: #F8FAFC !important;
+}
+
+/* Force dark text color for all main area text elements */
+[data-testid="stMain"] [data-testid="stMarkdownContainer"] p,
+[data-testid="stMain"] [data-testid="stMarkdownContainer"] span,
+[data-testid="stMain"] [data-testid="stMarkdownContainer"] li,
+[data-testid="stMain"] [data-testid="stWidgetLabel"] p,
+[data-testid="stMain"] label,
+[data-testid="stMain"] h1, 
+[data-testid="stMain"] h2, 
+[data-testid="stMain"] h3, 
+[data-testid="stMain"] h4, 
+[data-testid="stMain"] h5, 
+[data-testid="stMain"] h6 {
+    color: #1E293B !important;
+}
+
+/* Main area inputs (White background with dark slate text) */
+[data-testid="stMain"] div[data-testid="stTextInput"] input,
+[data-testid="stMain"] div[data-testid="stNumberInput"] input,
+[data-testid="stMain"] div[data-testid="stTextArea"] textarea,
+[data-testid="stMain"] div[data-baseweb="select"] {
+    background-color: #FFFFFF !important;
+    color: #1E293B !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 8px !important;
+}
+
+[data-testid="stMain"] div[data-testid="stTextInput"] input {
+    height: 50px !important;
+    font-size: 1.05rem !important;
+}
+
+[data-testid="stMain"] div[data-baseweb="select"] *,
+[data-testid="stMain"] div[data-testid="stSelectbox"] * {
+    color: #1E293B !important;
+}
+
+/* Dropdown popover list items - styled dark because they have light background natively */
+div[data-baseweb="popover"] *,
+div[role="listbox"] * {
+    color: #1E293B !important;
+}
+
+/* ── Disclaimer Y Khoa (medical-disclaimer-warning) ── */
+.medical-disclaimer-warning {
+    background: #FEF2F2 !important;
+    border: 1px solid #FCA5A5 !important;
+    border-radius: 8px !important;
+    padding: 12px 18px !important;
+    margin-bottom: 12px !important;
+    font-size: 0.84rem !important;
+    color: #991B1B !important;
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+}
+.medical-disclaimer-warning * {
+    color: #991B1B !important;
+}
+
+.ehr-page-title {
+    font-size: 1.55rem !important;
+    font-weight: 700 !important;
+    color: #0F172A !important;
+    margin: 0 0 2px 0 !important;
+}
+.ehr-page-sub {
+    font-size: 0.83rem !important;
+    color: #64748B !important;
+    margin: 0 0 14px 0 !important;
+}
+
+/* ── Triage & Warning Banners ── */
+.triage-banner {
+    background: #FEF2F2 !important;
+    border: 2px solid #EF4444 !important;
+    border-radius: 10px !important;
+    padding: 12px 18px !important;
+    text-align: center !important;
+    font-size: 0.92rem !important;
+    color: #991B1B !important;
+    font-weight: 600 !important;
+    margin: 10px 0 !important;
+}
+.success-banner {
+    background: #F0FDF4 !important;
+    border: 1.5px solid #4ADE80 !important;
+    border-radius: 8px !important;
+    padding: 10px 16px !important;
+    color: #166534 !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    margin: 8px 0 !important;
+}
+.clinical-warn {
+    background: #FFF7ED !important;
+    border: 1.5px solid #FDBA74 !important;
+    border-radius: 10px !important;
+    padding: 12px 18px !important;
+    margin: 10px 0 !important;
+    color: #C2410C !important;
+    font-size: 0.88rem !important;
+    line-height: 1.5 !important;
+    font-weight: 500 !important;
+}
+.clinical-danger {
+    background: #FEF2F2 !important;
+    border: 2px solid #EF4444 !important;
+    border-radius: 10px !important;
+    padding: 14px 18px !important;
+    margin: 12px 0 !important;
+    color: #991B1B !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.1) !important;
+}
+
+/* ── Metric Cards ABCD ── */
+.abcd-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    padding: 12px 10px !important;
+    text-align: center !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+.abcd-card.warn {
+    background: #FEF2F2 !important;
+    border-color: #FCA5A5 !important;
+}
+.abcd-card .card-label {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    color: #64748B !important;
+    margin-bottom: 4px !important;
+}
+.abcd-card .card-value {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #0F172A !important;
+}
+.abcd-card .card-value.warn {
+    color: #DC2626 !important;
+}
+.abcd-card .card-sublabel {
+    font-size: 0.68rem !important;
+    color: #64748B !important;
+    margin-top: 3px !important;
+}
+
+/* ── Diagnosis Badges ── */
+.diag-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    background: #EFF6FF !important;
+    border: 1px solid #BFDBFE !important;
+    border-radius: 8px !important;
+    padding: 8px 14px !important;
+    margin: 10px 0 !important;
+    font-size: 0.9rem !important;
+    color: #1E3A8A !important;
+}
+.diag-badge .conf-label {
+    padding: 2px 8px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+}
+.conf-high { background: #D1FAE5 !important; color: #065F46 !important; border: 1px solid #A7F3D0 !important; }
+.conf-mid  { background: #FEF3C7 !important; color: #92400E !important; border: 1px solid #FDE68A !important; }
+.conf-low  { background: #FEE2E2 !important; color: #991B1B !important; border: 1px solid #FCA5A5 !important; }
+
+[data-testid="stTabs"] [role="tab"] {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+div[data-testid="stAppViewContainer"] { opacity: 1 !important; filter: none !important; }
+[data-st-mode="running"] * { opacity: 1 !important; }
+
+div[data-testid="stHorizontalBlock"] div[data-testid="column"]:last-child button {
+    height: 50px !important;
+    font-size: 1.45rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    background-color: #2563eb !important;
+    color: white !important;
+    margin-top: 0 !important;
+    border: none !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 
 # ==============================================================================
@@ -1460,52 +1417,6 @@ def render_doctor_dashboard() -> None:
                     st.session_state["show_delete_confirm"] = False
                     st.rerun()
                     
-    # Tải dữ liệu JSON và CSV
-    col_dl_json, col_dl_csv = st.columns(2)
-    with col_dl_json:
-        json_str = json.dumps(record, indent=2, ensure_ascii=False)
-        st.download_button(
-            label="📥 Tải hồ sơ bệnh án (JSON)",
-            data=json_str,
-            file_name=f"EHR_{pi.get('name', 'BenhNhan').replace(' ', '_')}.json",
-            mime="application/json",
-            use_container_width=True,
-            key="dl_json_btn"
-        )
-    with col_dl_csv:
-        import io
-        import csv
-        csv_buffer = io.StringIO()
-        writer = csv.writer(csv_buffer)
-        writer.writerow([
-            "Mốc khám", "Ngày khám", "Vị trí tổn thương", "Chẩn đoán chính", 
-            "Độ tin cậy", "Area Ratio", "Border Complexity", "Asymmetry", "Circularity", "Số tin nhắn VQA"
-        ])
-        for v_idx, v in enumerate(reversed(visits)):
-            ai_met = v.get("ai_extracted_metrics", {})
-            vqa_len = len(v.get("vqa_conversations", []))
-            writer.writerow([
-                f"Lần {v_idx + 1}",
-                v.get("created_at", "N/A"),
-                v.get("location") or ai_met.get("location", "N/A"),
-                ai_met.get("prediction", "N/A"),
-                f"{float(ai_met.get('confidence', 0.0)):.4f}",
-                f"{float(ai_met.get('area_ratio', 0.0)):.4f}",
-                f"{float(ai_met.get('border_complexity', 0.0)):.4f}",
-                f"{float(ai_met.get('asymmetry', 0.0)):.4f}",
-                f"{float(ai_met.get('circularity', 0.0)):.4f}",
-                vqa_len
-            ])
-        csv_str = csv_buffer.getvalue()
-        st.download_button(
-            label="📥 Tải lịch sử mốc khám (CSV)",
-            data=csv_str.encode("utf-8-sig"),
-            file_name=f"EHR_{pi.get('name', 'BenhNhan').replace(' ', '_')}.csv",
-            mime="text/csv",
-            use_container_width=True,
-            key="dl_csv_btn"
-        )
-
     st.divider()
 
     # --- FILTER BY LOCATION ---
@@ -1727,8 +1638,8 @@ def main() -> None:
     _inject_custom_css()
 
     st.markdown(
-        "<div class='ehr-disclaimer'>"
-        "TUYÊN BỐ MIỄN TRỪ TRÁCH NHIỆM: Hệ thống này chỉ là công cụ hỗ trợ sàng lọc sơ bộ bằng AI, "
+        "<div class='medical-disclaimer-warning'>"
+        "⚠️ <b>TUYÊN BỐ MIỄN TRỪ TRÁCH NHIỆM Y KHOA:</b> Hệ thống này chỉ là công cụ hỗ trợ sàng lọc sơ bộ bằng AI, "
         "KHÔNG thay thế chẩn đoán y khoa chuyên môn của bác sĩ da liễu."
         "</div>",
         unsafe_allow_html=True,
@@ -1762,13 +1673,8 @@ def main() -> None:
         "input_key":               0,
         "voice_key":               0,
         "voice_prefill":           "",
-        "full_image_result":       None,
-        "active_analysis_path":    None,
-        "last_selected_lesion_idx": "Tất cả tổn thương (Ảnh gốc)",
         "record_saved":            False,
-        "show_delete_confirm":     False,
         "has_rag_queries":         False,
-        "dicom_meta":              None,
     }
     for k, v in _ss_defaults.items():
         if k not in st.session_state:
@@ -1801,7 +1707,7 @@ def main() -> None:
             st.markdown(
                 f"<div class='step-row {cls}'>"
                 f"<span class='step-dot {cls}'>{num}</span>"
-                f"<span style='margin-left: 8px;'>{text}</span></div>",
+                f"<span>{text}</span></div>",
                 unsafe_allow_html=True,
             )
 
@@ -1911,6 +1817,9 @@ def main() -> None:
             if st.session_state["last_uploaded_file_name"] != uploaded.name:
                 st.session_state["last_uploaded_file_name"] = uploaded.name
                 st.session_state["result"]                  = None
+                st.session_state["full_image_result"]        = None
+                st.session_state["active_analysis_path"]     = None
+                st.session_state["last_selected_lesion_idx"] = "Tất cả tổn thương (Ảnh gốc)"
                 st.session_state["messages"]                = []
                 st.session_state["analysis_time"]           = None
                 st.session_state["saved_local_img_path"]    = None
@@ -1922,7 +1831,6 @@ def main() -> None:
                 if image is None:
                     st.error("Không thể đọc file DICOM. Vui lòng kiểm tra định dạng.")
                 else:
-                    st.session_state["dicom_meta"] = dicom_meta
                     st.markdown(
                         f"<div class='success-banner'>Đã đọc DICOM thành công — "
                         f"Tên: {dicom_meta.get('patient_name','')} | "
@@ -2005,6 +1913,10 @@ def main() -> None:
                 if st.session_state.get("sam_pending") and st.session_state["sam_point"] is not None:
                     st.session_state["sam_pending"] = False
                     st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                    st.session_state["full_image_result"] = None
+                    st.session_state["active_analysis_path"] = None
+                    st.session_state["last_selected_lesion_idx"] = "Tất cả tổn thương (Ảnh gốc)"
+                    st.session_state["record_saved"] = False
                     with st.spinner("Đang chẩn đoán tương tác với điểm chọn..."):
                         tmp_dir  = tempfile.mkdtemp()
                         tmp_path = os.path.join(tmp_dir, "input.png")
@@ -2017,14 +1929,8 @@ def main() -> None:
                             gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
                             body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
                             lambda_val=lambda_w,
-                            interactive_point=st.session_state["sam_point"],
-                            malignant_threshold=mal_thresh
+                            interactive_point=st.session_state["sam_point"]
                         )
-                        if st.session_state.get("dicom_meta") and "metrics" in result_new:
-                            meta = st.session_state["dicom_meta"]
-                            if "pixel_spacing_x" in meta and "pixel_spacing_y" in meta:
-                                result_new["metrics"]["pixel_spacing_x"] = meta["pixel_spacing_x"]
-                                result_new["metrics"]["pixel_spacing_y"] = meta["pixel_spacing_y"]
                         st.session_state["result"] = result_new
                         st.session_state["messages"] = []
                         st.rerun()
@@ -2050,6 +1956,10 @@ def main() -> None:
                             st.session_state["custom_mask"] = resized_mask
                             st.session_state["sam_point"] = None
                             st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                            st.session_state["full_image_result"] = None
+                            st.session_state["active_analysis_path"] = None
+                            st.session_state["last_selected_lesion_idx"] = "Tất cả tổn thương (Ảnh gốc)"
+                            st.session_state["record_saved"] = False
                             with st.spinner("Đang áp dụng phân đoạn vẽ tay..."):
                                 tmp_dir  = tempfile.mkdtemp()
                                 tmp_path = os.path.join(tmp_dir, "input.png")
@@ -2062,14 +1972,8 @@ def main() -> None:
                                     gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
                                     body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
                                     lambda_val=lambda_w,
-                                    custom_mask=st.session_state["custom_mask"],
-                                    malignant_threshold=mal_thresh
+                                    custom_mask=st.session_state["custom_mask"]
                                 )
-                                if st.session_state.get("dicom_meta") and "metrics" in result_new:
-                                    meta = st.session_state["dicom_meta"]
-                                    if "pixel_spacing_x" in meta and "pixel_spacing_y" in meta:
-                                        result_new["metrics"]["pixel_spacing_x"] = meta["pixel_spacing_x"]
-                                        result_new["metrics"]["pixel_spacing_y"] = meta["pixel_spacing_y"]
                                 st.session_state["result"] = result_new
                                 st.session_state["messages"] = []
                                 st.rerun()
@@ -2079,6 +1983,10 @@ def main() -> None:
                     st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
                     st.session_state["sam_point"] = None
                     st.session_state["custom_mask"] = None
+                    st.session_state["full_image_result"] = None
+                    st.session_state["active_analysis_path"] = None
+                    st.session_state["last_selected_lesion_idx"] = "Tất cả tổn thương (Ảnh gốc)"
+                    st.session_state["record_saved"] = False
                     with st.spinner("Đang chạy Segmentation + Classification tự động..."):
                         tmp_dir  = tempfile.mkdtemp()
                         tmp_path = os.path.join(tmp_dir, "input.png")
@@ -2090,14 +1998,8 @@ def main() -> None:
                             age=float(p_age) if p_name.strip() else None,
                             gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
                             body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
-                            lambda_val=lambda_w,
-                            malignant_threshold=mal_thresh
+                            lambda_val=lambda_w
                         )
-                        if st.session_state.get("dicom_meta") and "metrics" in result_new:
-                            meta = st.session_state["dicom_meta"]
-                            if "pixel_spacing_x" in meta and "pixel_spacing_y" in meta:
-                                result_new["metrics"]["pixel_spacing_x"] = meta["pixel_spacing_x"]
-                                result_new["metrics"]["pixel_spacing_y"] = meta["pixel_spacing_y"]
                         st.session_state["result"]   = result_new
                         st.session_state["messages"] = []
                         st.rerun()
@@ -2171,7 +2073,7 @@ def main() -> None:
                                     les = next((l for l in lesions if l["id"] == lesion_id), None)
                                     if les:
                                         x, y, w, h = les["bbox"]
-                                        pad = int(max(w, h) * 0.20)
+                                        pad = 15
                                         crop_x = max(0, x - pad)
                                         crop_y = max(0, y - pad)
                                         crop_w = min(orig_w - crop_x, w + 2*pad)
@@ -2190,14 +2092,8 @@ def main() -> None:
                                                 age=float(p_age) if p_name.strip() else None,
                                                 gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
                                                 body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
-                                                lambda_val=lambda_w,
-                                                malignant_threshold=mal_thresh
+                                                lambda_val=lambda_w
                                             )
-                                            if st.session_state.get("dicom_meta") and "metrics" in result_crop:
-                                                meta = st.session_state["dicom_meta"]
-                                                if "pixel_spacing_x" in meta and "pixel_spacing_y" in meta:
-                                                    result_crop["metrics"]["pixel_spacing_x"] = meta["pixel_spacing_x"]
-                                                    result_crop["metrics"]["pixel_spacing_y"] = meta["pixel_spacing_y"]
                                             st.session_state["result"] = result_crop
                                             st.session_state["messages"] = []
                                             st.rerun()
@@ -2281,17 +2177,9 @@ def main() -> None:
                         f"</div>"
                     )
 
-                pixel_spacing_x = metrics.get("pixel_spacing_x")
-                pixel_spacing_y = metrics.get("pixel_spacing_y")
-                phys_area = None
-                if pixel_spacing_x is not None and pixel_spacing_y is not None:
-                    phys_area = float(metrics.get("lesion_area", 0)) * pixel_spacing_x * pixel_spacing_y
-                
-                area_sublabel = f"Diện tích: {phys_area:.2f} mm²" if phys_area is not None else "Tỷ lệ diện tích"
-
                 mc1, mc2, mc3, mc4, mc5 = st.columns(5)
                 mc1.markdown(_card("Thời gian", st.session_state.get("analysis_time", "—"), "Điểm lấy mẫu"), unsafe_allow_html=True)
-                mc2.markdown(_card("Area ratio",  f"{area_v:.4f}",  area_sublabel), unsafe_allow_html=True)
+                mc2.markdown(_card("Area ratio",  f"{area_v:.4f}",  "Tỷ lệ diện tích"), unsafe_allow_html=True)
                 mc3.markdown(_card("Border",      f"{bord_v:.4f}",  "Độ phức tạp bờ", bord_v > 5.0), unsafe_allow_html=True)
                 mc4.markdown(_card("Asymmetry",   f"{asym_v:.4f}",  "Bất đối xứng",   asym_v > 0.7), unsafe_allow_html=True)
                 mc5.markdown(_card("Circularity", f"{circ_v:.4f}",  "Độ tròn"), unsafe_allow_html=True)
@@ -2325,15 +2213,6 @@ def main() -> None:
             # ===========================================================
             st.divider()
             st.markdown("### Khu vực Tư vấn Lâm sàng (VQA)")
-
-            if "Offline" in vqa_mode or "Nội bộ" in vqa_mode:
-                st.markdown(
-                    "<div class='clinical-warn' style='margin-bottom: 12px; font-size: 0.85rem; padding: 8px 12px; border-left-width: 3px;'>"
-                    "⚠️ <b>Lưu ý chế độ Offline:</b> Mô hình ngoại tuyến hoạt động không có kết nối cơ sở dữ liệu y văn RAG. "
-                    "Câu trả lời dựa trên kho tri thức chuyên gia cục bộ tĩnh."
-                    "</div>",
-                    unsafe_allow_html=True
-                )
 
             is_triage     = result is not None and result.get("status") == "triage"
             chat_disabled = (not bool(result)) or is_triage
@@ -2369,24 +2248,24 @@ def main() -> None:
                         key=f"vqa_voice_realtime_main_{_vkey}",
                     )
 
-                # Ô nhập chính (Type Input) sử dụng key động để reset sau khi gửi và hỗ trợ Enter
+                # Ô nhập chính (Type Input) sử dụng key động để reset sau khi gửi
                 _ikey = st.session_state.get("input_key", 0)
-                with st.form(key=f"vqa_typed_form_{_ikey}", border=False):
-                    col_typed, col_btn = st.columns([12, 1], gap="small")
-                    with col_typed:
-                        user_typed = st.text_input(
-                            "Nhập câu hỏi:",
-                            placeholder="Nhập hoặc nói câu hỏi của bạn tại đây...",
-                            key=f"chat_textarea_vqa_{_ikey}",
-                            label_visibility="collapsed",
-                        )
-                    with col_btn:
-                        send_clicked = st.form_submit_button(
-                            "➤",
-                            disabled=chat_disabled,
-                            use_container_width=True,
-                            type="primary",
-                        )
+                col_typed, col_btn = st.columns([12, 1], gap="small")
+                with col_typed:
+                    user_typed = st.text_input(
+                        "Nhập câu hỏi:",
+                        placeholder="Nhập hoặc nói câu hỏi của bạn tại đây...",
+                        key=f"chat_textarea_vqa_{_ikey}",
+                        label_visibility="collapsed",
+                    )
+                with col_btn:
+                    send_clicked = st.button(
+                        "➤",
+                        key="send_vqa_btn",
+                        type="primary",
+                        disabled=chat_disabled,
+                        use_container_width=True,
+                    )
                 
                 # Logic xác định câu hỏi: ưu tiên gõ trực tiếp, dự phòng qua voice_result nếu trễ React state
                 if send_clicked:
@@ -2427,23 +2306,23 @@ def main() -> None:
                     for m in msgs:
                         with st.chat_message(m["role"]):
                             st.markdown(m["content"])
+                            # Vẽ tài liệu tham khảo RAG nếu có
+                            if m.get("references"):
+                                for ref in m["references"]:
+                                    sim = max(0.0, 1.0 - ref["distance"])
+                                    with st.expander(f"📖 Tài liệu y văn tham khảo (Độ tương đồng: {sim:.1%})"):
+                                        st.write(ref["text"])
                     
-                    # Nếu có generator stream của AI thì vẽ tiếp câu trả lời live và lưu trữ real-time vào session state
+                    # Nếu có generator stream của AI thì vẽ tiếp câu trả lời live
                     if ai_stream_gen is not None:
                         with st.chat_message("assistant"):
-                            placeholder = st.empty()
-                            full_response = ""
-                            # Khởi tạo tin nhắn trống trong session state để lưu trữ tiến trình
-                            st.session_state["messages"].append({"role": "assistant", "content": ""})
-                            msg_idx = len(st.session_state["messages"]) - 1
-                            
-                            for chunk in ai_stream_gen:
-                                full_response += chunk
-                                placeholder.markdown(full_response + "▌")
-                                # Cập nhật nội dung real-time vào session state để tránh mất dữ liệu khi bị voice component ngắt quãng
-                                st.session_state["messages"][msg_idx]["content"] = full_response
-                            
-                            placeholder.markdown(full_response)
+                            answer = st.write_stream(ai_stream_gen)
+                        
+                        msg_dict = {"role": "assistant", "content": answer}
+                        if st.session_state.get("last_vqa_references"):
+                            msg_dict["references"] = st.session_state["last_vqa_references"]
+                            st.session_state["last_vqa_references"] = None
+                        st.session_state["messages"].append(msg_dict)
                         st.rerun()
 
             # -- Đồng bộ EHR + Xuất báo cáo --
@@ -2464,60 +2343,33 @@ def main() -> None:
                         elif not st.session_state["saved_local_img_path"]:
                             st.error("Không tìm thấy file ảnh phân tích.")
                         else:
-                            # Chuẩn bị song song hóa luồng upload ảnh lên ImgBB để giảm tối đa độ trễ giao diện
-                            upload_tasks = {}
-                            temp_files = []
-                            
-                            # 1. Ảnh gốc
-                            upload_tasks["orig"] = st.session_state["saved_local_img_path"]
-                            
-                            # 2. Ảnh mặt nạ
-                            if mask_img_arr is not None:
-                                tmp_mask_path = os.path.join(tempfile.gettempdir(), f"mask_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
-                                cv2.imwrite(tmp_mask_path, mask_img_arr)
-                                upload_tasks["mask"] = tmp_mask_path
-                                temp_files.append(tmp_mask_path)
-                                
-                            # 3. Ảnh Grad-CAM
-                            gradcam_arr = result.get("gradcam_image")
-                            if isinstance(gradcam_arr, np.ndarray):
-                                tmp_gradcam_path = os.path.join(tempfile.gettempdir(), f"gradcam_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
-                                gradcam_bgr = cv2.cvtColor(gradcam_arr, cv2.COLOR_RGB2BGR)
-                                cv2.imwrite(tmp_gradcam_path, gradcam_bgr)
-                                upload_tasks["gradcam"] = tmp_gradcam_path
-                                temp_files.append(tmp_gradcam_path)
-
-                            from concurrent.futures import ThreadPoolExecutor
-                            
-                            urls = {}
-                            with st.spinner("Đang tải toàn bộ dữ liệu hình ảnh lâm sàng lên Cloud (song song)..."):
-                                with ThreadPoolExecutor(max_workers=3) as executor:
-                                    futures = {
-                                        key: executor.submit(upload_image_to_imgbb, path)
-                                        for key, path in upload_tasks.items()
-                                    }
-                                    for key, fut in futures.items():
-                                        try:
-                                            urls[key] = fut.result()
-                                        except Exception as e:
-                                            print(f"Parallel upload failed for {key}:", e)
-                                            urls[key] = None
-
-                            # Dọn dẹp file tạm
-                            for p in temp_files:
-                                if os.path.exists(p):
-                                    try:
-                                        os.remove(p)
-                                    except Exception:
-                                        pass
-
-                            pub_url = urls.get("orig")
-                            mask_url = urls.get("mask")
-                            gradcam_url = urls.get("gradcam")
-
+                            timestamp_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+                            with st.spinner("Đang đẩy ảnh gốc lên ImgBB..."):
+                                pub_url = upload_image_to_imgbb(st.session_state["saved_local_img_path"])
                             if not pub_url:
                                 st.error("Lỗi tải ảnh gốc lên ImgBB.")
                             else:
+                                # Tạo và đẩy ảnh mặt nạ phân đoạn lên
+                                mask_url = None
+                                if mask_img_arr is not None:
+                                    tmp_mask_path = os.path.join(tempfile.gettempdir(), f"mask_{timestamp_id}.png")
+                                    cv2.imwrite(tmp_mask_path, mask_img_arr)
+                                    with st.spinner("Đang tải ảnh mặt nạ phân đoạn lên Cloud..."):
+                                        mask_url = upload_image_to_imgbb(tmp_mask_path)
+                                    if os.path.exists(tmp_mask_path):
+                                        os.remove(tmp_mask_path)
+                                
+                                # Tạo và đẩy ảnh bản đồ nhiệt Grad-CAM lên
+                                gradcam_url = None
+                                gradcam_arr = result.get("gradcam_image")
+                                if isinstance(gradcam_arr, np.ndarray):
+                                    tmp_gradcam_path = os.path.join(tempfile.gettempdir(), f"gradcam_{timestamp_id}.png")
+                                    gradcam_bgr = cv2.cvtColor(gradcam_arr, cv2.COLOR_RGB2BGR)
+                                    cv2.imwrite(tmp_gradcam_path, gradcam_bgr)
+                                    with st.spinner("Đang tải ảnh bản đồ nhiệt Grad-CAM lên Cloud..."):
+                                        gradcam_url = upload_image_to_imgbb(tmp_gradcam_path)
+                                    if os.path.exists(tmp_gradcam_path):
+                                        os.remove(tmp_gradcam_path)
 
                                 pat_info = {
                                     "name":     p_name.strip(),
@@ -2530,7 +2382,7 @@ def main() -> None:
                                 m_r = result.get("metrics", {})
                                 c_r = result.get("classification") or {}
                                 v_data = {
-                                    "timestamp_id": datetime.now().strftime("%Y%m%d_%H%M%S"),
+                                    "timestamp_id": timestamp_id,
                                     "created_at":   st.session_state["analysis_time"],
                                     "image_url":    pub_url,
                                     "mask_url":     mask_url,
@@ -2544,9 +2396,6 @@ def main() -> None:
                                         "border_complexity": float(m_r.get("border_complexity", 0.0)),
                                         "asymmetry":         float(m_r.get("asymmetry",         0.0)),
                                         "circularity":       float(m_r.get("circularity",       0.0)),
-                                        "pixel_spacing_x":   m_r.get("pixel_spacing_x"),
-                                        "pixel_spacing_y":   m_r.get("pixel_spacing_y"),
-                                        "physical_area_mm2": float(m_r.get("lesion_area", 0) * m_r.get("pixel_spacing_x", 0) * m_r.get("pixel_spacing_y", 0)) if m_r.get("pixel_spacing_x") and m_r.get("pixel_spacing_y") else None,
                                     },
                                     "vqa_conversations": list(st.session_state["messages"]),
                                 }

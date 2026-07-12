@@ -348,7 +348,7 @@
         <div class="slide" id="slide-2">
             <div class="slide-header">
                 <h2>Tính cấp thiết & Mục tiêu Đề tài</h2>
-                <span class="slide-number">Slide 2 / 8</span>
+                <span class="slide-number">Slide 2 / 9</span>
             </div>
             <div class="slide-body">
                 <div class="slide-text">
@@ -388,11 +388,50 @@
             </div>
         </div>
 
-        <!-- SLIDE 3: KIẾN TRÚC TỔNG QUAN -->
+        <!-- SLIDE 3: ĐỐI TƯỢNG ĐỀ TÀI & TÍNH MỚI -->
         <div class="slide" id="slide-3">
             <div class="slide-header">
+                <h2>Đối tượng & Tính mới của Đề tài</h2>
+                <span class="slide-number">Slide 3 / 9</span>
+            </div>
+            <div class="slide-body">
+                <div class="slide-text">
+                    <ul>
+                        <li><strong>Đối tượng nghiên cứu:</strong> 7 nhóm bệnh lý da liễu phổ biến (HAM10000). Dữ liệu: Ảnh chụp RGB (điện thoại/máy ảnh), tệp tin chuẩn y tế DICOM, và hồ sơ bệnh án bệnh nhân (Tuổi, Giới, Vị trí tổn thương).</li>
+                        <li><strong>Đối tượng thụ hưởng:</strong> Bác sĩ đa khoa tại các trạm y tế tuyến cơ sở (huyện, xã), hỗ trợ chẩn đoán chính xác ngay tại vùng sâu vùng xa.</li>
+                        <li><strong>Tính mới so với hệ thống hiện tại:</strong> 
+                            1. Chuyển đổi từ "AI Hộp đen" sang **XAI (Explainable AI)** biện giải qua ABCD lâm sàng và Grad-CAM.
+                            2. Tích hợp **Đa phương thức** Late Fusion Bayes kết hợp demographics.
+                            3. Trợ lý hội thoại VQA hỗ trợ chạy **Offline qua Ollama** giúp bảo mật tối đa bệnh án.
+                        </li>
+                    </ul>
+                </div>
+                <div class="slide-visual">
+                    <svg class="mock-diagram" viewBox="0 0 400 300" font-family="sans-serif">
+                        <!-- Left Side: Old AI -->
+                        <rect x="20" y="50" width="150" height="90" rx="8" fill="#475569" opacity="0.8" />
+                        <text x="95" y="85" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">AI CỔ ĐIỂN</text>
+                        <text x="95" y="105" fill="#94a3b8" font-size="9" text-anchor="middle">Một phương thức - Hộp đen</text>
+                        <text x="95" y="120" fill="#94a3b8" font-size="9" text-anchor="middle">Chỉ chạy Online qua Cloud</text>
+ 
+                        <!-- Right Side: New CDSS -->
+                        <rect x="230" y="50" width="150" height="180" rx="8" fill="#0369a1" stroke="#0ea5e9" stroke-width="2" />
+                        <text x="305" y="85" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">CDSS ĐỀ XUẤT</text>
+                        <text x="305" y="110" fill="#bae6fd" font-size="9" text-anchor="middle" font-weight="bold">✦ Đa phương thức</text>
+                        <text x="305" y="130" fill="#bae6fd" font-size="9" text-anchor="middle" font-weight="bold">✦ Biện giải được (ABCD)</text>
+                        <text x="305" y="150" fill="#bae6fd" font-size="9" text-anchor="middle" font-weight="bold">✦ Trợ lý VQA Offline</text>
+                        <text x="305" y="170" fill="#bae6fd" font-size="9" text-anchor="middle" font-weight="bold">✦ An toàn thuốc (Guardrails)</text>
+                        <text x="305" y="195" fill="#bae6fd" font-size="9" text-anchor="middle" font-weight="bold">✦ Bảo mật EHR (SHA256+XOR)</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: KIẾN TRÚC TỔNG QUAN -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
                 <h2>Kiến trúc Tổng quan hệ thống</h2>
-                <span class="slide-number">Slide 3 / 8</span>
+                <span class="slide-number">Slide 4 / 9</span>
             </div>
             <div class="slide-body">
                 <div class="slide-text">
@@ -443,24 +482,18 @@
             </div>
         </div>
 
-        <!-- SLIDE 4: PHÂN VÙNG TỔN THƯƠNG -->
-        <div class="slide" id="slide-4">
+        <!-- SLIDE 5: PHÂN VÙNG TỔN THƯƠNG -->
+        <div class="slide" id="slide-5">
             <div class="slide-header">
                 <h2>Phân vùng tổn thương & Chỉ số ABCD</h2>
-                <span class="slide-number">Slide 4 / 8</span>
+                <span class="slide-number">Slide 5 / 9</span>
             </div>
             <div class="slide-body">
                 <div class="slide-text">
                     <ul>
-                        <li><strong>Mô hình đề xuất:</strong> Sử dụng DeepLabV3+ kết hợp bộ lọc Atrous Spatial Pyramid
-                            Pooling (ASPP) thu thập đặc trưng đa tỷ lệ.</li>
-                        <li><strong>Multi-scale TTA (Test-Time Augmentation):</strong> Tăng cường ảnh lúc suy luận với
-                            các tỷ lệ {1.0, 0.75, 0.5} giúp cải thiện rõ rệt chỉ số trên ảnh điện thoại bị mờ hoặc có
-                            lông.</li>
-                        <li><strong>Cơ chế dự phòng tương tác (Interactive Fallback):</strong> Cho phép vẽ tay hoặc
-                            click điểm (MobileSAM / GrabCut). Nếu mặt nạ tương tác rỗng hoặc quá nhỏ (&lt; 100px), hệ
-                            thống tự động fallback về mặt nạ tự động của DeepLabV3+ để đảm bảo luồng đo ABCD ổn định.
-                        </li>
+                        <li><strong>Mô hình đề xuất:</strong> Sử dụng DeepLabV3+ (ResNet50) và Multi-scale TTA (Scales: 1.0, 0.75, 0.5) tối ưu hóa phân đoạn ảnh chụp bằng điện thoại thường.</li>
+                        <li><strong>Phân đoạn tương tác (SAM Click + GrabCut):</strong> Tích hợp giải thuật GrabCut cải tiến khởi tạo bằng mặt nạ (`GC_INIT_WITH_MASK`) định vị chính xác vùng click chuột của bác sĩ lâm sàng để khoanh vùng tổn thương.</li>
+                        <li><strong>Bộ lọc OTSU dự phòng y khoa:</strong> Tích hợp thuật toán OTSU nghịch đảo (`cv2.THRESH_BINARY_INV`) tự động tách biên trong trường hợp mô hình học sâu phân đoạn lỗi, đảm bảo đo đạc chỉ số hình học ABCD luôn ổn định.</li>
                     </ul>
                 </div>
                 <div class="slide-visual">
@@ -469,38 +502,30 @@
             </div>
         </div>
 
-        <!-- SLIDE 5: PHÂN LOẠI & HỢP NHẤT BAYES -->
-        <div class="slide" id="slide-5">
+        <!-- SLIDE 6: PHÂN LOẠI & HỢP NHẤT BAYES -->
+        <div class="slide" id="slide-6">
             <div class="slide-header">
                 <h2>Phân loại bệnh lý & Hợp nhất Bayes</h2>
-                <span class="slide-number">Slide 5 / 8</span>
+                <span class="slide-number">Slide 6 / 9</span>
             </div>
             <div class="slide-body">
                 <div class="slide-text">
                     <ul>
-                        <li><strong>Kiến trúc phân loại chính:</strong> EfficientNet-B1 tích hợp mô-đun chú ý kép CBAM
-                            (Channel & Spatial Attention) tập trung vào vùng tổn thương sắc tố.</li>
-                        <li><strong>Chiến lược xử lý mất cân bằng lớp:</strong> Áp dụng Weighted Random Sampler và tăng
-                            cường Elastic Deformation cho các lớp thiểu số như U xơ da (DF), giúp tăng chỉ số Macro
-                            F1-Score thêm 7%.</li>
-                        <li><strong>Hợp nhất Bayes Đa phương thức (Bayesian Late Fusion):</strong> Kết hợp xác suất ảnh
-                            và dữ liệu dịch tễ y tế (Tuổi, Giới tính, Vị trí tổn thương) thống kê từ HAM10000 thông qua
-                            tham số tin cậy ảnh $\lambda$.</li>
+                        <li><strong>Kiến trúc phân loại chính:</strong> EfficientNet-B1 tích hợp khối chú ý kép CBAM (Channel & Spatial Attention) tập trung hiệu quả vào đặc trưng vùng tổn thương sắc tố.</li>
+                        <li><strong>Late Fusion Bayes đa phương thức:</strong> Kết hợp xác suất hình ảnh và các thông số dịch tễ học lâm sàng (Tuổi, Giới tính, Vị trí giải phẫu) để cá nhân hóa kết quả chẩn đoán.</li>
+                        <li><strong>Điều phối trọng số dịch tễ ($\lambda$):</strong> Thiết lập thanh trượt $\lambda$ động trên giao diện giúp bác sĩ chủ động giảm bớt/triệt tiêu ảnh hưởng của thiên lệch địa lý HAM10000 (dữ liệu người da trắng) khi khám cho bệnh nhân Việt Nam.</li>
                     </ul>
                 </div>
                 <div class="slide-visual">
                     <svg class="mock-diagram" viewBox="0 0 400 300" font-family="sans-serif">
                         <circle cx="100" cy="100" r="50" fill="#0ea5e9" opacity="0.8" />
-                        <text x="100" y="105" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">Ảnh
-                            (EfficientNet)</text>
+                        <text x="100" y="105" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">Ảnh (EfficientNet)</text>
 
                         <circle cx="300" cy="100" r="50" fill="#a855f7" opacity="0.8" />
-                        <text x="300" y="105" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">Dịch tễ
-                            (Bayes)</text>
+                        <text x="300" y="105" fill="#fff" font-size="12" text-anchor="middle" font-weight="bold">Dịch tễ (Bayes)</text>
 
                         <rect x="150" y="190" width="100" height="50" rx="8" fill="#f97316" />
-                        <text x="200" y="220" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">Hợp
-                            nhất muộn</text>
+                        <text x="200" y="220" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">Hợp nhất muộn</text>
 
                         <path d="M 120 140 L 170 190" stroke="#f97316" stroke-width="2" />
                         <path d="M 280 140 L 230 190" stroke="#f97316" stroke-width="2" />
@@ -509,23 +534,18 @@
             </div>
         </div>
 
-        <!-- SLIDE 6: TRỢ LÝ ĐÀM THOẠI VQA & RAG -->
-        <div class="slide" id="slide-6">
+        <!-- SLIDE 7: TRỢ LÝ ĐÀM THOẠI VQA & RAG -->
+        <div class="slide" id="slide-7">
             <div class="slide-header">
                 <h2>Trợ lý hội thoại y khoa VQA & RAG</h2>
-                <span class="slide-number">Slide 6 / 8</span>
+                <span class="slide-number">Slide 7 / 9</span>
             </div>
             <div class="slide-body">
                 <div class="slide-text">
                     <ul>
-                        <li><strong>Kiến trúc VQA ngoại tuyến:</strong> DistilGPT-2 tích hợp tầng chiếu đặc trưng thị
-                            giác (Linear Projection) và tinh chỉnh qua LoRA (rank r=8) chỉ chiếm 2.13% tham số huấn
-                            luyện.</li>
-                        <li><strong>Kiến trúc VQA đám mây:</strong> Sử dụng API GPT-4o-mini tích hợp RAG y văn và rào
-                            cản an toàn thuốc (Medication Guardrails) ngăn chặn hiện tượng tự kê đơn thuốc gây hại.</li>
-                        <li><strong>Truy xuất RAG tiếng Việt:</strong> Đoạn tài liệu hướng dẫn điều trị của Bộ Y tế Việt
-                            Nam có độ tương đồng Cosine cao nhất sẽ được đính kèm trực tiếp vào prompt để LLM giải đáp
-                            chính xác, tránh ảo giác.</li>
+                        <li><strong>VQA cục bộ (Local CPU & Edge LLM):</strong> Hỗ trợ mô hình nội bộ DistilGPT-2 LoRA (huấn luyện 2.13% tham số) chạy trực tiếp trên CPU, hoặc kết nối **Ollama** (`localhost:11434`) chạy các LLM lớn hơn (Qwen 3B/7B).</li>
+                        <li><strong>RAG y văn ngoại tuyến & trực tuyến:</strong> So khớp tài liệu y văn từ ChromaDB bằng khoảng cách Cosine. Chế độ Ollama nội bộ hỗ trợ đầy đủ RAG offline nhờ cửa sổ ngữ cảnh lớn, tránh ảo giác y khoa.</li>
+                        <li><strong>Vấn đáp trực tuyến & Rào cản thuốc:</strong> Tích hợp GPT-4o-mini và rào cản an toàn thuốc (Medication Guardrails) tự động lọc cảnh báo, ngăn chặn việc kê đơn thuốc tùy tiện gây hại cho bệnh nhân.</li>
                     </ul>
                 </div>
                 <div class="slide-visual">
@@ -534,23 +554,18 @@
             </div>
         </div>
 
-        <!-- SLIDE 7: KẾT QUẢ THỰC NGHIỆM -->
-        <div class="slide" id="slide-7">
+        <!-- SLIDE 8: KẾT QUẢ THỰC NGHIỆM -->
+        <div class="slide" id="slide-8">
             <div class="slide-header">
                 <h2>Kết quả Thực nghiệm & Ablation Study</h2>
-                <span class="slide-number">Slide 7 / 8</span>
+                <span class="slide-number">Slide 8 / 9</span>
             </div>
             <div class="slide-body">
                 <div class="slide-text">
                     <ul>
-                        <li><strong>Độ chính xác phân loại:</strong> Đạt **95.01%** toàn luồng trên ứng dụng thực tế
-                            (phiên bản tối ưu đạt 96.51% trong nghiên cứu cắt bỏ).</li>
-                        <li><strong>Tốc độ đáp ứng (Latency):</strong> Đạt tốc độ suy luận trung bình cực kỳ nhanh chỉ
-                            **232.27 ms** đầu cuối, phù hợp triển khai trên các thiết bị y tế cấu hình trung bình ở
-                            tuyến xã.</li>
-                        <li><strong>Ablation Study:</strong> Việc chuyển đổi từ ảnh thô sang cắt ROI bằng mặt nạ
-                            DeepLabV3+ đóng góp mức tăng trưởng độ chính xác cao nhất (từ 88.10% lên 95.01%), chứng minh
-                            sự tối ưu của Pipeline.</li>
+                        <li><strong>Độ chính xác phân loại:</strong> Đạt **95.01%** toàn luồng trên ứng dụng thực tế (phiên bản tối ưu đạt 96.51% trong nghiên cứu cắt bỏ).</li>
+                        <li><strong>Tốc độ đáp ứng (Latency):</strong> Đạt tốc độ suy luận trung bình cực kỳ nhanh chỉ **232.27 ms** đầu cuối, phù hợp triển khai trên các thiết bị y tế cấu hình trung bình ở tuyến xã.</li>
+                        <li><strong>Ablation Study:</strong> Việc chuyển đổi từ ảnh thô sang cắt ROI bằng mặt nạ DeepLabV3+ đóng góp mức tăng trưởng độ chính xác cao nhất (từ 88.10% lên 95.01%), chứng minh sự tối ưu của Pipeline.</li>
                     </ul>
                 </div>
                 <div class="slide-visual">
@@ -559,35 +574,32 @@
             </div>
         </div>
 
-        <!-- SLIDE 8: KẾT LUẬN & HƯỚNG PHÁT TRIỂN -->
-        <div class="slide" id="slide-8">
+        <!-- SLIDE 9: KẾT LUẬN & ĐỐNG GÓP XÃ HỘI -->
+        <div class="slide" id="slide-9">
             <div class="slide-header">
-                <h2>Kết luận & Hướng phát triển</h2>
-                <span class="slide-number">Slide 8 / 8</span>
+                <h2>Kết luận & Đóng góp Xã hội</h2>
+                <span class="slide-number">Slide 9 / 9</span>
             </div>
             <div class="slide-body">
                 <div class="slide-text">
                     <ul>
-                        <li><strong>Kết quả đạt được:</strong> Xây dựng thành công hệ thống CDSS y tế hoàn chỉnh, bảo vệ
-                            an toàn cao thông qua Safety Gate, minh bạch hóa chẩn đoán bằng Grad-CAM và xuất báo cáo PDF
-                            tự động đồng bộ Firestore.</li>
-                        <li><strong>Hướng phát triển 1 (Tích hợp PACS):</strong> Tích hợp sâu tiêu chuẩn DICOM SR và
-                            PACS/RIS kết nối trực tiếp với thiết bị chụp chiếu tại bệnh viện lớn.</li>
-                        <li><strong>Hướng phát triển 2 (Học chủ động):</strong> Tạo chu kỳ học máy chủ động liên tục
-                            (Active Learning Loop) lấy trực tiếp các mặt nạ hiệu chỉnh từ nét vẽ tay của bác sĩ để cập
-                            nhật mô hình.</li>
+                        <li><strong>Đóng góp xã hội của đề tài:</strong>
+                            1. *Bình đẳng hóa y khoa*: Giúp trạm y tế cơ sở (huyện/xã) tầm soát sớm ung thư da với chi phí tối thiểu, nâng cao chất lượng chẩn đoán vùng khó khăn.
+                            2. *Hỗ trợ tự đào tạo bác sĩ*: Hệ thống VQA + RAG đóng vai trò như một chuyên gia cố vấn 24/7 giải thích kiến thức lâm sàng cho các bác sĩ trẻ.
+                            3. *Tuân thủ an toàn dữ liệu*: Mã hóa EHR (SHA-256, XOR + Base64) bảo đảm bí mật thông tin bệnh án theo chuẩn HIPAA.
+                        </li>
+                        <li><strong>Kết quả đạt được:</strong> Xây dựng hoàn chỉnh hệ thống CDSS da liễu: chẩn đoán đa phương thức chuẩn xác, bảo mật cao thông qua Safety Gate, minh bạch hóa chẩn đoán và đồng bộ hóa EHR song song (1.5s).</li>
+                        <li><strong>Định hướng phát triển:</strong> Tích hợp sâu hệ thống PACS/RIS bệnh viện, kết nối DICOM SR và thiết kế cơ chế Học chủ động (Active Learning) từ các nét hiệu chỉnh biên tổn thương của bác sĩ.</li>
                     </ul>
                 </div>
                 <div class="slide-visual">
                     <svg class="mock-diagram" viewBox="0 0 400 300" font-family="sans-serif">
                         <rect x="50" y="30" width="300" height="70" rx="8" fill="#1e3a8a" opacity="0.8" />
-                        <text x="200" y="70" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">PACS /
-                            RIS BỆNH VIỆN</text>
-
+                        <text x="200" y="70" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">PACS / RIS BỆNH VIỆN</text>
+ 
                         <rect x="50" y="190" width="300" height="70" rx="8" fill="#14532d" opacity="0.8" />
-                        <text x="200" y="230" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">Chu Kỳ
-                            Học Liên Tục (Active Learning)</text>
-
+                        <text x="200" y="230" fill="#fff" font-size="14" text-anchor="middle" font-weight="bold">Chu Kỳ Học Liên Tục (Active Learning)</text>
+ 
                         <path d="M 200 100 L 200 190" stroke="#f97316" stroke-width="3" marker-end="url(#arrow)" />
                     </svg>
                 </div>
@@ -637,12 +649,13 @@
         const notes = [
             "Kính chào Hội đồng. Em tên là Nguyễn Thành Nghĩa. Hôm nay em xin phép bảo vệ đồ án tốt nghiệp với đề tài: Hệ thống Chẩn đoán Da liễu Đa phương thức Tích hợp Thị giác Máy tính, Hội thoại Y tế VQA và Hồ sơ Bệnh án Điện tử. Đồ án được hướng dẫn bởi PGS. TS. Giảng Viên Hướng Dẫn.",
             "Về tính cấp thiết, Melanoma hay BCC là ung thư da nguy hiểm cần phát hiện sớm. Tuy nhiên, các hệ thống AI hiện nay hầu hết là hộp đen và khó phân tích trực quan. Vì vậy mục tiêu của em là xây dựng hệ thống đa phương thức hỗ trợ lâm sàng kết hợp phân vùng đo chỉ số hình học ABCD, phân loại Bayes và trợ lý đàm thoại y tế VQA bổ trợ RAG để hỗ trợ bác sĩ tuyến đầu.",
+            "Về đối tượng đề tài, nghiên cứu tập trung vào 7 nhóm bệnh da liễu phổ biến từ bộ HAM10000. Dữ liệu bao gồm ảnh chụp thường, ảnh y tế chuẩn DICOM và dữ liệu hành chính/dịch tễ học bệnh nhân. Đối tượng thụ hưởng chính là các bác sĩ đa khoa tại trạm y tế tuyến cơ sở. Điểm mới của đề tài nằm ở việc cung cấp giải pháp AI biện giải được (XAI), tích hợp đa phương thức Bayes Fusion và hỗ trợ VQA offline qua Ollama giúp bảo mật dữ liệu tuyệt đối.",
             "Đây là sơ đồ kiến trúc của hệ thống. Ảnh da đầu vào sẽ được xử lý qua 2 nhánh độc lập: Nhánh phân vùng DeepLabV3+ đo đạc ABCD và Nhánh phân loại EfficientNet-B1. Đầu ra sẽ đi qua Safety Gate kiểm duyệt độ sắc nét, phơi sáng thích ứng chủng tộc da màu trước khi hiển thị. Kết quả cũng được chuyển vào trợ lý VQA và lưu trữ Firestore.",
-            "Nhánh phân vùng sử dụng DeepLabV3+ kết hợp Test-Time Augmentation (TTA) đa tỷ lệ giúp nâng Dice Score lên 91.32% trên ảnh chụp di động thực tế. Hệ thống cũng cung cấp cơ chế Fallback tự động quay về DeepLabV3+ nếu bác sĩ click điểm mồi tương tác bị rỗng hoặc diện tích nhỏ dưới 100 pixel.",
-            "Nhánh phân loại sử dụng EfficientNet-B1 nhúng khối chú ý kép CBAM để định vị ranh giới bệnh lý. Để giải quyết sự mất cân bằng lớp của HAM10000, em áp dụng bộ nạp mẫu ngẫu nhiên có trọng số giúp nâng Macro F1-Score lên 0.68. Kết quả phân loại được hợp nhất Bayes với dữ liệu dịch tễ tuổi, giới tính, vị trí tổn thương theo trọng số lambda do bác sĩ cấu hình.",
-            "Trợ lý hội thoại VQA ngoại tuyến sử dụng DistilGPT-2 tinh chỉnh LoRA rank 8, chỉ huấn luyện 2.13% tham số nhưng hội tụ Loss rất tốt ở Epoch 12. Trong khi đó, trợ lý đám mây dùng gpt-4o-mini tích hợp RAG y văn tiếng Việt của Bộ Y tế giúp loại bỏ ảo giác và Medication Guardrails ngăn chặn AI tự kê đơn nguy hiểm.",
+            "Nhánh phân vùng sử dụng DeepLabV3+ kết hợp Test-Time Augmentation (TTA) đa tỷ lệ trên ảnh chụp di động. Đặc biệt, hệ thống hỗ trợ phân đoạn tương tác bằng SAM Click chuột kết hợp giải thuật GrabCut mồi mặt nạ định vị tối ưu. Ngoài ra còn có cơ chế dự phòng OTSU nghịch đảo y khoa tự động tách biên nếu mô hình học sâu lỗi.",
+            "Nhánh phân loại sử dụng EfficientNet-B1 nhúng khối chú ý CBAM. Kết quả phân loại được hợp nhất Bayes với dữ liệu dịch tễ tuổi, giới tính, vị trí tổn thương. Nhằm giải tế sự thiên lệch địa lý của tập HAM10000 (dữ liệu người da trắng), em thiết kế thanh trượt lambda giúp bác sĩ chủ động kiểm soát và giảm bớt ảnh hưởng dịch tễ khi khám cho người Việt.",
+            "Hệ thống hỗ trợ VQA cục bộ chạy offline: sử dụng DistilGPT-2 LoRA trên CPU, hoặc kết nối Ollama cục bộ chạy các LLM 3B/7B mạnh hơn để nạp trọn vẹn ngữ cảnh RAG y văn ChromaDB offline. Ngoài ra, luồng trực tuyến tích hợp GPT-4o-mini và rào cản thuốc Medication Guardrails tự động lọc ngăn chặn AI kê đơn bừa bãi.",
             "Về kết quả định lượng, hệ thống đạt độ chính xác chẩn đoán toàn luồng là 95.01%. Latency suy luận trung bình đạt 232.27 ms (chưa tới 0.25 giây) chạy cực kỳ mượt mà. Nghiên cứu cắt bỏ cấu trúc chứng minh bước cắt ROI từ mặt nạ phân đoạn đóng góp mức tăng trưởng độ chính xác cao nhất (hơn 6%).",
-            "Đồ án đã xây dựng thành công một hệ thống hỗ trợ chẩn đoán CDSS an toàn, minh bạch với Grad-CAM và quản lý EHR tốt. Trong tương lai, em định hướng tích hợp sâu tiêu chuẩn DICOM SR, hệ thống PACS bệnh viện và thiết lập chu kỳ học chủ động liên tục (Active Learning) từ nét vẽ tay mặt nạ của bác sĩ."
+            "Tóm lại, đề tài mang lại giá trị thực tiễn to lớn thông qua việc bình đẳng hóa y khoa vùng khó khăn, hỗ trợ đào tạo bác sĩ trẻ thông qua tư vấn RAG 24/7 và tuân thủ chặt chẽ bảo mật HIPAA nhờ mã hóa đầu cuối EHR. Trong tương lai, em định hướng tích hợp sâu PACS/RIS bệnh viện, kết nối DICOM SR và thiết kế cơ chế Học chủ động."
         ];
 
         function updateSlide(index) {
