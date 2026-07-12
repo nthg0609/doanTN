@@ -120,7 +120,7 @@ class UnifiedDermatologyPipeline:
             # P1-2: Truyền img_type để kích hoạt TTA cho ảnh phone.
             seg_mask, seg_info = self._segment(img_rgb, image_type=img_type)
             
-        metrics = self._get_lesion_metrics(seg_mask)
+        metrics = self._get_lesion_metrics(seg_mask, img_rgb=img_rgb)
 
         # Nhánh 2: classification chạy ĐỘC LẬP trên chính ảnh gốc, không nhân mask.
         cls_result = None
@@ -383,42 +383,35 @@ class UnifiedDermatologyPipeline:
         }
         return best.astype(np.uint8), info
 
-    def _get_lesion_metrics(self, mask: np.ndarray) -> Dict[str, Any]:
+    def _get_lesion_metrics(self, mask: np.ndarray, img_rgb: Optional[np.ndarray] = None) -> Dict[str, Any]:
         mask = (np.asarray(mask) > 0).astype(np.uint8)
         h, w = mask.shape[:2]
         img_area = max(int(h * w), 1)
         lesion_area = int(cv2.countNonZero(mask))
+        _empty = {
+            "asymmetry": 0.0,
+            "border_complexity": 0.0,
+            "color_variation": 0.0,
+            "diameter_px": 0.0,
+            "area_ratio": 0.0,
+            "circularity": 0.0,
+            "lesion_area": lesion_area,
+            "image_area": img_area,
+            "low_confidence": True,
+        }
         if lesion_area < self.min_area_px:
-            return {
-                "area_ratio": 0.0,
-                "border_complexity": 0.0,
-                "asymmetry": 0.0,
-                "circularity": 0.0,
-                "lesion_area": lesion_area,
-                "image_area": img_area,
-                "low_confidence": True,
-            }
+            return _empty
         contours, _ = cv2.findContours((mask * 255).copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if not contours:
-            return {
-                "area_ratio": 0.0,
-                "border_complexity": 0.0,
-                "asymmetry": 0.0,
-                "circularity": 0.0,
-                "lesion_area": lesion_area,
-                "image_area": img_area,
-                "low_confidence": True,
-            }
+            return _empty
         largest = max(contours, key=cv2.contourArea)
         perimeter = float(cv2.arcLength(largest, True))
         area_ratio = float(lesion_area) / float(img_area)
+
+        # --- B (Border): Độ phức tạp bờ = Chu vi / √Diện tích ---
         border_complexity = perimeter / max(np.sqrt(float(lesion_area)), 1.0)
 
-        # --- Circularity (ABCD - C): 4π·Area / Perimeter² → 1.0 = perfect circle (NV lành tính) ---
-        circularity = (4.0 * np.pi * float(lesion_area)) / max(perimeter ** 2, 1e-6)
-        circularity = float(np.clip(circularity, 0.0, 1.0))
-
-        # --- Asymmetry (ABCD - A): Chia mask theo centroid (cả 2 trục ngang + dọc) ---
+        # --- A (Asymmetry): Chia mask theo centroid (cả 2 trục ngang + dọc) ---
         M = cv2.moments(largest)
         if M.get("m00", 0) > 0:
             cx = int(round(M["m10"] / M["m00"]))
@@ -429,7 +422,6 @@ class UnifiedDermatologyPipeline:
         # Trục ngang (horizontal split tại cy)
         top_half = mask[:cy, :]
         bot_half = mask[cy:, :]
-        # Lật nửa dưới để so sánh với nửa trên (cùng kích thước)
         max_rows = max(top_half.shape[0], bot_half.shape[0])
         top_padded = np.pad(top_half, ((0, max_rows - top_half.shape[0]), (0, 0)))
         bot_flipped = np.pad(np.flipud(bot_half), ((0, max_rows - bot_half.shape[0]), (0, 0)))
@@ -446,10 +438,35 @@ class UnifiedDermatologyPipeline:
         # Normalize: Asymmetry score ∈ [0, 1] — 0 = hoàn toàn đối xứng, 1 = bất đối xứng tối đa
         asymmetry = float(np.clip((asym_h + asym_v) / (2.0 * max(lesion_area, 1)), 0.0, 1.0))
 
+        # --- C (Color): Độ lệch chuẩn RGB trung bình trong vùng tổn thương ---
+        color_variation = 0.0
+        if img_rgb is not None:
+            # Đảm bảo mask cùng kích thước ảnh gốc
+            img_h, img_w = img_rgb.shape[:2]
+            if (img_h, img_w) != (h, w):
+                mask_resized = cv2.resize(mask, (img_w, img_h), interpolation=cv2.INTER_NEAREST)
+            else:
+                mask_resized = mask
+            lesion_pixels = img_rgb[mask_resized > 0]  # shape: (N, 3)
+            if len(lesion_pixels) > 0:
+                # Tính std dev từng kênh R, G, B rồi lấy trung bình, chuẩn hóa về [0, 1]
+                std_per_channel = np.std(lesion_pixels.astype(np.float64), axis=0)  # shape: (3,)
+                # max std của một kênh 8-bit là 127.5, chuẩn hóa
+                color_variation = float(np.clip(np.mean(std_per_channel) / 127.5, 0.0, 1.0))
+
+        # --- D (Diameter): Đường kính tương đương (equivalent diameter) tính bằng pixel ---
+        diameter_px = float(2.0 * np.sqrt(float(lesion_area) / np.pi))
+
+        # --- Circularity (chỉ số phụ): 4π·Area / Perimeter² ---
+        circularity = (4.0 * np.pi * float(lesion_area)) / max(perimeter ** 2, 1e-6)
+        circularity = float(np.clip(circularity, 0.0, 1.0))
+
         return {
-            "area_ratio": float(area_ratio),
-            "border_complexity": float(border_complexity),
             "asymmetry": float(asymmetry),
+            "border_complexity": float(border_complexity),
+            "color_variation": float(color_variation),
+            "diameter_px": float(diameter_px),
+            "area_ratio": float(area_ratio),
             "circularity": float(circularity),
             "lesion_area": lesion_area,
             "image_area": img_area,

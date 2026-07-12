@@ -889,11 +889,11 @@ Mô hình EfficientNet-B1 + CBAM Attention:
 Phân phối xác suất đầy đủ 7 nhãn bệnh lý (ISIC):
 {prob_lines}
 
-Chỉ số hình học (DeepLabV3+ Segmentation):
-  Area ratio        : {metrics.get('area_ratio', 0.0):.4f}
-  Border complexity : {metrics.get('border_complexity', 0.0):.4f}
-  Asymmetry         : {metrics.get('asymmetry', 0.0):.4f}  [0=đối xứng, 1=bất đối xứng]
-  Circularity       : {metrics.get('circularity', 0.0):.4f}  [0=không tròn, 1=tròn đều]
+Chỉ số hình học ABCD (DeepLabV3+ Segmentation):
+  A — Asymmetry         : {metrics.get('asymmetry', 0.0):.4f}  [0=đối xứng, 1=bất đối xứng]
+  B — Border complexity : {metrics.get('border_complexity', 0.0):.4f}  [Chu vi/√Diện tích]
+  C — Color variation   : {metrics.get('color_variation', 0.0):.4f}  [0=đồng nhất, 1=đa sắc]
+  D — Diameter (px)     : {metrics.get('diameter_px', 0.0):.1f}  [Đường kính tương đương pixel]
 
 [GUARDRAIL_RULES]
 ĐƯỢC PHÉP: Giải thích cơ chế bệnh sinh, mô tả triệu chứng, hướng dẫn chăm sóc da không dùng thuốc,
@@ -946,7 +946,7 @@ def generate_vqa_response_stream(
         category = "symptoms"
     elif any(k in q_lower for k in ("chăm sóc", "phác đồ", "care", "dưỡng", "bôi", "vệ sinh", "rửa", "điều trị", "treatment")):
         category = "care"
-    elif any(k in q_lower for k in ("abcd", "chỉ số", "độ tròn", "bờ", "đối xứng", "asymmetry", "circularity", "border")):
+    elif any(k in q_lower for k in ("abcd", "chỉ số", "độ tròn", "bờ", "đối xứng", "asymmetry", "circularity", "border", "color", "màu", "diameter", "đường kính")):
         category = "abcd"
     elif any(k in q_lower for k in ("sinh thiết", "xét nghiệm", "biopsy", "test", "khám", "tiếp theo", "next step")):
         category = "biopsy"
@@ -1233,13 +1233,14 @@ def render_probability_chart(
 
 
 def render_radar_chart(metrics: Dict[str, Any]) -> None:
-    area  = min(float(metrics.get("area_ratio",        0.0)) / 0.75, 1.0)
+    asym  = float(metrics.get("asymmetry",         0.0))
     bord  = min(float(metrics.get("border_complexity", 0.0)) / 8.0,  1.0)
-    asym  = float(metrics.get("asymmetry",   0.0))
-    circ  = float(metrics.get("circularity", 0.0))
-    cats  = ["Diện tích<br>(Area)", "Phức tạp bờ<br>(Border)",
-             "Bất đối xứng<br>(Asymmetry)", "Độ tròn<br>(Circularity)"]
-    vals  = [area, bord, asym, circ]
+    colr  = float(metrics.get("color_variation",   0.0))
+    # Diameter: chuẩn hóa về [0,1] dựa trên ngưỡng 300px (tương đương ~6mm trên ảnh dermoscopy)
+    diam  = min(float(metrics.get("diameter_px",   0.0)) / 300.0, 1.0)
+    cats  = ["A — Bất đối xứng<br>(Asymmetry)", "B — Phức tạp bờ<br>(Border)",
+             "C — Biến đổi màu<br>(Color)", "D — Đường kính<br>(Diameter)"]
+    vals  = [asym, bord, colr, diam]
     vals += [vals[0]]; cats += [cats[0]]
 
     fig = go.Figure()
@@ -1360,10 +1361,10 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
         
         metrics = [
             ("Chẩn đoán bệnh lý lý thuyết", f"{vi_pred}", f"Độ tin cậy: {conf:.1%}"),
-            ("Tỉ lệ diện tích (Area ratio)", f"{ai.get('area_ratio', 0.0):.4f}", "Chiếm tỷ lệ diện tích trên vùng ảnh"),
-            ("Độ bất đối xứng (Asymmetry)", f"{ai.get('asymmetry', 0.0):.4f}", "Đánh giá cấu trúc đối xứng tổn thương"),
-            ("Độ tròn hình học (Circularity)", f"{ai.get('circularity', 0.0):.4f}", "Đo lường hình thái rìa tổn thương"),
-            ("Độ phức tạp viền (Border complexity)", f"{ai.get('border_complexity', 0.0):.4f}", "Độ lồi lõm của viền ngoài")
+            ("A — Bất đối xứng (Asymmetry)", f"{ai.get('asymmetry', 0.0):.4f}", "0=đối xứng, 1=bất đối xứng tối đa"),
+            ("B — Phức tạp bờ (Border)", f"{ai.get('border_complexity', 0.0):.4f}", "Chu vi / √Diện tích tổn thương"),
+            ("C — Biến đổi màu (Color)", f"{ai.get('color_variation', 0.0):.4f}", "Std dev RGB trong vùng tổn thương"),
+            ("D — Đường kính (Diameter)", f"{ai.get('diameter_px', 0.0):.1f} px", "Đường kính tương đương (pixel)")
         ]
         
         for idx, (label, val, comment) in enumerate(metrics):
@@ -1453,9 +1454,11 @@ def prepare_pdf_report(result: Dict, p_name: str, p_age: int, p_gender: str, p_h
         "ai_extracted_metrics": {
             "prediction": c_r.get("prediction", "N/A"),
             "confidence": float(c_r.get("confidence", 0.0)),
-            "area_ratio": float(m_r.get("area_ratio", 0.0)),
-            "border_complexity": float(m_r.get("border_complexity", 0.0)),
             "asymmetry": float(m_r.get("asymmetry", 0.0)),
+            "border_complexity": float(m_r.get("border_complexity", 0.0)),
+            "color_variation": float(m_r.get("color_variation", 0.0)),
+            "diameter_px": float(m_r.get("diameter_px", 0.0)),
+            "area_ratio": float(m_r.get("area_ratio", 0.0)),
             "circularity": float(m_r.get("circularity", 0.0))
         }
     }
@@ -1753,7 +1756,7 @@ def render_doctor_dashboard() -> None:
         writer = csv.writer(csv_buffer)
         writer.writerow([
             "Mốc khám", "Ngày khám", "Vị trí tổn thương", "Chẩn đoán chính", 
-            "Độ tin cậy", "Area Ratio", "Border Complexity", "Asymmetry", "Circularity", "Số tin nhắn VQA"
+            "Độ tin cậy", "A—Asymmetry", "B—Border", "C—Color", "D—Diameter(px)", "Số tin nhắn VQA"
         ])
         for v_idx, v in enumerate(reversed(visits)):
             ai_met = v.get("ai_extracted_metrics", {})
@@ -1764,10 +1767,10 @@ def render_doctor_dashboard() -> None:
                 v.get("location") or ai_met.get("location", "N/A"),
                 ai_met.get("prediction", "N/A"),
                 f"{float(ai_met.get('confidence', 0.0)):.4f}",
-                f"{float(ai_met.get('area_ratio', 0.0)):.4f}",
-                f"{float(ai_met.get('border_complexity', 0.0)):.4f}",
                 f"{float(ai_met.get('asymmetry', 0.0)):.4f}",
-                f"{float(ai_met.get('circularity', 0.0)):.4f}",
+                f"{float(ai_met.get('border_complexity', 0.0)):.4f}",
+                f"{float(ai_met.get('color_variation', 0.0)):.4f}",
+                f"{float(ai_met.get('diameter_px', 0.0)):.1f}",
                 vqa_len
             ])
         csv_str = csv_buffer.getvalue()
@@ -1884,52 +1887,53 @@ def render_doctor_dashboard() -> None:
                 
                 st.markdown("#### Bảng so sánh chỉ số hình học ABCD")
                 m_keys = [
-                    ("area_ratio", "Tỷ lệ diện tích (Area ratio)"),
-                    ("border_complexity", "Độ phức tạp bờ (Border complexity)"),
-                    ("asymmetry", "Bất đối xứng (Asymmetry)"),
-                    ("circularity", "Độ tròn (Circularity)")
+                    ("asymmetry", "A — Bất đối xứng (Asymmetry)"),
+                    ("border_complexity", "B — Phức tạp bờ (Border)"),
+                    ("color_variation", "C — Biến đổi màu (Color)"),
+                    ("diameter_px", "D — Đường kính (Diameter, px)")
                 ]
                 comp_rows = []
                 for k, label in m_keys:
                     val_a = float(metrics_a.get(k, 0.0))
                     val_b = float(metrics_b.get(k, 0.0))
                     diff = val_b - val_a
+                    fmt = ".1f" if k == "diameter_px" else ".4f"
                     comp_rows.append({
                         "Chỉ số": label,
-                        "Mốc A (Cũ hơn)": f"{val_a:.4f}",
-                        "Mốc B (Mới hơn)": f"{val_b:.4f}",
-                        "Chênh lệch (B - A)": f"{diff:+.4f}"
+                        "Mốc A (Cũ hơn)": f"{val_a:{fmt}}",
+                        "Mốc B (Mới hơn)": f"{val_b:{fmt}}",
+                        "Chênh lệch (B - A)": f"{diff:+{fmt}}"
                     })
                 st.table(comp_rows)
                 
                 st.markdown("#### Đánh giá tiến triển lâm sàng định tính:")
                 analysis_texts = []
-                area_diff = float(metrics_b.get("area_ratio", 0.0)) - float(metrics_a.get("area_ratio", 0.0))
-                border_diff = float(metrics_b.get("border_complexity", 0.0)) - float(metrics_a.get("border_complexity", 0.0))
                 asym_diff = float(metrics_b.get("asymmetry", 0.0)) - float(metrics_a.get("asymmetry", 0.0))
-                circ_diff = float(metrics_b.get("circularity", 0.0)) - float(metrics_a.get("circularity", 0.0))
+                border_diff = float(metrics_b.get("border_complexity", 0.0)) - float(metrics_a.get("border_complexity", 0.0))
+                color_diff = float(metrics_b.get("color_variation", 0.0)) - float(metrics_a.get("color_variation", 0.0))
+                diam_diff = float(metrics_b.get("diameter_px", 0.0)) - float(metrics_a.get("diameter_px", 0.0))
                 
-                if area_diff > 0.05:
-                    analysis_texts.append(" **Diện tích tổn thương:** Có xu hướng tăng đáng kể (lan rộng), khuyến nghị giám sát chặt chẽ.")
-                elif area_diff < -0.05:
-                    analysis_texts.append(" **Diện tích tổn thương:** Thu nhỏ rõ rệt, đáp ứng điều trị tốt.")
-                else:
-                    analysis_texts.append(" **Diện tích tổn thương:** Không có biến động lớn, kích thước ổn định.")
+                if asym_diff > 0.1:
+                    analysis_texts.append("⚠ **A — Bất đối xứng:** Mức độ bất đối xứng tăng lên rõ rệt, dấu hiệu đáng báo động đối với tổn thương sắc tố.")
+                elif asym_diff < -0.1:
+                    analysis_texts.append("✅ **A — Bất đối xứng:** Tổn thương có xu hướng trở nên đối xứng hơn.")
                     
                 if border_diff > 0.5:
-                    analysis_texts.append(" **Độ phức tạp bờ:** Viền tổn thương nham nhở và phức tạp hơn, có thể là dấu hiệu tiến triển xấu.")
+                    analysis_texts.append("⚠ **B — Độ phức tạp bờ:** Viền tổn thương nham nhở và phức tạp hơn, có thể là dấu hiệu tiến triển xấu.")
                 elif border_diff < -0.5:
-                    analysis_texts.append(" **Độ phức tạp bờ:** Viền tổn thương trở nên thuôn gọn và đều đặn hơn.")
+                    analysis_texts.append("✅ **B — Độ phức tạp bờ:** Viền tổn thương trở nên thuôn gọn và đều đặn hơn.")
                     
-                if asym_diff > 0.1:
-                    analysis_texts.append(" **Bất đối xứng:** Mức độ bất đối xứng tăng lên rõ rệt, dấu hiệu đáng báo động đối với tổn thương sắc tố.")
-                elif asym_diff < -0.1:
-                    analysis_texts.append(" **Bất đối xứng:** Tổn thương có xu hướng trở nên đối xứng hơn.")
+                if color_diff > 0.1:
+                    analysis_texts.append("⚠ **C — Biến đổi màu:** Màu sắc tổn thương trở nên đa dạng hơn, có thể gợi ý sự biến đổi tế bào.")
+                elif color_diff < -0.1:
+                    analysis_texts.append("✅ **C — Biến đổi màu:** Màu sắc tổn thương đồng nhất hơn, xu hướng tích cực.")
                     
-                if circ_diff < -0.08:
-                    analysis_texts.append(" **Độ tròn:** Hình dạng biến đổi méo mó, giảm độ tròn tự nhiên.")
-                elif circ_diff > 0.08:
-                    analysis_texts.append(" **Độ tròn:** Hình dạng phục hồi tiến dần về dạng tròn đều hơn.")
+                if diam_diff > 20:
+                    analysis_texts.append("⚠ **D — Đường kính:** Tổn thương lan rộng đáng kể, khuyến nghị giám sát chặt chẽ.")
+                elif diam_diff < -20:
+                    analysis_texts.append("✅ **D — Đường kính:** Tổn thương thu nhỏ rõ rệt, đáp ứng điều trị tốt.")
+                else:
+                    analysis_texts.append("ℹ **D — Đường kính:** Kích thước ổn định, không biến động lớn.")
                 
                 st.info("\n\n".join(analysis_texts))
 
@@ -2670,10 +2674,10 @@ def main() -> None:
 
                 # ABCD metrics
                 st.markdown("**Số liệu Phân tích Định lượng (ABCD)**")
-                area_v  = float(metrics.get("area_ratio",        0.0))
-                bord_v  = float(metrics.get("border_complexity", 0.0))
                 asym_v  = float(metrics.get("asymmetry",         0.0))
-                circ_v  = float(metrics.get("circularity",       0.0))
+                bord_v  = float(metrics.get("border_complexity", 0.0))
+                colr_v  = float(metrics.get("color_variation",   0.0))
+                diam_v  = float(metrics.get("diameter_px",       0.0))
 
                 def _card(lbl, val, sub, warn=False):
                     wc = "warn" if warn else ""
@@ -2686,20 +2690,24 @@ def main() -> None:
                         f"</div>"
                     )
 
+                # Quy đổi Diameter sang mm nếu có PixelSpacing từ DICOM
                 pixel_spacing_x = metrics.get("pixel_spacing_x")
                 pixel_spacing_y = metrics.get("pixel_spacing_y")
-                phys_area = None
                 if pixel_spacing_x is not None and pixel_spacing_y is not None:
-                    phys_area = float(metrics.get("lesion_area", 0)) * pixel_spacing_x * pixel_spacing_y
-                
-                area_sublabel = f"Diện tích: {phys_area:.2f} mm²" if phys_area is not None else "Tỷ lệ diện tích"
+                    avg_spacing = (float(pixel_spacing_x) + float(pixel_spacing_y)) / 2.0
+                    diam_mm = diam_v * avg_spacing
+                    diam_display = f"{diam_mm:.2f} mm"
+                    diam_sub = f"≈ {diam_v:.0f} px × {avg_spacing:.4f} mm/px"
+                else:
+                    diam_display = f"{diam_v:.1f} px"
+                    diam_sub = "Đường kính tương đương"
 
                 mc1, mc2, mc3, mc4, mc5 = st.columns(5)
                 with mc1: st.markdown(_card("Thời gian", st.session_state.get("analysis_time", "—"), "Điểm lấy mẫu"), unsafe_allow_html=True)
-                with mc2: st.markdown(_card("Area ratio",  f"{area_v:.4f}",  area_sublabel), unsafe_allow_html=True)
-                with mc3: st.markdown(_card("Border",      f"{bord_v:.4f}",  "Độ phức tạp bờ", bord_v > 5.0), unsafe_allow_html=True)
-                with mc4: st.markdown(_card("Asymmetry",   f"{asym_v:.4f}",  "Bất đối xứng",   asym_v > 0.7), unsafe_allow_html=True)
-                with mc5: st.markdown(_card("Circularity", f"{circ_v:.4f}",  "Độ tròn"), unsafe_allow_html=True)
+                with mc2: st.markdown(_card("A — Asymmetry",  f"{asym_v:.4f}",  "Bất đối xứng",   asym_v > 0.7), unsafe_allow_html=True)
+                with mc3: st.markdown(_card("B — Border",     f"{bord_v:.4f}",  "Độ phức tạp bờ",  bord_v > 5.0), unsafe_allow_html=True)
+                with mc4: st.markdown(_card("C — Color",      f"{colr_v:.4f}",  "Biến đổi màu sắc", colr_v > 0.5), unsafe_allow_html=True)
+                with mc5: st.markdown(_card("D — Diameter",   diam_display,     diam_sub), unsafe_allow_html=True)
 
                 conf_cls = "conf-high" if conf_pct >= 70 else ("conf-mid" if conf_pct >= 50 else "conf-low")
                 st.markdown(
@@ -2949,9 +2957,11 @@ def main() -> None:
                                         "status":            result.get("status"),
                                         "prediction":        c_r.get("prediction", "N/A"),
                                         "confidence":        float(c_r.get("confidence", 0.0)),
-                                        "area_ratio":        float(m_r.get("area_ratio",        0.0)),
-                                        "border_complexity": float(m_r.get("border_complexity", 0.0)),
                                         "asymmetry":         float(m_r.get("asymmetry",         0.0)),
+                                        "border_complexity": float(m_r.get("border_complexity", 0.0)),
+                                        "color_variation":   float(m_r.get("color_variation",   0.0)),
+                                        "diameter_px":       float(m_r.get("diameter_px",       0.0)),
+                                        "area_ratio":        float(m_r.get("area_ratio",        0.0)),
                                         "circularity":       float(m_r.get("circularity",       0.0)),
                                         "pixel_spacing_x":   m_r.get("pixel_spacing_x"),
                                         "pixel_spacing_y":   m_r.get("pixel_spacing_y"),
