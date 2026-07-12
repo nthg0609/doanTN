@@ -857,7 +857,8 @@ def generate_vqa_response_stream(
         # OpenAI Online
         api_key = api_key or os.getenv("OPENAI_API_KEY")
         if OpenAI is None or not api_key:
-            yield _fallback_response(question, result)
+            for char in expert_answer:
+                yield char
             return
         client = OpenAI(api_key=api_key)
         model_to_use = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
@@ -887,7 +888,8 @@ def generate_vqa_response_stream(
             )
         else:
             write_dev_log({"error": str(exc), "question": question}, "LLM_ERROR")
-            yield _fallback_response(question, result)
+            for char in expert_answer:
+                yield char
         return
 
     if retrieved_docs and history is not None:
