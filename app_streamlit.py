@@ -1717,6 +1717,66 @@ def render_doctor_dashboard() -> None:
 # ==============================================================================
 # MAIN APPLICATION
 # ==============================================================================
+def download_weights_if_missing() -> None:
+    import os
+    import requests
+    from pathlib import Path
+    import streamlit as st
+
+    weights_info = {
+        "deeplabv3plus_best.pth": {
+            "path": Path("4_Models/deeplabv3plus/deeplabv3plus_best.pth"),
+            "id": "1crKDYmFVt3rsfHMmIrLdhAlMg4cDCpfT"
+        },
+        "efficientnet_attention_best.pth": {
+            "path": Path("4_Models/classification/efficientnet_attention_best.pth"),
+            "id": "1nquxwVeZRoawedzuP4H0wULF-e03fTMs"
+        },
+        "dermavqa_gpt2_joint_best.pth": {
+            "path": Path("9_VQA/models/dermavqa_gpt2_joint_best.pth"),
+            "id": "1kTiNvqtQI6qtueDE3zGcTFFoDWio6STa"
+        }
+    }
+
+    to_download = {}
+    for filename, info in weights_info.items():
+        if not info["path"].exists():
+            to_download[filename] = info
+
+    if not to_download:
+        return
+
+    def download_file_from_google_drive(file_id, dest_path):
+        URL = "https://docs.google.com/uc?export=download"
+        session = requests.Session()
+        response = session.get(URL, params={'id': file_id}, stream=True)
+        
+        token = None
+        for key, value in response.cookies.items():
+            if key.startswith('download_warning'):
+                token = value
+                break
+
+        if token:
+            params = {'id': file_id, 'confirm': token}
+            response = session.get(URL, params=params, stream=True)
+
+        os.makedirs(dest_path.parent, exist_ok=True)
+        CHUNK_SIZE = 32768
+        with open(dest_path, "wb") as f:
+            for chunk in response.iter_content(CHUNK_SIZE):
+                if chunk:
+                    f.write(chunk)
+
+    with st.spinner("⏳ Đang tải xuống trọng số mô hình từ Google Drive (chỉ tải một lần khi khởi chạy trên Cloud)..."):
+        for filename, info in to_download.items():
+            st.info(f"📥 Đang tải {filename}...")
+            try:
+                download_file_from_google_drive(info["id"], info["path"])
+                st.success(f"✅ Tải thành công {filename}!")
+            except Exception as e:
+                st.error(f"❌ Lỗi khi tải {filename}: {str(e)}")
+
 def main() -> None:
     st.set_page_config(
         page_title="Dermatology EHR — AI Assistant",
@@ -1724,6 +1784,7 @@ def main() -> None:
         layout="wide",
         initial_sidebar_state="expanded",
     )
+    download_weights_if_missing()
     _inject_custom_css()
 
     st.markdown(
