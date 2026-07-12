@@ -120,7 +120,7 @@ def custom_st_canvas(
     initial_drawing = {"version": "4.4.0"} if initial_drawing is None else initial_drawing
     initial_drawing["background"] = background_color
 
-    st.caption(f"Debug Canvas URL: {background_image_url}")
+
 
     component_value = custom_component_func(
         fillColor=fill_color,
@@ -2275,31 +2275,7 @@ def main() -> None:
                 "**VRAM:** ~8 192 MB  \n"
                 "**Biên ROI:** delta = 10 px"
             )
-        # Check patch status
-        patched_status = "Lỗi"
-        try:
-            import glob
-            js_pattern = os.path.join("patched_canvas_frontend", "static", "js", "main.*.js")
-            js_files = glob.glob(js_pattern)
-            if js_files:
-                with open(js_files[0], "r", encoding="utf-8") as f:
-                    js_content = f.read()
-                if 'h.startsWith("http")' in js_content:
-                    patched_status = f"Đã vá ({os.path.basename(js_files[0])})"
-                else:
-                    # Let's check if the target string "e.src=n+h" is even in this file!
-                    if "e.src=n+h" in js_content:
-                        patched_status = f"Chưa vá. Tìm thấy target in ({os.path.basename(js_files[0])})"
-                    else:
-                        # Print some snippet of the file to see what it contains
-                        snippet = js_content[:50]
-                        patched_status = f"Chưa vá. Target không tìm thấy. Snippet: {snippet}"
-            else:
-                patched_status = "Không tìm thấy file JS trong bản copy"
-        except Exception as e:
-            patched_status = f"Lỗi: {e}"
-            
-        st.sidebar.caption(f"Phiên bản: vqa-canvas-final-v12 | Canvas: {patched_status}")
+
 
     # ============================================================
     # TABS CHÍNH

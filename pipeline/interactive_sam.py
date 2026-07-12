@@ -74,15 +74,18 @@ class InteractiveSegmenter:
                 print(f"[InteractiveSegmenter] SAM prediction failed: {e}. Fallback to GrabCut.")
 
         # --- Case B: GrabCut Fallback (Zero-Dependency & Fast CPU performance) ---
-        # Initialize GrabCut mask: default is probable background
-        gc_mask = np.ones(img_rgb.shape[:2], dtype=np.uint8) * cv2.GC_PR_BGD
+        # Initialize GrabCut mask: default is definite background (0) to isolate the lesion
+        gc_mask = np.zeros(img_rgb.shape[:2], dtype=np.uint8)
         
-        # Mark outer border (5px) as definite background
-        border = 5
-        gc_mask[:border, :] = cv2.GC_BGD
-        gc_mask[-border:, :] = cv2.GC_BGD
-        gc_mask[:, :border] = cv2.GC_BGD
-        gc_mask[:, -border:] = cv2.GC_BGD
+        # Define probable background box around the click point to restrict segmentation focus
+        box_w = int(w * 0.6)
+        box_h = int(h * 0.6)
+        x1 = max(0, point_x - box_w // 2)
+        y1 = max(0, point_y - box_h // 2)
+        x2 = min(w, point_x + box_w // 2)
+        y2 = min(h, point_y + box_h // 2)
+        
+        gc_mask[y1:y2, x1:x2] = cv2.GC_PR_BGD
         
         # Mark region around the click point as probable foreground
         fg_r = max(10, int(min(w, h) * 0.08))
