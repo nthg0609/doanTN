@@ -25,6 +25,31 @@ from PIL import Image, ImageDraw
 from dotenv import load_dotenv
 import plotly.graph_objects as go
 from streamlit_drawable_canvas import st_canvas as orig_st_canvas
+
+def patch_streamlit_canvas():
+    try:
+        import streamlit_drawable_canvas
+        import os
+        
+        package_dir = os.path.dirname(streamlit_drawable_canvas.__file__)
+        js_path = os.path.join(package_dir, "frontend", "build", "static", "js", "main.80185090.chunk.js")
+        
+        if os.path.exists(js_path):
+            with open(js_path, "r", encoding="utf-8") as f:
+                js_content = f.read()
+                
+            target = "e.src=n+h"
+            replacement = 'e.src=h.startsWith("http")||h.startsWith("data:")?h:n+h'
+            
+            if target in js_content:
+                patched_content = js_content.replace(target, replacement)
+                with open(js_path, "w", encoding="utf-8") as f:
+                    f.write(patched_content)
+    except Exception:
+        pass
+
+# Thực hiện patch thư viện streamlit-drawable-canvas ngay khi khởi chạy ứng dụng
+patch_streamlit_canvas()
 import base64
 import io
 
@@ -2231,7 +2256,7 @@ def main() -> None:
                 "**VRAM:** ~8 192 MB  \n"
                 "**Biên ROI:** delta = 10 px"
             )
-        st.sidebar.caption("Phiên bản: vqa-canvas-final-v7")
+        st.sidebar.caption("Phiên bản: vqa-canvas-final-v8")
 
     # ============================================================
     # TABS CHÍNH
