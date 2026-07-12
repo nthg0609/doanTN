@@ -57,7 +57,7 @@ def custom_st_canvas(
         
         # Sửa đường dẫn tương đối để iframe của component React có thể truy cập được từ root domain
         if background_image_url.startswith("/"):
-            background_image_url = "../../" + background_image_url.lstrip("/")
+            background_image_url = "../../../" + background_image_url.lstrip("/")
             
         background_color = ""
 
@@ -1375,6 +1375,32 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
         return None
 
 
+def prepare_pdf_report(result: Dict, p_name: str, p_age: int, p_gender: str, p_hometown: str, p_location: str) -> Optional[bytes]:
+    """Helper để chuẩn bị dữ liệu báo cáo PDF, tách biệt hoàn toàn khỏi scope của main()
+    để ngăn chặn trình biên dịch Streamlit Magic in ra các nhãn 'None' từ dictionary literals.
+    """
+    m_r = result.get("metrics", {})
+    c_r = result.get("classification") or {}
+    pat_info_pdf = {
+        "name": p_name.strip() or "N/A",
+        "age": str(p_age),
+        "gender": p_gender,
+        "hometown": p_hometown,
+        "location": p_location
+    }
+    v_pdf = {
+        "ai_extracted_metrics": {
+            "prediction": c_r.get("prediction", "N/A"),
+            "confidence": float(c_r.get("confidence", 0.0)),
+            "area_ratio": float(m_r.get("area_ratio", 0.0)),
+            "border_complexity": float(m_r.get("border_complexity", 0.0)),
+            "asymmetry": float(m_r.get("asymmetry", 0.0)),
+            "circularity": float(m_r.get("circularity", 0.0))
+        }
+    }
+    return generate_pdf_report(pat_info_pdf, v_pdf)
+
+
 # ==============================================================================
 # CSS — Clean, Professional Medical EHR (no comments, no dashes)
 # ==============================================================================
@@ -2186,7 +2212,7 @@ def main() -> None:
                 "**VRAM:** ~8 192 MB  \n"
                 "**Biên ROI:** delta = 10 px"
             )
-        st.sidebar.caption("Phiên bản: vqa-canvas-base64-v4")
+        st.sidebar.caption("Phiên bản: vqa-canvas-final-v5")
 
     # ============================================================
     # TABS CHÍNH
@@ -2755,12 +2781,8 @@ def main() -> None:
                 st.divider()
                 st.markdown("**Đồng bộ Bệnh án Điện tử (EHR) và Xuất báo cáo**")
                 
-                # Tính toán báo cáo PDF bên ngoài khối cột để tránh Streamlit Magic in ra các nhãn 'None'
-                m_r_pdf = result.get("metrics", {})
-                c_r_pdf = result.get("classification") or {}
-                pat_info_pdf = {"name": p_name.strip() or "N/A", "age": str(p_age), "gender": p_gender, "hometown": p_hometown, "location": p_location}
-                v_pdf = {"ai_extracted_metrics": {"prediction": c_r_pdf.get("prediction", "N/A"), "confidence": float(c_r_pdf.get("confidence", 0.0)), "area_ratio": float(m_r_pdf.get("area_ratio", 0.0)), "border_complexity": float(m_r_pdf.get("border_complexity", 0.0)), "asymmetry": float(m_r_pdf.get("asymmetry", 0.0)), "circularity": float(m_r_pdf.get("circularity", 0.0))}}
-                pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
+                # Tính toán báo cáo PDF bằng hàm helper ngoài main() để cô lập hoàn toàn Streamlit Magic, loại bỏ nhãn 'None'
+                pdf_bytes = prepare_pdf_report(result, p_name, p_age, p_gender, p_hometown, p_location)
 
                 col_ehr, col_pdf = st.columns(2)
 
