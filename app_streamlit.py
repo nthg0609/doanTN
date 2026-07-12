@@ -102,7 +102,7 @@ VIETNAM_PROVINCES: List[str] = [
 ]
 
 VQA_MODE_OPTIONS: List[str] = [
-    "Trực tuyến — OpenAI GPT-4o-mini",
+    "Trực tuyến",
     "Nội bộ — CPU (LLM local)",
     "Nội bộ — Ollama",
 ]
@@ -692,7 +692,7 @@ def generate_vqa_response_stream(
     }
     
     # Xác định chế độ VQA hoạt động
-    vqa_mode = st.session_state.get("vqa_mode_radio", "Trực tuyến — OpenAI GPT-4o-mini")
+    vqa_mode = st.session_state.get("vqa_mode_radio", "Trực tuyến")
     
     # Phân loại câu hỏi để tìm fallback lâm sàng cục bộ
     q_lower = question.lower()
@@ -1989,10 +1989,16 @@ def main() -> None:
         )
 
         with st.expander("Thông số kỹ thuật AI"):
+            vqa_spec = ""
+            if "Ollama" in vqa_mode:
+                vqa_spec = "**VQA:** Local Ollama (Qwen2.5:3b)  \n"
+            elif "CPU" in vqa_mode or "Offline" in vqa_mode:
+                vqa_spec = "**VQA:** Custom CPUMedicalVQAModel (DistilGPT-2 + LoRA)  \n"
+                
             st.markdown(
                 "**Phân loại:** EfficientNet-B1 + CBAM Attention  \n"
                 "**Phân đoạn:** DeepLabV3+ (ResNet-101 backbone)  \n"
-                "**VQA Online:** GPT-4o-mini (OpenAI API)  \n"
+                f"{vqa_spec}"
                 "**Độ trễ:** ~0.5 giây trung bình  \n"
                 "**VRAM:** ~8 192 MB  \n"
                 "**Biên ROI:** delta = 10 px"
