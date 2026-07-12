@@ -30,11 +30,13 @@ def patch_streamlit_canvas():
     try:
         import streamlit_drawable_canvas
         import os
+        import glob
         
         package_dir = os.path.dirname(streamlit_drawable_canvas.__file__)
-        js_path = os.path.join(package_dir, "frontend", "build", "static", "js", "main.80185090.chunk.js")
+        js_pattern = os.path.join(package_dir, "frontend", "build", "static", "js", "main.*.js")
+        js_files = glob.glob(js_pattern)
         
-        if os.path.exists(js_path):
+        for js_path in js_files:
             with open(js_path, "r", encoding="utf-8") as f:
                 js_content = f.read()
                 
@@ -2257,22 +2259,27 @@ def main() -> None:
                 "**Biên ROI:** delta = 10 px"
             )
         # Check patch status
+        # Check patch status
         patched_status = "Lỗi"
         try:
             import streamlit_drawable_canvas
+            import glob
             package_dir = os.path.dirname(streamlit_drawable_canvas.__file__)
-            js_path = os.path.join(package_dir, "frontend", "build", "static", "js", "main.80185090.chunk.js")
-            if os.path.exists(js_path):
-                with open(js_path, "r", encoding="utf-8") as f:
+            js_pattern = os.path.join(package_dir, "frontend", "build", "static", "js", "main.*.js")
+            js_files = glob.glob(js_pattern)
+            if js_files:
+                with open(js_files[0], "r", encoding="utf-8") as f:
                     js_content = f.read()
                 if 'h.startsWith("http")' in js_content:
                     patched_status = "Đã kích hoạt"
                 else:
                     patched_status = "Chưa kích hoạt"
-        except Exception:
-            pass
+            else:
+                patched_status = "Không tìm thấy file JS"
+        except Exception as e:
+            patched_status = f"Lỗi: {e}"
             
-        st.sidebar.caption(f"Phiên bản: vqa-canvas-final-v9 | Canvas: {patched_status}")
+        st.sidebar.caption(f"Phiên bản: vqa-canvas-final-v10 | Canvas: {patched_status}")
 
     # ============================================================
     # TABS CHÍNH
