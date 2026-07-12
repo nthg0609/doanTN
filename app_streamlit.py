@@ -76,6 +76,8 @@ def custom_st_canvas(
     initial_drawing = {"version": "4.4.0"} if initial_drawing is None else initial_drawing
     initial_drawing["background"] = background_color
 
+    st.caption(f"Debug Canvas URL: {background_image_url}")
+
     component_value = _component_func(
         fillColor=fill_color,
         strokeWidth=stroke_width,
