@@ -1786,13 +1786,13 @@ def download_weights_if_missing() -> None:
         temp_dir.mkdir(exist_ok=True)
         
         for fid in drive_ids:
-            st.info(f"📥 Đang tải tài nguyên ID: {fid}...")
+            print(f"[ModelRegistry] Downloading resource ID: {fid}...")
             temp_file = temp_dir / f"download_{fid}.pth"
             try:
                 download_file_from_google_drive(fid, temp_file)
                 if temp_file.exists():
                     fsize = temp_file.stat().st_size
-                    st.caption(f"Đã tải xong ID {fid}: {fsize / 1024 / 1024:.2f} MB")
+                    print(f"[ModelRegistry] Downloaded ID {fid}: {fsize / 1024 / 1024:.2f} MB")
                     
                     # Phân loại dựa trên kích thước tệp
                     dest_path = None
@@ -1808,7 +1808,7 @@ def download_weights_if_missing() -> None:
                         if dest_path.exists():
                             dest_path.unlink()
                         temp_file.rename(dest_path)
-                        st.success(f"⭐ Đã cấu hình thành công: {dest_path.name}")
+                        print(f"[ModelRegistry] Configured weight: {dest_path.name}")
                     else:
                         st.error(f"❌ Tệp tải xuống từ ID {fid} có kích thước không hợp lệ ({fsize / 1024 / 1024:.2f} MB)")
                         temp_file.unlink()
