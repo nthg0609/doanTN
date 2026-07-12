@@ -2223,7 +2223,7 @@ def main() -> None:
                     height=display_h,
                     width=display_w,
                     drawing_mode="point",
-                    key="canvas_sam",
+                    key=f"canvas_sam_{st.session_state.get('last_uploaded_file_name', '')}_{st.session_state.get('analysis_time', '')}",
                     display_toolbar=False,
                 )
                 # Xử lý click SAM mới từ canvas
@@ -2279,7 +2279,7 @@ def main() -> None:
                     height=display_h,
                     width=display_w,
                     drawing_mode="freedraw",
-                    key="canvas_freedraw",
+                    key=f"canvas_freedraw_{st.session_state.get('last_uploaded_file_name', '')}_{st.session_state.get('analysis_time', '')}",
                 )
                 if canvas_result.image_data is not None:
                     mask_data = canvas_result.image_data[:, :, 3] > 0
