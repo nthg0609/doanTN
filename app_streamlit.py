@@ -1807,11 +1807,13 @@ def download_weights_if_missing() -> None:
                         dest_path.parent.mkdir(parents=True, exist_ok=True)
                         if dest_path.exists():
                             dest_path.unlink()
-                        temp_file.rename(dest_path)
+                        import shutil
+                        shutil.move(str(temp_file), str(dest_path))
                         print(f"[ModelRegistry] Configured weight: {dest_path.name}")
                     else:
                         st.error(f" Tệp tải xuống từ ID {fid} có kích thước không hợp lệ ({fsize / 1024 / 1024:.2f} MB)")
-                        temp_file.unlink()
+                        if temp_file.exists():
+                            temp_file.unlink()
             except Exception as e:
                 st.error(f" Lỗi khi tải tài nguyên ID {fid}: {str(e)}")
                 if temp_file.exists():
