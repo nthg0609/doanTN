@@ -87,15 +87,19 @@ class ModelRegistry:
 
         model = smp.DeepLabV3Plus(
             encoder_name="resnet50",
-            encoder_weights=None,
+            encoder_weights="imagenet" if not ckpt_path.exists() else None,
             in_channels=3,
             classes=1,
             activation=None,
         )
-        state = torch.load(str(ckpt_path), map_location=self.device)
-        if isinstance(state, dict) and "model_state_dict" in state:
-            state = state["model_state_dict"]
-        model.load_state_dict(state)
+        if ckpt_path.exists():
+            state = torch.load(str(ckpt_path), map_location=self.device)
+            if isinstance(state, dict) and "model_state_dict" in state:
+                state = state["model_state_dict"]
+            model.load_state_dict(state)
+        else:
+            print(f"[ModelRegistry] Warning: {ckpt_path} not found. Initializing DeepLabV3+ with ImageNet weights for Demo mode.")
+            
         model = model.to(self.device)
         model.eval()
         self._seg_model = model
@@ -175,16 +179,20 @@ class ModelRegistry:
                 return self.classifier(pooled)
 
         num_classes = len(idx_to_class) if idx_to_class else 7
-        model = EfficientNetWithAttention(num_classes=num_classes, pretrained=False)
-        state = torch.load(str(ckpt_path), map_location=self.device)
-        if isinstance(state, dict) and "model_state_dict" in state:
-            state = state["model_state_dict"]
+        model = EfficientNetWithAttention(num_classes=num_classes, pretrained=True)
+        if ckpt_path.exists():
+            state = torch.load(str(ckpt_path), map_location=self.device)
+            if isinstance(state, dict) and "model_state_dict" in state:
+                state = state["model_state_dict"]
 
-        # Remap DataParallel prefix if present
-        if any(k.startswith("module.") for k in state.keys()):
-            state = {k.replace("module.", "", 1): v for k, v in state.items()}
+            # Remap DataParallel prefix if present
+            if any(k.startswith("module.") for k in state.keys()):
+                state = {k.replace("module.", "", 1): v for k, v in state.items()}
 
-        model.load_state_dict(state)
+            model.load_state_dict(state)
+        else:
+            print(f"[ModelRegistry] Warning: {ckpt_path} not found. Initializing EfficientNet with ImageNet weights for Demo mode.")
+            
         model = model.to(self.device)
         model.eval()
         self._cls_model = model
