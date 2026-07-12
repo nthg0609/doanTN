@@ -2256,7 +2256,23 @@ def main() -> None:
                 "**VRAM:** ~8 192 MB  \n"
                 "**Biên ROI:** delta = 10 px"
             )
-        st.sidebar.caption("Phiên bản: vqa-canvas-final-v8")
+        # Check patch status
+        patched_status = "Lỗi"
+        try:
+            import streamlit_drawable_canvas
+            package_dir = os.path.dirname(streamlit_drawable_canvas.__file__)
+            js_path = os.path.join(package_dir, "frontend", "build", "static", "js", "main.80185090.chunk.js")
+            if os.path.exists(js_path):
+                with open(js_path, "r", encoding="utf-8") as f:
+                    js_content = f.read()
+                if 'h.startsWith("http")' in js_content:
+                    patched_status = "Đã kích hoạt"
+                else:
+                    patched_status = "Chưa kích hoạt"
+        except Exception:
+            pass
+            
+        st.sidebar.caption(f"Phiên bản: vqa-canvas-final-v9 | Canvas: {patched_status}")
 
     # ============================================================
     # TABS CHÍNH
