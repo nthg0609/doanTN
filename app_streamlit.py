@@ -26,16 +26,27 @@ from dotenv import load_dotenv
 import plotly.graph_objects as go
 from streamlit_drawable_canvas import st_canvas as orig_st_canvas
 
-def patch_streamlit_canvas():
+def setup_patched_component() -> str:
     try:
         import streamlit_drawable_canvas
         import os
         import glob
+        import shutil
         
+        # Thư mục gốc chứa build tĩnh của canvas
         package_dir = os.path.dirname(streamlit_drawable_canvas.__file__)
-        js_pattern = os.path.join(package_dir, "frontend", "build", "static", "js", "main.*.js")
-        js_files = glob.glob(js_pattern)
+        src_build_dir = os.path.join(package_dir, "frontend", "build")
         
+        # Thư mục đích trong workspace có quyền ghi 100%
+        dest_build_dir = os.path.abspath("patched_canvas_frontend")
+        
+        # Copy nếu chưa tồn tại
+        if not os.path.exists(dest_build_dir):
+            shutil.copytree(src_build_dir, dest_build_dir)
+            
+        # Vá file JS trong bản copy
+        js_pattern = os.path.join(dest_build_dir, "static", "js", "main.*.js")
+        js_files = glob.glob(js_pattern)
         for js_path in js_files:
             with open(js_path, "r", encoding="utf-8") as f:
                 js_content = f.read()
@@ -47,11 +58,17 @@ def patch_streamlit_canvas():
                 patched_content = js_content.replace(target, replacement)
                 with open(js_path, "w", encoding="utf-8") as f:
                     f.write(patched_content)
+        return dest_build_dir
     except Exception:
-        pass
+        # Fallback về thư mục gốc nếu gặp lỗi
+        import streamlit_drawable_canvas
+        import os
+        return os.path.join(os.path.dirname(streamlit_drawable_canvas.__file__), "frontend", "build")
 
-# Thực hiện patch thư viện streamlit-drawable-canvas ngay khi khởi chạy ứng dụng
-patch_streamlit_canvas()
+# Khởi tạo bản copy front-end đã được vá lỗi URL
+patched_build_dir = setup_patched_component()
+# Khai báo component sử dụng thư mục đã vá
+custom_component_func = stc_v1.declare_component("st_canvas", path=patched_build_dir)
 import base64
 import io
 
@@ -72,7 +89,7 @@ def custom_st_canvas(
 ):
     from hashlib import md5
     import streamlit.elements.image as st_image
-    from streamlit_drawable_canvas import CanvasResult, _data_url_to_image, _resize_img, _component_func
+    from streamlit_drawable_canvas import CanvasResult, _data_url_to_image, _resize_img
     
     background_image_url = None
     if background_image:
@@ -105,7 +122,7 @@ def custom_st_canvas(
 
     st.caption(f"Debug Canvas URL: {background_image_url}")
 
-    component_value = _component_func(
+    component_value = custom_component_func(
         fillColor=fill_color,
         strokeWidth=stroke_width,
         strokeColor=stroke_color,
@@ -2261,13 +2278,8 @@ def main() -> None:
         # Check patch status
         patched_status = "Lỗi"
         try:
-            import streamlit_drawable_canvas
             import glob
-            package_dir = os.path.dirname(streamlit_drawable_canvas.__file__)
-            js_dir = os.path.join(package_dir, "frontend", "build", "static", "js")
-            files_found = os.listdir(js_dir) if os.path.exists(js_dir) else []
-            
-            js_pattern = os.path.join(js_dir, "main.*.js")
+            js_pattern = os.path.join("patched_canvas_frontend", "static", "js", "main.*.js")
             js_files = glob.glob(js_pattern)
             if js_files:
                 with open(js_files[0], "r", encoding="utf-8") as f:
@@ -2283,11 +2295,11 @@ def main() -> None:
                         snippet = js_content[:50]
                         patched_status = f"Chưa vá. Target không tìm thấy. Snippet: {snippet}"
             else:
-                patched_status = f"Không có main JS. Files: {files_found}. Package dir: {package_dir}"
+                patched_status = "Không tìm thấy file JS trong bản copy"
         except Exception as e:
             patched_status = f"Lỗi: {e}"
             
-        st.sidebar.caption(f"Phiên bản: vqa-canvas-final-v11 | Canvas: {patched_status}")
+        st.sidebar.caption(f"Phiên bản: vqa-canvas-final-v12 | Canvas: {patched_status}")
 
     # ============================================================
     # TABS CHÍNH
