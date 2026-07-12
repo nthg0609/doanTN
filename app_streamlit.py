@@ -2204,7 +2204,7 @@ def main() -> None:
             )
 
             # Vẽ điểm click SAM lên hình ảnh hiển thị để người dùng đối chiếu trực quan
-            display_image = image.copy()
+            display_image = image.resize((display_w, display_h))
             if st.session_state["sam_point"] is not None:
                 draw = ImageDraw.Draw(display_image)
                 px = int(st.session_state["sam_point"][0] * scale)
@@ -2802,21 +2802,8 @@ def main() -> None:
                 with col_pdf:
                     m_r = result.get("metrics", {})
                     c_r = result.get("classification") or {}
-                    pat_info_pdf = {
-                        "name": p_name.strip() or "N/A",
-                        "age":  str(p_age),
-                        "gender":   p_gender,
-                        "hometown": p_hometown,
-                        "location": p_location,
-                    }
-                    v_pdf = {"ai_extracted_metrics": {
-                        "prediction":        c_r.get("prediction", "N/A"),
-                        "confidence":        float(c_r.get("confidence", 0.0)),
-                        "area_ratio":        float(m_r.get("area_ratio",        0.0)),
-                        "border_complexity": float(m_r.get("border_complexity", 0.0)),
-                        "asymmetry":         float(m_r.get("asymmetry",         0.0)),
-                        "circularity":       float(m_r.get("circularity",       0.0)),
-                    }}
+                    pat_info_pdf = {"name": p_name.strip() or "N/A", "age": str(p_age), "gender": p_gender, "hometown": p_hometown, "location": p_location}
+                    v_pdf = {"ai_extracted_metrics": {"prediction": c_r.get("prediction", "N/A"), "confidence": float(c_r.get("confidence", 0.0)), "area_ratio": float(m_r.get("area_ratio", 0.0)), "border_complexity": float(m_r.get("border_complexity", 0.0)), "asymmetry": float(m_r.get("asymmetry", 0.0)), "circularity": float(m_r.get("circularity", 0.0))}}
                     pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
                     if pdf_bytes:
                         fname = (
