@@ -1560,9 +1560,9 @@ def render_doctor_dashboard() -> None:
     with col_info:
         st.subheader("Thông tin hành chính bệnh nhân")
         ca, cb, cc = st.columns(3)
-        ca.markdown(f"**Họ tên:** `{pi.get('name', '').upper()}`")
-        cb.markdown(f"**Tuổi:** `{pi.get('age', 'N/A')}` — **Giới tính:** `{pi.get('gender', 'N/A')}`")
-        cc.markdown(f"**Địa chỉ:** `{pi.get('hometown', 'N/A')}`")
+        with ca: st.markdown(f"**Họ tên:** `{pi.get('name', '').upper()}`")
+        with cb: st.markdown(f"**Tuổi:** `{pi.get('age', 'N/A')}` — **Giới tính:** `{pi.get('gender', 'N/A')}`")
+        with cc: st.markdown(f"**Địa chỉ:** `{pi.get('hometown', 'N/A')}`")
     with col_del:
         st.write("")
         st.write("")
@@ -1690,7 +1690,7 @@ def render_doctor_dashboard() -> None:
                 
                 col_a, col_b = st.columns(2)
                 with col_a:
-                    st.markdown("<p style='font-weight:700;color:#1E3A8A;'>MỐC KHÁM A (Ngày: " + visit_a.get('created_at', 'N/A') + ")</p>", unsafe_allow_html=True)
+                    st.markdown("<p style='font-weight:700;color:#3b82f6;'>MỐC KHÁM A (Ngày: " + visit_a.get('created_at', 'N/A') + ")</p>", unsafe_allow_html=True)
                     st.write(f"Vị trí: `{visit_a.get('location', 'N/A')}`")
                     img_url_a = visit_a.get("image_url")
                     mask_url_a = visit_a.get("mask_url")
@@ -1711,7 +1711,7 @@ def render_doctor_dashboard() -> None:
                     st.metric("Độ tin cậy A", f"{float(metrics_a.get('confidence', 0.0)) * 100:.1f}%")
                     
                 with col_b:
-                    st.markdown("<p style='font-weight:700;color:#065F46;'>MỐC KHÁM B (Ngày: " + visit_b.get('created_at', 'N/A') + ")</p>", unsafe_allow_html=True)
+                    st.markdown("<p style='font-weight:700;color:#10b981;'>MỐC KHÁM B (Ngày: " + visit_b.get('created_at', 'N/A') + ")</p>", unsafe_allow_html=True)
                     st.write(f"Vị trí: `{visit_b.get('location', 'N/A')}`")
                     img_url_b = visit_b.get("image_url")
                     mask_url_b = visit_b.get("mask_url")
@@ -1810,8 +1810,8 @@ def render_doctor_dashboard() -> None:
                 with c_info:
                     st.markdown("**Kết quả phân tích AI**")
                     m1, m2 = st.columns(2)
-                    m1.metric("Nhãn dự đoán", v_pred)
-                    m2.metric("Độ tin cậy", f"{float(ai_m.get('confidence', 0.0)) * 100:.1f}%")
+                    with m1: st.metric("Nhãn dự đoán", v_pred)
+                    with m2: st.metric("Độ tin cậy", f"{float(ai_m.get('confidence', 0.0)) * 100:.1f}%")
                     st.markdown(f"Giải nghĩa: **{v_vi}**")
                     st.markdown("**Chỉ số hình học:**")
                     for k, lbl in [
@@ -1829,7 +1829,7 @@ def render_doctor_dashboard() -> None:
                         bd   = "#3b82f6" if role == "user" else "#22c55e"
                         st.markdown(
                             f"<div style='background:rgba(59,130,246,0.08);border-left:3px solid {bd};"
-                            f"padding:5px 10px;border-radius:4px;font-size:0.84rem;margin:3px 0;color:var(--text-color);'>"
+                            f"padding:5px 10px;border-radius:4px;font-size:0.84rem;margin:3px 0;'>"
                             f"<b>{lbl}:</b> {esc}</div>",
                             unsafe_allow_html=True,
                         )
@@ -2529,11 +2529,11 @@ def main() -> None:
                 area_sublabel = f"Diện tích: {phys_area:.2f} mm²" if phys_area is not None else "Tỷ lệ diện tích"
 
                 mc1, mc2, mc3, mc4, mc5 = st.columns(5)
-                mc1.markdown(_card("Thời gian", st.session_state.get("analysis_time", "—"), "Điểm lấy mẫu"), unsafe_allow_html=True)
-                mc2.markdown(_card("Area ratio",  f"{area_v:.4f}",  area_sublabel), unsafe_allow_html=True)
-                mc3.markdown(_card("Border",      f"{bord_v:.4f}",  "Độ phức tạp bờ", bord_v > 5.0), unsafe_allow_html=True)
-                mc4.markdown(_card("Asymmetry",   f"{asym_v:.4f}",  "Bất đối xứng",   asym_v > 0.7), unsafe_allow_html=True)
-                mc5.markdown(_card("Circularity", f"{circ_v:.4f}",  "Độ tròn"), unsafe_allow_html=True)
+                with mc1: st.markdown(_card("Thời gian", st.session_state.get("analysis_time", "—"), "Điểm lấy mẫu"), unsafe_allow_html=True)
+                with mc2: st.markdown(_card("Area ratio",  f"{area_v:.4f}",  area_sublabel), unsafe_allow_html=True)
+                with mc3: st.markdown(_card("Border",      f"{bord_v:.4f}",  "Độ phức tạp bờ", bord_v > 5.0), unsafe_allow_html=True)
+                with mc4: st.markdown(_card("Asymmetry",   f"{asym_v:.4f}",  "Bất đối xứng",   asym_v > 0.7), unsafe_allow_html=True)
+                with mc5: st.markdown(_card("Circularity", f"{circ_v:.4f}",  "Độ tròn"), unsafe_allow_html=True)
 
                 conf_cls = "conf-high" if conf_pct >= 70 else ("conf-mid" if conf_pct >= 50 else "conf-low")
                 st.markdown(
