@@ -11,8 +11,11 @@ import tempfile
 import base64
 import requests
 from typing import Any, Dict, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+def get_vietnam_time() -> datetime:
+    return datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=7)))
 
 import cv2
 import numpy as np
@@ -137,7 +140,7 @@ class _NumpySafeEncoder(json.JSONEncoder):
 
 def write_dev_log(data: Dict[str, Any], action_type: str) -> None:
     log_entry = {
-        "action_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "action_time": get_vietnam_time().strftime("%Y-%m-%d %H:%M:%S"),
         "action_type": action_type,
         "payload":     data,
     }
@@ -195,13 +198,26 @@ def load_gcp_credentials() -> Optional[service_account.Credentials]:
         except Exception:
             pass
             
-    # 2. Check Streamlit secrets
-    for key in ["gcp_service_account", "gcp_credentials", "GCP_CREDENTIALS"]:
+    # 2. Check root-level Streamlit secrets directly
+    try:
+        if hasattr(st, "secrets") and st.secrets:
+            if "type" in st.secrets and "project_id" in st.secrets and "private_key" in st.secrets:
+                info = {k: st.secrets[k] for k in st.secrets.keys() if k not in ["gcp_service_account", "gcp_credentials", "GCP_CREDENTIALS", "gcp", "firestore", "firebase", "google_credentials"]}
+                # Ensure all key fields are present
+                if info.get("type") == "service_account":
+                    return service_account.Credentials.from_service_account_info(info)
+    except Exception:
+        pass
+
+    # 3. Check nested Streamlit secrets
+    for key in ["gcp_service_account", "gcp_credentials", "GCP_CREDENTIALS", "gcp", "firestore", "firebase", "google_credentials"]:
         try:
-            if key in st.secrets:
+            if hasattr(st, "secrets") and key in st.secrets:
                 secret_val = st.secrets[key]
-                if isinstance(secret_val, dict):
-                    return service_account.Credentials.from_service_account_info(secret_val)
+                if isinstance(secret_val, dict) or hasattr(secret_val, "keys"):
+                    # Convert to standard dict
+                    info = {k: secret_val[k] for k in secret_val.keys()}
+                    return service_account.Credentials.from_service_account_info(info)
                 elif isinstance(secret_val, str):
                     import json
                     info = json.loads(secret_val)
@@ -209,7 +225,7 @@ def load_gcp_credentials() -> Optional[service_account.Credentials]:
         except Exception:
             pass
             
-    # 3. Check environment variables
+    # 4. Check environment variables
     for env_var in ["GCP_CREDENTIALS", "GCP_SERVICE_ACCOUNT"]:
         val = os.environ.get(env_var)
         if val:
@@ -249,7 +265,7 @@ def save_medical_record_to_gcp(
             doc_id = get_patient_doc_id(patient_name)
             ref    = db.collection("medical_records").document(doc_id)
             snap   = ref.get()
-            now    = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            now    = get_vietnam_time().strftime("%Y-%m-%d %H:%M:%S")
             
             # Encrypt sensitive patient info fields
             pat_info_enc = patient_info.copy()
@@ -273,7 +289,11 @@ def save_medical_record_to_gcp(
             write_dev_log({"patient_id": doc_id, "visit": visit_data}, "SAVE_OR_UPDATE_RECORD")
             return True
         else:
-            st.error("Không tìm thấy cấu hình GCP Credentials (gcp-credentials.json hoặc Streamlit Secrets / Env vars)!")
+            secrets_keys = list(st.secrets.keys()) if (hasattr(st, "secrets") and st.secrets is not None) else []
+            st.error(
+                f"Không tìm thấy cấu hình GCP Credentials (gcp-credentials.json hoặc Streamlit Secrets / Env vars)!\n"
+                f"Các khóa hiện có trong Streamlit Secrets: {secrets_keys if secrets_keys else 'Trống'}"
+            )
             return False
     except Exception as e:
         st.error(f"Lỗi ghi dữ liệu lên Cloud Firestore: {e}")
@@ -995,7 +1015,7 @@ def render_probability_chart(
     st.plotly_chart(fig, use_container_width=True)
 
     try:
-        ts_clean  = (timestamp or datetime.now().strftime("%Y%m%d_%H%M%S"))\
+        ts_clean  = (timestamp or get_vietnam_time().strftime("%Y%m%d_%H%M%S"))\
                     .replace("/", "").replace("\\", "").replace(":", "").replace(" ", "_")
         safe_name = "".join(c for c in patient_name.upper() if c.isalnum() or c in "-_") or "UNKNOWN"
         png_path  = CHART_SAVE_DIR / f"prob_{safe_name}_{ts_clean}.png"
@@ -1058,10 +1078,10 @@ def render_radar_chart(metrics: Dict[str, Any]) -> None:
 def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]:
     try:
         from fpdf import FPDF
-        import datetime
-        from app_streamlit import get_vietnamese_diagnosis
         
         pdf = FPDF()
+        pdf.set_margins(15, 10, 15)
+        pdf.set_auto_page_break(True, margin=5)
         pdf.add_page()
         
         # Load Unicode font DejaVu để hiển thị Tiếng Việt đầy đủ
@@ -1081,22 +1101,22 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
         # 2. Tiêu đề thương hiệu y khoa
         pdf.set_font("DejaVu", "B", 15)
         pdf.set_text_color(30, 58, 138)  # Deep Medical Blue
-        pdf.cell(0, 10, "HỆ THỐNG EHR BỆNH ÁN ĐIỆN TỬ MULTI-VISIT AI-DERMA", new_x="LMARGIN", new_y="NEXT", align="C")
+        pdf.cell(0, 10, "HỆ THỐNG EHR BỆNH ÁN ĐIỆN TỬ", new_x="LMARGIN", new_y="NEXT", align="C")
         
         pdf.set_font("DejaVu", "", 9)
         pdf.set_text_color(100, 116, 139)  # Slate
         pdf.cell(0, 5, "Trung tâm Phân tích Định lượng AI & Hỗ trợ Lâm sàng VQA", new_x="LMARGIN", new_y="NEXT", align="C")
         
-        pdf.ln(5)
+        pdf.ln(4)
         pdf.set_draw_color(226, 232, 240)  # #e2e8f0
         pdf.line(15, 38, 195, 38)
         
         # Tiêu đề báo cáo
-        pdf.ln(5)
+        pdf.ln(4)
         pdf.set_font("DejaVu", "B", 13)
         pdf.set_text_color(30, 41, 59)
         pdf.cell(0, 8, "PHIẾU KẾT QUẢ PHÂN TÍCH VÀ CHẨN ĐOÁN HÌNH ẢNH DA LIỄU", new_x="LMARGIN", new_y="NEXT", align="C")
-        pdf.ln(4)
+        pdf.ln(3)
         
         # --- PHẦN I: THÔNG TIN HÀNH CHÍNH ---
         pdf.set_font("DejaVu", "B", 10)
@@ -1110,20 +1130,20 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
         pdf.set_fill_color(248, 250, 252)  # Nền nhạt
         
         # Dòng 1: Họ tên + Giới tính
-        pdf.cell(30, 7, " Họ tên bệnh nhân", border=1, fill=True)
+        pdf.cell(30, 5.5, " Họ tên bệnh nhân", border=1, fill=True)
         pdf.set_font("DejaVu", "B", 9)
-        pdf.cell(70, 7, f" {patient_info.get('name', 'N/A').upper()}", border=1)
+        pdf.cell(70, 5.5, f" {patient_info.get('name', 'N/A').upper()}", border=1)
         pdf.set_font("DejaVu", "", 9)
-        pdf.cell(30, 7, " Giới tính / Tuổi", border=1, fill=True)
-        pdf.cell(50, 7, f" {patient_info.get('gender', 'N/A')} / {patient_info.get('age', 'N/A')} tuổi", border=1)
-        pdf.ln(7)
+        pdf.cell(30, 5.5, " Giới tính / Tuổi", border=1, fill=True)
+        pdf.cell(50, 5.5, f" {patient_info.get('gender', 'N/A')} / {patient_info.get('age', 'N/A')} tuổi", border=1)
+        pdf.ln(5.5)
         
         # Dòng 2: Quê quán + Vị trí tổn thương
-        pdf.cell(30, 7, " Quê quán", border=1, fill=True)
-        pdf.cell(70, 7, f" {patient_info.get('hometown', 'N/A')}", border=1)
-        pdf.cell(30, 7, " Vị trí tổn thương", border=1, fill=True)
-        pdf.cell(50, 7, f" {patient_info.get('location', 'N/A')}", border=1)
-        pdf.ln(10)
+        pdf.cell(30, 5.5, " Quê quán", border=1, fill=True)
+        pdf.cell(70, 5.5, f" {patient_info.get('hometown', 'N/A')}", border=1)
+        pdf.cell(30, 5.5, " Vị trí tổn thương", border=1, fill=True)
+        pdf.cell(50, 5.5, f" {patient_info.get('location', 'N/A')}", border=1)
+        pdf.ln(7.5)
         
         # --- PHẦN II: PHÂN TÍCH ĐỊNH LƯỢNG AI ---
         pdf.set_font("DejaVu", "B", 10)
@@ -1134,10 +1154,10 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
         pdf.set_font("DejaVu", "B", 9)
         pdf.set_text_color(255, 255, 255)
         pdf.set_fill_color(30, 58, 138)  # Deep Blue Header
-        pdf.cell(70, 7, " Chỉ số đánh giá", border=1, fill=True)
-        pdf.cell(40, 7, " Giá trị phân tích", border=1, fill=True, align="C")
-        pdf.cell(70, 7, " Đánh giá lâm sàng", border=1, fill=True)
-        pdf.ln(7)
+        pdf.cell(70, 5.5, " Chỉ số đánh giá", border=1, fill=True)
+        pdf.cell(40, 5.5, " Giá trị phân tích", border=1, fill=True, align="C")
+        pdf.cell(70, 5.5, " Đánh giá lâm sàng", border=1, fill=True)
+        pdf.ln(5.5)
         
         pdf.set_text_color(30, 41, 59)
         ai = visit_data.get("ai_extracted_metrics", {})
@@ -1156,12 +1176,12 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
         
         for idx, (label, val, comment) in enumerate(metrics):
             pdf.set_fill_color(248, 250, 252) if idx % 2 == 0 else pdf.set_fill_color(255, 255, 255)
-            pdf.cell(70, 7, f" {label}", border=1, fill=True)
-            pdf.cell(40, 7, f" {val}", border=1, fill=True, align="C")
-            pdf.cell(70, 7, f" {comment}", border=1, fill=True)
-            pdf.ln(7)
+            pdf.cell(70, 5.5, f" {label}", border=1, fill=True)
+            pdf.cell(40, 5.5, f" {val}", border=1, fill=True, align="C")
+            pdf.cell(70, 5.5, f" {comment}", border=1, fill=True)
+            pdf.ln(5.5)
             
-        pdf.ln(5)
+        pdf.ln(3.5)
         
         # --- PHẦN III: KHUYẾN NGHỊ LÂM SÀNG ---
         pdf.set_font("DejaVu", "B", 10)
@@ -1191,35 +1211,31 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
                 "Liên hệ bác sĩ nếu có bất kỳ hiện tượng ngứa, loét hoặc chảy máu bất thường."
             )
             
-        pdf.multi_cell(180, 5, adv, border=1, fill=True)
-        pdf.ln(5)
+        pdf.multi_cell(180, 4.5, adv, border=1, fill=True)
         
         # --- CHỮ KÝ BÁC SĨ ---
-        pdf.ln(5)
-        pdf.set_font("DejaVu", "I", 9.5)
-        now_str = datetime.datetime.now().strftime("Hà Nội, ngày %d tháng %m năm %Y")
-        pdf.cell(180, 5, now_str, new_x="LMARGIN", new_y="NEXT", align="R")
-        pdf.ln(2)
-        pdf.set_font("DejaVu", "B", 9.5)
-        pdf.cell(180, 5, "Bác sĩ chẩn đoán hình ảnh", new_x="LMARGIN", new_y="NEXT", align="R")
-        pdf.set_font("DejaVu", "", 8.5)
+        pdf.ln(3)
+        pdf.set_font("DejaVu", "I", 9)
+        now_str = get_vietnam_time().strftime("Hà Nội, ngày %d tháng %m năm %Y")
+        pdf.cell(180, 4.5, now_str, new_x="LMARGIN", new_y="NEXT", align="R")
+        pdf.ln(1)
+        pdf.set_font("DejaVu", "B", 9)
+        pdf.cell(180, 4.5, "Bác sĩ chẩn đoán hình ảnh", new_x="LMARGIN", new_y="NEXT", align="R")
+        pdf.set_font("DejaVu", "", 8)
         pdf.set_text_color(100, 116, 139)
-        pdf.cell(180, 5, "(Ký và ghi rõ họ tên)", new_x="LMARGIN", new_y="NEXT", align="R")
+        pdf.cell(180, 4.5, "(Ký và ghi rõ họ tên)", new_x="LMARGIN", new_y="NEXT", align="R")
         
         # Disclaimer ở dưới cùng
-        pdf.set_y(-25)
-        pdf.set_font("DejaVu", "I", 8)
+        pdf.set_y(-15)
+        pdf.set_font("DejaVu", "I", 7.5)
         pdf.set_text_color(239, 68, 68)  # Red warning
         dis = (
             "* TUYÊN BỐ MIỄN TRỪ: Hệ thống AI này chỉ đóng vai trò hỗ trợ sàng lọc lâm sàng sơ bộ dựa trên học máy. "
             "Kết quả phân tích không thể thay thế quyết định chẩn đoán y khoa chuyên môn của bác sĩ da liễu có thẩm quyền."
         )
-        pdf.multi_cell(180, 4, dis, align="C")
+        pdf.multi_cell(180, 3.5, dis, align="C")
         
         return bytes(pdf.output())
-    except Exception as e:
-        st.warning(f"Không tạo được PDF: {e}")
-        return None
     except Exception as e:
         st.warning(f"Không tạo được PDF: {e}")
         return None
@@ -2157,7 +2173,7 @@ def main() -> None:
                 # Chạy pipeline ngay khi có điểm SAM chờ xử lý (sau rerun canvas đã reset)
                 if st.session_state.get("sam_pending") and st.session_state["sam_point"] is not None:
                     st.session_state["sam_pending"] = False
-                    st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                    st.session_state["analysis_time"] = get_vietnam_time().strftime("%Y/%m/%d %H:%M:%S")
                     with st.spinner("Đang chẩn đoán tương tác với điểm chọn..."):
                         tmp_dir  = tempfile.mkdtemp()
                         tmp_path = os.path.join(tmp_dir, "input.png")
@@ -2202,7 +2218,7 @@ def main() -> None:
                         if st.button("Áp dụng nét vẽ tay chỉnh sửa", use_container_width=True, key="apply_custom_draw"):
                             st.session_state["custom_mask"] = resized_mask
                             st.session_state["sam_point"] = None
-                            st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                            st.session_state["analysis_time"] = get_vietnam_time().strftime("%Y/%m/%d %H:%M:%S")
                             with st.spinner("Đang áp dụng phân đoạn vẽ tay..."):
                                 tmp_dir  = tempfile.mkdtemp()
                                 tmp_path = os.path.join(tmp_dir, "input.png")
@@ -2229,7 +2245,7 @@ def main() -> None:
 
             else:
                 if st.button("Chạy Phân tích CV", type="primary", key="run_analysis_btn", use_container_width=True):
-                    st.session_state["analysis_time"] = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+                    st.session_state["analysis_time"] = get_vietnam_time().strftime("%Y/%m/%d %H:%M:%S")
                     st.session_state["sam_point"] = None
                     st.session_state["custom_mask"] = None
                     with st.spinner("Đang chạy Segmentation + Classification tự động..."):
@@ -2626,7 +2642,7 @@ def main() -> None:
                             
                             # 2. Ảnh mặt nạ
                             if mask_img_arr is not None:
-                                tmp_mask_path = os.path.join(tempfile.gettempdir(), f"mask_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
+                                tmp_mask_path = os.path.join(tempfile.gettempdir(), f"mask_{get_vietnam_time().strftime('%Y%m%d_%H%M%S')}.png")
                                 cv2.imwrite(tmp_mask_path, mask_img_arr)
                                 upload_tasks["mask"] = tmp_mask_path
                                 temp_files.append(tmp_mask_path)
@@ -2634,7 +2650,7 @@ def main() -> None:
                             # 3. Ảnh Grad-CAM
                             gradcam_arr = result.get("gradcam_image")
                             if isinstance(gradcam_arr, np.ndarray):
-                                tmp_gradcam_path = os.path.join(tempfile.gettempdir(), f"gradcam_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
+                                tmp_gradcam_path = os.path.join(tempfile.gettempdir(), f"gradcam_{get_vietnam_time().strftime('%Y%m%d_%H%M%S')}.png")
                                 gradcam_bgr = cv2.cvtColor(gradcam_arr, cv2.COLOR_RGB2BGR)
                                 cv2.imwrite(tmp_gradcam_path, gradcam_bgr)
                                 upload_tasks["gradcam"] = tmp_gradcam_path
@@ -2683,7 +2699,7 @@ def main() -> None:
                                 m_r = result.get("metrics", {})
                                 c_r = result.get("classification") or {}
                                 v_data = {
-                                    "timestamp_id": datetime.now().strftime("%Y%m%d_%H%M%S"),
+                                    "timestamp_id": get_vietnam_time().strftime("%Y%m%d_%H%M%S"),
                                     "created_at":   st.session_state["analysis_time"],
                                     "image_url":    pub_url,
                                     "mask_url":     mask_url,
@@ -2714,37 +2730,37 @@ def main() -> None:
                                         st.rerun()
 
                 with col_pdf:
-                    if st.button("Xuất báo cáo PDF", type="secondary", key="pdf_export_btn"):
-                        pat_info_pdf = {
-                            "name": p_name.strip() or "N/A",
-                            "age":  str(p_age),
-                            "gender":   p_gender,
-                            "hometown": p_hometown,
-                            "location": p_location,
-                        }
-                        m_r = result.get("metrics", {})
-                        c_r = result.get("classification") or {}
-                        v_pdf = {"ai_extracted_metrics": {
-                            "prediction":        c_r.get("prediction", "N/A"),
-                            "confidence":        float(c_r.get("confidence", 0.0)),
-                            "area_ratio":        float(m_r.get("area_ratio",        0.0)),
-                            "border_complexity": float(m_r.get("border_complexity", 0.0)),
-                            "asymmetry":         float(m_r.get("asymmetry",         0.0)),
-                            "circularity":       float(m_r.get("circularity",       0.0)),
-                        }}
-                        pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
-                        if pdf_bytes:
-                            fname = (
-                                f"BaoCao_{(p_name or 'BenhNhan').replace(' ', '_')}"
-                                f"_{datetime.now().strftime('%Y%m%d')}.pdf"
-                            )
-                            st.download_button(
-                                "Tải xuống báo cáo PDF",
-                                data=pdf_bytes,
-                                file_name=fname,
-                                mime="application/pdf",
-                                key="pdf_dl_btn",
-                            )
+                    pat_info_pdf = {
+                        "name": p_name.strip() or "N/A",
+                        "age":  str(p_age),
+                        "gender":   p_gender,
+                        "hometown": p_hometown,
+                        "location": p_location,
+                    }
+                    m_r = result.get("metrics", {})
+                    c_r = result.get("classification") or {}
+                    v_pdf = {"ai_extracted_metrics": {
+                        "prediction":        c_r.get("prediction", "N/A"),
+                        "confidence":        float(c_r.get("confidence", 0.0)),
+                        "area_ratio":        float(m_r.get("area_ratio",        0.0)),
+                        "border_complexity": float(m_r.get("border_complexity", 0.0)),
+                        "asymmetry":         float(m_r.get("asymmetry",         0.0)),
+                        "circularity":       float(m_r.get("circularity",       0.0)),
+                    }}
+                    pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
+                    if pdf_bytes:
+                        fname = (
+                            f"BaoCao_{(p_name or 'BenhNhan').replace(' ', '_')}"
+                            f"_{get_vietnam_time().strftime('%Y%m%d')}.pdf"
+                        )
+                        st.download_button(
+                            "Tải báo cáo PDF",
+                            data=pdf_bytes,
+                            file_name=fname,
+                            mime="application/pdf",
+                            key="pdf_dl_btn",
+                            use_container_width=True,
+                        )
 
     # ==========================================================
     # TAB 2 — DOCTOR DASHBOARD
