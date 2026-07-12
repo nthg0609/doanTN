@@ -24,7 +24,65 @@ import streamlit.components.v1 as stc_v1
 from PIL import Image, ImageDraw
 from dotenv import load_dotenv
 import plotly.graph_objects as go
-from streamlit_drawable_canvas import st_canvas
+from streamlit_drawable_canvas import st_canvas as orig_st_canvas
+import base64
+import io
+
+def custom_st_canvas(
+    fill_color: str = "#eee",
+    stroke_width: int = 20,
+    stroke_color: str = "black",
+    background_color: str = "",
+    background_image = None,
+    update_streamlit: bool = True,
+    height: int = 400,
+    width: int = 600,
+    drawing_mode: str = "freedraw",
+    initial_drawing: dict = None,
+    display_toolbar: bool = True,
+    point_display_radius: int = 3,
+    key=None,
+):
+    from hashlib import md5
+    from streamlit_drawable_canvas import CanvasResult, _data_url_to_image, _resize_img, _component_func
+    
+    background_image_url = None
+    if background_image:
+        background_image = _resize_img(background_image, height, width)
+        buffered = io.BytesIO()
+        background_image.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        background_image_url = f"data:image/png;base64,{img_str}"
+        background_color = ""
+
+    initial_drawing = {"version": "4.4.0"} if initial_drawing is None else initial_drawing
+    initial_drawing["background"] = background_color
+
+    component_value = _component_func(
+        fillColor=fill_color,
+        strokeWidth=stroke_width,
+        strokeColor=stroke_color,
+        backgroundColor=background_color,
+        backgroundImageURL=background_image_url,
+        realtimeUpdateStreamlit=update_streamlit and (drawing_mode != "polygon"),
+        canvasHeight=height,
+        canvasWidth=width,
+        drawingMode=drawing_mode,
+        initialDrawing=initial_drawing,
+        displayToolbar=display_toolbar,
+        displayRadius=point_display_radius,
+        key=key,
+        default=None,
+    )
+    if component_value is None:
+        return CanvasResult(None, None)
+
+    return CanvasResult(
+        np.asarray(_data_url_to_image(component_value["data"])),
+        component_value["raw"],
+    )
+
+st_canvas = custom_st_canvas
 
 import google.cloud.firestore as gcp_firestore
 from google.oauth2 import service_account
@@ -2122,6 +2180,7 @@ def main() -> None:
                 "**VRAM:** ~8 192 MB  \n"
                 "**Biên ROI:** delta = 10 px"
             )
+        st.sidebar.caption("Phiên bản: vqa-canvas-base64-v4")
 
     # ============================================================
     # TABS CHÍNH
