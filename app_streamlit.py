@@ -1309,7 +1309,10 @@ def generate_pdf_report(patient_info: Dict, visit_data: Dict) -> Optional[bytes]
         ]
         
         for idx, (label, val, comment) in enumerate(metrics):
-            pdf.set_fill_color(248, 250, 252) if idx % 2 == 0 else pdf.set_fill_color(255, 255, 255)
+            if idx % 2 == 0:
+                pdf.set_fill_color(248, 250, 252)
+            else:
+                pdf.set_fill_color(255, 255, 255)
             pdf.cell(70, 5.5, f" {label}", border=1, fill=True)
             pdf.cell(40, 5.5, f" {val}", border=1, fill=True, align="C")
             pdf.cell(70, 5.5, f" {comment}", border=1, fill=True)
@@ -2212,7 +2215,7 @@ def main() -> None:
                 "**VRAM:** ~8 192 MB  \n"
                 "**Biên ROI:** delta = 10 px"
             )
-        st.sidebar.caption("Phiên bản: vqa-canvas-final-v5")
+        st.sidebar.caption("Phiên bản: vqa-canvas-final-v6")
 
     # ============================================================
     # TABS CHÍNH
