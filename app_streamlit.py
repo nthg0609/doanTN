@@ -1828,8 +1828,8 @@ def render_doctor_dashboard() -> None:
                         lbl  = "Bác sĩ" if role == "user" else "Trợ lý AI"
                         bd   = "#3b82f6" if role == "user" else "#22c55e"
                         st.markdown(
-                            f"<div style='background:rgba(0,0,0,0.03);border-left:3px solid {bd};"
-                            f"padding:5px 10px;border-radius:4px;font-size:0.84rem;margin:3px 0;color:#0F172A;'>"
+                            f"<div style='background:rgba(59,130,246,0.08);border-left:3px solid {bd};"
+                            f"padding:5px 10px;border-radius:4px;font-size:0.84rem;margin:3px 0;color:var(--text-color);'>"
                             f"<b>{lbl}:</b> {esc}</div>",
                             unsafe_allow_html=True,
                         )
@@ -2799,26 +2799,25 @@ def main() -> None:
                                             st.session_state["saved_local_img_path"] = None
                                         st.rerun()
 
-                pat_info_pdf = {
-                    "name": p_name.strip() or "N/A",
-                    "age":  str(p_age),
-                    "gender":   p_gender,
-                    "hometown": p_hometown,
-                    "location": p_location,
-                }
-                m_r = result.get("metrics", {})
-                c_r = result.get("classification") or {}
-                v_pdf = {"ai_extracted_metrics": {
-                    "prediction":        c_r.get("prediction", "N/A"),
-                    "confidence":        float(c_r.get("confidence", 0.0)),
-                    "area_ratio":        float(m_r.get("area_ratio",        0.0)),
-                    "border_complexity": float(m_r.get("border_complexity", 0.0)),
-                    "asymmetry":         float(m_r.get("asymmetry",         0.0)),
-                    "circularity":       float(m_r.get("circularity",       0.0)),
-                }}
-                pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
-
                 with col_pdf:
+                    m_r = result.get("metrics", {})
+                    c_r = result.get("classification") or {}
+                    pat_info_pdf = {
+                        "name": p_name.strip() or "N/A",
+                        "age":  str(p_age),
+                        "gender":   p_gender,
+                        "hometown": p_hometown,
+                        "location": p_location,
+                    }
+                    v_pdf = {"ai_extracted_metrics": {
+                        "prediction":        c_r.get("prediction", "N/A"),
+                        "confidence":        float(c_r.get("confidence", 0.0)),
+                        "area_ratio":        float(m_r.get("area_ratio",        0.0)),
+                        "border_complexity": float(m_r.get("border_complexity", 0.0)),
+                        "asymmetry":         float(m_r.get("asymmetry",         0.0)),
+                        "circularity":       float(m_r.get("circularity",       0.0)),
+                    }}
+                    pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
                     if pdf_bytes:
                         fname = (
                             f"BaoCao_{(p_name or 'BenhNhan').replace(' ', '_')}"
