@@ -186,14 +186,50 @@ def get_patient_doc_id(patient_name: str) -> str:
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:16]
 
 
+def load_gcp_credentials() -> Optional[service_account.Credentials]:
+    # 1. Check local file
+    cred_path = "gcp-credentials.json"
+    if os.path.exists(cred_path):
+        try:
+            return service_account.Credentials.from_service_account_file(cred_path)
+        except Exception:
+            pass
+            
+    # 2. Check Streamlit secrets
+    for key in ["gcp_service_account", "gcp_credentials", "GCP_CREDENTIALS"]:
+        try:
+            if key in st.secrets:
+                secret_val = st.secrets[key]
+                if isinstance(secret_val, dict):
+                    return service_account.Credentials.from_service_account_info(secret_val)
+                elif isinstance(secret_val, str):
+                    import json
+                    info = json.loads(secret_val)
+                    return service_account.Credentials.from_service_account_info(info)
+        except Exception:
+            pass
+            
+    # 3. Check environment variables
+    for env_var in ["GCP_CREDENTIALS", "GCP_SERVICE_ACCOUNT"]:
+        val = os.environ.get(env_var)
+        if val:
+            try:
+                import json
+                info = json.loads(val)
+                return service_account.Credentials.from_service_account_info(info)
+            except Exception:
+                pass
+                
+    return None
+
+
 def check_patient_exists(patient_name: str) -> bool:
     if not patient_name.strip():
         return False
     try:
-        cred_path = "gcp-credentials.json"
-        if os.path.exists(cred_path):
-            creds = service_account.Credentials.from_service_account_file(cred_path)
-            db    = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
+        creds = load_gcp_credentials()
+        if creds is not None:
+            db = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
             doc_id = get_patient_doc_id(patient_name)
             return db.collection("medical_records").document(doc_id).get().exists
     except Exception:
@@ -207,9 +243,8 @@ def save_medical_record_to_gcp(
     visit_data: Dict[str, Any],
 ) -> bool:
     try:
-        cred_path = "gcp-credentials.json"
-        if os.path.exists(cred_path):
-            creds  = service_account.Credentials.from_service_account_file(cred_path)
+        creds = load_gcp_credentials()
+        if creds is not None:
             db     = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
             doc_id = get_patient_doc_id(patient_name)
             ref    = db.collection("medical_records").document(doc_id)
@@ -238,7 +273,7 @@ def save_medical_record_to_gcp(
             write_dev_log({"patient_id": doc_id, "visit": visit_data}, "SAVE_OR_UPDATE_RECORD")
             return True
         else:
-            st.error("Không tìm thấy file gcp-credentials.json!")
+            st.error("Không tìm thấy cấu hình GCP Credentials (gcp-credentials.json hoặc Streamlit Secrets / Env vars)!")
             return False
     except Exception as e:
         st.error(f"Lỗi ghi dữ liệu lên Cloud Firestore: {e}")
@@ -247,9 +282,8 @@ def save_medical_record_to_gcp(
 
 def delete_patient_record_from_gcp(patient_name: str) -> bool:
     try:
-        cred_path = "gcp-credentials.json"
-        if os.path.exists(cred_path):
-            creds = service_account.Credentials.from_service_account_file(cred_path)
+        creds = load_gcp_credentials()
+        if creds is not None:
             db = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
             doc_id = get_patient_doc_id(patient_name)
             db.collection("medical_records").document(doc_id).delete()
@@ -262,9 +296,8 @@ def delete_patient_record_from_gcp(patient_name: str) -> bool:
 def fetch_all_medical_records() -> List[Dict[str, Any]]:
     records: List[Dict[str, Any]] = []
     try:
-        cred_path = "gcp-credentials.json"
-        if os.path.exists(cred_path):
-            creds = service_account.Credentials.from_service_account_file(cred_path)
+        creds = load_gcp_credentials()
+        if creds is not None:
             db    = gcp_firestore.Client(credentials=creds, project=creds.project_id, database="(default)")
             docs  = db.collection("medical_records").order_by(
                 "updated_at", direction=gcp_firestore.Query.DESCENDING
@@ -278,8 +311,8 @@ def fetch_all_medical_records() -> List[Dict[str, Any]]:
                     if "id" in pi:
                         pi["id"] = decrypt_data(pi["id"])
                 records.append(d)
-    except Exception:
-        pass
+    except Exception as e:
+        st.error(f"Lỗi khi tải dữ liệu bệnh án: {e}")
     return records
 
 
@@ -2502,7 +2535,7 @@ def main() -> None:
                         )
                     with col_btn:
                         send_clicked = st.form_submit_button(
-                            "",
+                            "➤",
                             disabled=chat_disabled,
                             use_container_width=True,
                             type="primary",

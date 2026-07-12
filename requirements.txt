@@ -19,6 +19,6 @@ google-cloud-firestore
 google-auth
 requests
 peft
-fpdf
+fpdf2
 pydicom
 streamlit-drawable-canvas

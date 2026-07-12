@@ -109,11 +109,21 @@ class MultimodalBayesianFusion:
         if has_location:
             location_key = self.map_body_location(body_location)
 
-        fused_probs = {}
-        total_fused = 0.0
+        CLASS_PRIORS: Dict[str, float] = {
+            "NV": 0.6705,
+            "MEL": 0.1111,
+            "BKL": 0.1097,
+            "BCC": 0.0513,
+            "AKIEC": 0.0326,
+            "VASC": 0.0142,
+            "DF": 0.0115
+        }
 
-        for cls, img_p in image_probs.items():
-            # Likelihood product initialized to 1.0
+        demographic_probs = {}
+        total_demo = 0.0
+
+        for cls in image_probs:
+            prior_c = CLASS_PRIORS.get(cls, 1.0 / len(image_probs))
             likelihood = 1.0
 
             # 1. Age likelihood
@@ -129,28 +139,36 @@ class MultimodalBayesianFusion:
             if location_key and cls in LOCATION_PRIORS:
                 likelihood *= LOCATION_PRIORS[cls].get(location_key, 0.05)
 
-            # Posterior term (unnormalized)
-            fused_val = img_p * likelihood
-            fused_probs[cls] = fused_val
-            total_fused += fused_val
+            p_c_d = prior_c * likelihood
+            demographic_probs[cls] = p_c_d
+            total_demo += p_c_d
 
-        # Normalize fused probabilities
-        if total_fused > 0:
-            for cls in fused_probs:
-                fused_probs[cls] /= total_fused
+        # Normalize P(C_i | D)
+        if total_demo > 0:
+            for cls in demographic_probs:
+                demographic_probs[cls] /= total_demo
         else:
-            # Fallback if likelihood calculations zero out (numerical underflow)
-            fused_probs = image_probs.copy()
+            # Fallback to class priors
+            demographic_probs = CLASS_PRIORS.copy()
 
-        # Weighted combination: lambda_val * image_probs + (1 - lambda_val) * fused_probs
+        # Multiplicative Bayesian Fusion: P(C_i | V, D) proportional to [P(C_i|V)]^lambda * [P(C_i|D)]^(1-lambda)
+        eps = 1e-9
         final_probs = {}
+        total_final = 0.0
+
         for cls in image_probs:
-            final_probs[cls] = lambda_val * image_probs[cls] + (1.0 - lambda_val) * fused_probs.get(cls, image_probs[cls])
+            p_v = max(image_probs[cls], eps)
+            p_d = max(demographic_probs.get(cls, eps), eps)
+
+            fused_val = (p_v ** lambda_val) * (p_d ** (1.0 - lambda_val))
+            final_probs[cls] = fused_val
+            total_final += fused_val
 
         # Re-normalize to guarantee sum to 1.0
-        sum_p = sum(final_probs.values())
-        if sum_p > 0:
+        if total_final > 0:
             for cls in final_probs:
-                final_probs[cls] /= sum_p
+                final_probs[cls] /= total_final
+        else:
+            final_probs = image_probs.copy()
 
         return final_probs
