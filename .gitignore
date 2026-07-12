@@ -14,3 +14,4 @@ __pycache__/
 9_VQA/dermavqa_dataset/
 .env
 gcp-credentials.json
+*.pptx
