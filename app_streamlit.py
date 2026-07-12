@@ -532,7 +532,7 @@ def fetch_all_medical_records() -> List[Dict[str, Any]]:
 # PIPELINE
 # ==============================================================================
 @st.cache_resource
-def get_pipeline(min_conf: float, reload_token: str = "v2"):
+def get_pipeline(min_conf: float, reload_token: str = "v3"):
     import sys
     for k in list(sys.modules.keys()):
         if k == "pipeline" or k.startswith("pipeline."):
