@@ -239,6 +239,69 @@ def load_gcp_credentials() -> Optional[service_account.Credentials]:
     return None
 
 
+# ── Local JSON fallback DB ────────────────────────────────────────────────────
+_LOCAL_DB_DIR = "local_medical_records"
+
+def _local_record_path(patient_name: str) -> str:
+    os.makedirs(_LOCAL_DB_DIR, exist_ok=True)
+    doc_id = get_patient_doc_id(patient_name)
+    return os.path.join(_LOCAL_DB_DIR, f"{doc_id}.json")
+
+def _local_save_record(patient_name: str, patient_info: Dict, visit_data: Dict) -> bool:
+    import json
+    try:
+        path = _local_record_path(patient_name)
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                record = json.load(f)
+            record["patient_info"] = patient_info
+            record["visits"].append(visit_data)
+            record["updated_at"] = get_vietnam_time().strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            doc_id = get_patient_doc_id(patient_name)
+            now = get_vietnam_time().strftime("%Y-%m-%d %H:%M:%S")
+            record = {
+                "patient_id": doc_id,
+                "patient_info": patient_info,
+                "created_at": now,
+                "updated_at": now,
+                "visits": [visit_data],
+            }
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(record, f, ensure_ascii=False, indent=2, default=str)
+        return True
+    except Exception as e:
+        print("Local DB save error:", e)
+        return False
+
+def _local_check_exists(patient_name: str) -> bool:
+    return os.path.exists(_local_record_path(patient_name))
+
+def _local_fetch_all() -> List[Dict]:
+    import json
+    records = []
+    if not os.path.isdir(_LOCAL_DB_DIR):
+        return records
+    for fname in sorted(os.listdir(_LOCAL_DB_DIR), reverse=True):
+        if fname.endswith(".json"):
+            try:
+                with open(os.path.join(_LOCAL_DB_DIR, fname), "r", encoding="utf-8") as f:
+                    records.append(json.load(f))
+            except Exception:
+                pass
+    return records
+
+def _local_delete_record(patient_name: str) -> bool:
+    path = _local_record_path(patient_name)
+    try:
+        if os.path.exists(path):
+            os.remove(path)
+        return True
+    except Exception as e:
+        print("Local DB delete error:", e)
+        return False
+# ──────────────────────────────────────────────────────────────────────────────
+
 def check_patient_exists(patient_name: str) -> bool:
     if not patient_name.strip():
         return False
@@ -250,7 +313,8 @@ def check_patient_exists(patient_name: str) -> bool:
             return db.collection("medical_records").document(doc_id).get().exists
     except Exception:
         pass
-    return False
+    # Fallback: local JSON
+    return _local_check_exists(patient_name)
 
 
 def save_medical_record_to_gcp(
@@ -266,14 +330,14 @@ def save_medical_record_to_gcp(
             ref    = db.collection("medical_records").document(doc_id)
             snap   = ref.get()
             now    = get_vietnam_time().strftime("%Y-%m-%d %H:%M:%S")
-            
+
             # Encrypt sensitive patient info fields
             pat_info_enc = patient_info.copy()
             if "name" in pat_info_enc:
                 pat_info_enc["name"] = encrypt_data(pat_info_enc["name"])
             if "id" in pat_info_enc:
                 pat_info_enc["id"] = encrypt_data(pat_info_enc["id"])
-                
+
             if snap.exists:
                 visits = snap.to_dict().get("visits", [])
                 visits.append(visit_data)
@@ -289,14 +353,15 @@ def save_medical_record_to_gcp(
             write_dev_log({"patient_id": doc_id, "visit": visit_data}, "SAVE_OR_UPDATE_RECORD")
             return True
         else:
-            secrets_keys = list(st.secrets.keys()) if (hasattr(st, "secrets") and st.secrets is not None) else []
-            st.error(
-                f"Không tìm thấy cấu hình GCP Credentials (gcp-credentials.json hoặc Streamlit Secrets / Env vars)!\n"
-                f"Các khóa hiện có trong Streamlit Secrets: {secrets_keys if secrets_keys else 'Trống'}"
-            )
-            return False
+            # GCP không khả dụng → lưu cục bộ (local JSON fallback)
+            ok = _local_save_record(patient_name, patient_info, visit_data)
+            if ok:
+                st.info("ℹ️ GCP Firestore chưa được cấu hình. Hồ sơ đã được lưu cục bộ trên máy chủ.")
+            else:
+                st.error("❌ Không thể lưu hồ sơ cục bộ. Vui lòng kiểm tra quyền ghi file.")
+            return ok
     except Exception as e:
-        st.error(f"Lỗi ghi dữ liệu lên Cloud Firestore: {e}")
+        st.error(f"Lỗi ghi dữ liệu: {e}")
     return False
 
 
@@ -308,6 +373,9 @@ def delete_patient_record_from_gcp(patient_name: str) -> bool:
             doc_id = get_patient_doc_id(patient_name)
             db.collection("medical_records").document(doc_id).delete()
             return True
+        else:
+            # Fallback: local JSON
+            return _local_delete_record(patient_name)
     except Exception as e:
         st.error(f"Lỗi khi xóa bệnh nhân: {e}")
     return False
@@ -331,9 +399,11 @@ def fetch_all_medical_records() -> List[Dict[str, Any]]:
                     if "id" in pi:
                         pi["id"] = decrypt_data(pi["id"])
                 records.append(d)
+            return records
     except Exception as e:
-        st.error(f"Lỗi khi tải dữ liệu bệnh án: {e}")
-    return records
+        st.error(f"Lỗi khi tải dữ liệu bệnh án (GCP): {e}")
+    # Fallback: local JSON
+    return _local_fetch_all()
 
 
 # ==============================================================================
@@ -2729,25 +2799,26 @@ def main() -> None:
                                             st.session_state["saved_local_img_path"] = None
                                         st.rerun()
 
+                pat_info_pdf = {
+                    "name": p_name.strip() or "N/A",
+                    "age":  str(p_age),
+                    "gender":   p_gender,
+                    "hometown": p_hometown,
+                    "location": p_location,
+                }
+                m_r = result.get("metrics", {})
+                c_r = result.get("classification") or {}
+                v_pdf = {"ai_extracted_metrics": {
+                    "prediction":        c_r.get("prediction", "N/A"),
+                    "confidence":        float(c_r.get("confidence", 0.0)),
+                    "area_ratio":        float(m_r.get("area_ratio",        0.0)),
+                    "border_complexity": float(m_r.get("border_complexity", 0.0)),
+                    "asymmetry":         float(m_r.get("asymmetry",         0.0)),
+                    "circularity":       float(m_r.get("circularity",       0.0)),
+                }}
+                pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
+
                 with col_pdf:
-                    pat_info_pdf = {
-                        "name": p_name.strip() or "N/A",
-                        "age":  str(p_age),
-                        "gender":   p_gender,
-                        "hometown": p_hometown,
-                        "location": p_location,
-                    }
-                    m_r = result.get("metrics", {})
-                    c_r = result.get("classification") or {}
-                    v_pdf = {"ai_extracted_metrics": {
-                        "prediction":        c_r.get("prediction", "N/A"),
-                        "confidence":        float(c_r.get("confidence", 0.0)),
-                        "area_ratio":        float(m_r.get("area_ratio",        0.0)),
-                        "border_complexity": float(m_r.get("border_complexity", 0.0)),
-                        "asymmetry":         float(m_r.get("asymmetry",         0.0)),
-                        "circularity":       float(m_r.get("circularity",       0.0)),
-                    }}
-                    pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
                     if pdf_bytes:
                         fname = (
                             f"BaoCao_{(p_name or 'BenhNhan').replace(' ', '_')}"
