@@ -44,15 +44,21 @@ def custom_st_canvas(
     key=None,
 ):
     from hashlib import md5
+    import streamlit.elements.image as st_image
     from streamlit_drawable_canvas import CanvasResult, _data_url_to_image, _resize_img, _component_func
     
     background_image_url = None
     if background_image:
         background_image = _resize_img(background_image, height, width)
-        buffered = io.BytesIO()
-        background_image.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue()).decode()
-        background_image_url = f"data:image/png;base64,{img_str}"
+        background_image_url = st_image.image_to_url(
+            background_image, width, True, "RGB", "PNG", f"drawable-canvas-bg-{md5(background_image.tobytes()).hexdigest()}-{key}" 
+        )
+        background_image_url = st._config.get_option("server.baseUrlPath") + background_image_url
+        
+        # Sửa đường dẫn tương đối để iframe của component React có thể truy cập được từ root domain
+        if background_image_url.startswith("/"):
+            background_image_url = "../../" + background_image_url.lstrip("/")
+            
         background_color = ""
 
     initial_drawing = {"version": "4.4.0"} if initial_drawing is None else initial_drawing
@@ -2748,6 +2754,14 @@ def main() -> None:
             if result:
                 st.divider()
                 st.markdown("**Đồng bộ Bệnh án Điện tử (EHR) và Xuất báo cáo**")
+                
+                # Tính toán báo cáo PDF bên ngoài khối cột để tránh Streamlit Magic in ra các nhãn 'None'
+                m_r_pdf = result.get("metrics", {})
+                c_r_pdf = result.get("classification") or {}
+                pat_info_pdf = {"name": p_name.strip() or "N/A", "age": str(p_age), "gender": p_gender, "hometown": p_hometown, "location": p_location}
+                v_pdf = {"ai_extracted_metrics": {"prediction": c_r_pdf.get("prediction", "N/A"), "confidence": float(c_r_pdf.get("confidence", 0.0)), "area_ratio": float(m_r_pdf.get("area_ratio", 0.0)), "border_complexity": float(m_r_pdf.get("border_complexity", 0.0)), "asymmetry": float(m_r_pdf.get("asymmetry", 0.0)), "circularity": float(m_r_pdf.get("circularity", 0.0))}}
+                pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
+
                 col_ehr, col_pdf = st.columns(2)
 
                 with col_ehr:
@@ -2859,11 +2873,6 @@ def main() -> None:
                                         st.rerun()
 
                 with col_pdf:
-                    m_r = result.get("metrics", {})
-                    c_r = result.get("classification") or {}
-                    pat_info_pdf = {"name": p_name.strip() or "N/A", "age": str(p_age), "gender": p_gender, "hometown": p_hometown, "location": p_location}
-                    v_pdf = {"ai_extracted_metrics": {"prediction": c_r.get("prediction", "N/A"), "confidence": float(c_r.get("confidence", 0.0)), "area_ratio": float(m_r.get("area_ratio", 0.0)), "border_complexity": float(m_r.get("border_complexity", 0.0)), "asymmetry": float(m_r.get("asymmetry", 0.0)), "circularity": float(m_r.get("circularity", 0.0))}}
-                    pdf_bytes = generate_pdf_report(pat_info_pdf, v_pdf)
                     if pdf_bytes:
                         fname = (
                             f"BaoCao_{(p_name or 'BenhNhan').replace(' ', '_')}"
