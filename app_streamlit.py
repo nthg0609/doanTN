@@ -855,6 +855,8 @@ def generate_vqa_response_stream(
             return
     else:
         # OpenAI Online
+        if "OPENAI_API_KEY" in st.secrets:
+            api_key = api_key or st.secrets["OPENAI_API_KEY"]
         api_key = api_key or os.getenv("OPENAI_API_KEY")
         if OpenAI is None or not api_key:
             for char in expert_answer:
