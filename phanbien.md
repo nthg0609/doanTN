@@ -180,3 +180,27 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
   * **Nhận xét học thuật:** Mô hình offline đạt điểm BLEU rất cao do học thuộc tốt các cấu trúc câu trả lời mẫu y văn của chuyên gia trên tập dữ liệu hẹp, nhưng khả năng linh hoạt ngôn ngữ bị hạn chế khi gặp câu hỏi ngoài tập huấn luyện.
 * **Mô hình trực tuyến (Online Model):**
   * **BLEU-1 trung bình:** **`10.91%`** (mức độ trùng khớp từ vựng thấp do mô hình trực tuyến sinh câu trả lời tự nhiên, dài, đa dạng từ ngữ và mang nhiều chi tiết y học phong phú hơn hẳn câu trả lời tham chiếu ngắn, mặc dù có độ chính xác y khoa thực tế tốt hơn).
+
+---
+
+### 11. Cấu trúc hệ thống RAG (Retrieval-Augmented Generation) ngoại tuyến
+* **Mục đích:** Khắc phục hiện tượng ảo giác (hallucination) của mô hình ngôn ngữ lớn (LLM) bằng cách trích xuất văn bản hướng dẫn chẩn đoán và điều trị chính thức từ Bộ Y tế để làm căn cứ/ngữ cảnh (Context) trước khi LLM sinh câu trả lời tư vấn cho bác sĩ.
+* **Các thành phần cốt lõi trong hệ thống RAG của chương trình:**
+  1. **Kho ngữ cảnh / Tài liệu cơ sở (Medical Corpus):**
+     * Tệp tài liệu y văn chuẩn `9_VQA/medical_guidelines.txt` chứa toàn bộ hướng dẫn điều trị chi tiết bằng tiếng Việt cho 7 nhóm bệnh lý da liễu trong chương trình.
+     * Tài liệu được phân đoạn tự động theo cấu trúc định dạng thẻ phân loại: `[BỆNH LÝ X: Tên bệnh] ... Nội dung hướng dẫn chi tiết`.
+  2. **Mô hình mã hóa Vector (Embedding Model):**
+     * Sử dụng mô hình mã hóa **`all-MiniLM-L6-v2`** từ thư viện `sentence-transformers`.
+     * Nhiệm vụ: Chuyển đổi các chuỗi văn bản tự nhiên thành các vector đặc trưng số thực dày đặc (dense embeddings) có **384 chiều** biểu diễn chính xác ý nghĩa ngữ nghĩa của từ ngữ.
+  3. **Cơ sở dữ liệu Vector (Vector Database):**
+     * Sử dụng **ChromaDB** chạy ở chế độ lưu trữ ngoại tuyến (`chromadb.PersistentClient`) lưu tại thư mục `5_Results/chroma_db`.
+     * Nhiệm vụ: Lưu trữ các vector nhúng của tài liệu y văn Bộ Y tế cùng metadata nhãn bệnh để phục vụ truy vấn tốc độ cao mà không cần kết nối mạng Internet.
+  4. **Thuật toán truy xuất (Retrieval Algorithm):**
+     * Khi người dùng gửi câu hỏi y khoa $q$, mô hình `all-MiniLM-L6-v2` sẽ mã hóa câu hỏi đó thành vector $\mathbf{v}_q$.
+     * Hệ thống tiến hành so sánh độ tương đồng giữa $\mathbf{v}_q$ với toàn bộ các vector tài liệu $\mathbf{v}_d$ được lưu trữ trong ChromaDB bằng công thức tính **Khoảng cách Cosine (Cosine Distance)**:
+       $$D_C(\mathbf{v}_q, \mathbf{v}_d) = 1 - \text{Cosine-Similarity}(\mathbf{v}_q, \mathbf{v}_d) = 1 - \frac{\mathbf{v}_q \cdot \mathbf{v}_d}{\|\mathbf{v}_q\| \|\mathbf{v}_d\|}$$
+       * *Giải thích phép chia:* Lấy tích vô hướng của hai vector câu hỏi và tài liệu ($\mathbf{v}_q \cdot \mathbf{v}_d$) **chia cho tích độ dài Euclid (L2-norm) của chúng ($\|\mathbf{v}_q\| \|\mathbf{v}_d\|$)** để tính cosin góc giữa hai vector. Lấy 1 trừ đi tỉ số này để quy đổi thành khoảng cách (khoảng cách càng gần $0$ thì tài liệu càng tương đồng lớn với câu hỏi).
+     * Hệ thống tự động chọn ra phân đoạn tài liệu có khoảng cách ngắn nhất để làm ngữ cảnh tin cậy.
+  5. **Nhồi ngữ cảnh vào Prompt (Prompt Injection):**
+     * Phân đoạn y văn chuẩn tìm được sẽ được tiêm trực tiếp vào trường dữ liệu `[CV_CONTEXT]` hoặc hệ thống prompt đầu vào của LLM (DistilGPT-2 LoRA hoặc Qwen chạy trên Ollama) để trói buộc phạm vi tư vấn của LLM hoàn toàn dựa trên y văn, triệt tiêu khả năng tự bịa đặt thuốc của mô hình.
+
