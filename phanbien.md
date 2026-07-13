@@ -12,21 +12,22 @@ Tài liệu này tổng hợp chi tiết toàn bộ các khía cạnh toán họ
 * **Xấp xỉ rời rạc:** Trong không gian ảnh số rời rạc, toán tử này được xấp xỉ bằng phép tích chập ảnh xám $I_{\text{gray}}$ với nhân (kernel) Laplacian $\mathbf{K}_L$:
   $$\mathbf{K}_L = \begin{bmatrix} 0 & 1 & 0 \\ 1 & -4 & 1 \\ 0 & 1 & 0 \end{bmatrix}$$
 * **Chỉ số phương sai (Variance):** Độ sắc nét (Sharpness) được biểu diễn thông qua phương sai $\sigma^2$ của các giá trị cường độ sáng sau tích chập:
-  $$\text{blur\_score} = \sigma^2(\nabla^2 I) = \frac{1}{H \cdot W} \sum_{x=1}^W \sum_{y=1}^H \left( (\nabla^2 I)(x, y) - \mu_{\nabla^2 I} \right)^2$$
+  $$\text{blur-score} = \sigma^2(\nabla^2 I) = \frac{1}{H \cdot W} \sum_{x=1}^W \sum_{y=1}^H \left( (\nabla^2 I)(x, y) - \mu_{\nabla^2 I} \right)^2$$
   Trong đó $\mu_{\nabla^2 I}$ là cường độ xám trung bình của ảnh sau tích chập Laplacian.
 * **Ngưỡng so sánh (Threshold):** Mặc định trong code là **`80.0`** (đơn vị là $(\text{gray level})^2$, tức bình phương mức xám trong khoảng $[0, 255]$, phản ánh mức độ phân tán của biên).
   * Ý nghĩa: **80.0 không phải là pixel (độ dài/khoảng cách)**.
   * Nếu $\text{blur\_score} < 80.0$: Các cạnh biên bị làm mịn mạnh (do nhòe ảnh, triệt tiêu các tần số cao), ảnh bị đánh giá là **mờ/out-focus** và bị từ chối chẩn đoán.
+  * Nếu $\text{blur-score} < 80.0$: Các cạnh biên bị làm mịn mạnh (do nhòe ảnh, triệt tiêu các tần số cao), ảnh bị đánh giá là **mờ/out-focus** và bị từ chối chẩn đoán.
 
 ---
 
 ### 2. Thang Fitzpatrick & Cơ chế thích ứng giảm định kiến chủng tộc (Bias Mitigation)
 * **Thang đo Fitzpatrick:** Phân loại da người thành 6 nhóm từ tuýp I (trắng sáng) đến tuýp VI (sẫm/đen).
 * **Đo độ sáng trung bình:** 
-  $$\text{brightness\_score} = \mu_I = \frac{1}{H \cdot W} \sum_{x=1}^W \sum_{y=1}^H I_{\text{gray}}(x, y)$$
+  $$\text{brightness-score} = \mu_I = \frac{1}{H \cdot W} \sum_{x=1}^W \sum_{y=1}^H I_{\text{gray}}(x, y)$$
 * **Cơ chế thích ứng động:**
   * Ngưỡng tối an toàn mặc định là **`DARK_THRESHOLD = 50.0`**. Tuy nhiên, đối với bệnh nhân da sẫm màu tự nhiên (Fitzpatrick Type V, VI), giá trị $\mu_I$ thường tự nhiên rơi xuống dưới 50.0 dù điều kiện chụp đủ sáng.
-  * Giải pháp chống định kiến: Nếu ảnh có độ sắc nét chi tiết cao ($\text{blur\_score} \geq 100.0$), tức là ảnh lấy nét tốt và độ tối không phải do mờ hay rung ảnh mà có khả năng lớn do sắc tố da tự nhiên. Khi đó, hệ thống sẽ **hạ ngưỡng tối thiểu xuống `30.0`** để tránh từ chối sai lệch (false rejection) đối với người da màu.
+  * Giải pháp chống định kiến: Nếu ảnh có độ sắc nét chi tiết cao ($\text{blur-score} \geq 100.0$), tức là ảnh lấy nét tốt và độ tối không phải do mờ hay rung ảnh mà có khả năng lớn do sắc tố da tự nhiên. Khi đó, hệ thống sẽ **hạ ngưỡng tối thiểu xuống `30.0`** để tránh từ chối sai lệch (false rejection) đối với người da màu.
 
 ---
 
@@ -58,13 +59,13 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
   1. Xác định trọng tâm $(C_x, C_y)$ của vùng tổn thương qua các mô-men không gian bậc một:
      $$C_x = \frac{m_{10}}{m_{00}}, \quad C_y = \frac{m_{01}}{m_{00}} \quad \text{với} \quad m_{pq} = \sum_{x} \sum_{y} x^p y^q M(x, y)$$
   2. Chia đôi mặt nạ theo trục ngang qua $C_y$, lật ngược nửa dưới chồng lên nửa trên để tính diện tích khác biệt ($Asym_H$):
-     $$Asym_H = \sum_{x} \sum_{y} |M_{\text{top}}(x, y) - M_{\text{bottom\_flipped}}(x, y)|$$
+     $$Asym_H = \sum_{x} \sum_{y} |M_{\text{top}}(x, y) - M_{\text{bottom-flipped}}(x, y)|$$
   3. Chia đôi mặt nạ theo trục dọc qua $C_x$, lật ngược nửa phải chồng lên nửa trái để tính diện tích khác biệt ($Asym_V$):
-     $$Asym_V = \sum_{x} \sum_{y} |M_{\text{left}}(x, y) - M_{\text{right\_flipped}}(x, y)|$$
+     $$Asym_V = \sum_{x} \sum_{y} |M_{\text{left}}(x, y) - M_{\text{right-flipped}}(x, y)|$$
   4. Chỉ số bất đối xứng $A \in [0, 1]$:
      $$A = \frac{Asym_H + Asym_V}{2 \times \text{Area}(M)}$$
 * **B — Border (Biên bờ):** Tính độ phức tạp của biên bờ dựa trên tỷ lệ chu vi ($P$) và căn bậc hai diện tích ($A_{lesion}$):
-     $$\text{Border\_Complexity} = \frac{P}{\sqrt{A_{lesion}}}$$
+     $$\text{Border-Complexity} = \frac{P}{\sqrt{A_{lesion}}}$$
      Trong đó chu vi $P$ được trích xuất bằng giải thuật dò biên Moore (contour tracing). Chỉ số cao biểu thị bờ nham nhở, răng cưa.
 * **C — Color (Màu sắc):** Đo độ biến động màu sắc bằng độ lệch chuẩn trung bình của 3 kênh màu RGB trên các pixel thuộc vùng tổn thương, chuẩn hóa về dải $[0, 1]$:
      $$C = \frac{1}{127.5} \times \left( \frac{\sigma_R + \sigma_G + \sigma_B}{3} \right)$$
@@ -98,7 +99,7 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
      Với tham số $\mu_k, \sigma_k$ được thống kê từ bộ dữ liệu HAM10000 (Ví dụ: U hắc tố ác tính $MEL$ có $\mu=59.6, \sigma=14.8$, trong khi nốt ruồi lành $NV$ có $\mu=38.2, \sigma=17.4$).
   2. *Xác suất giới tính & Vị trí:* Trích xuất từ phân phối tần suất rời rạc trong lịch sử bệnh án HAM10000.
   3. *Hợp nhất muộn (Late Fusion) hiệu chỉnh bằng tham số $\lambda$ (mặc định = 0.85):*
-     $$\text{Final\_P}(C_k) = \frac{(P(C_k | \text{Ảnh}))^\lambda \cdot (P(C_k | \text{Dịch tễ}))^{1-\lambda}}{\sum_j (P(C_j | \text{Ảnh}))^\lambda \cdot (P(C_j | \text{Dịch tễ}))^{1-\lambda}}$$
+     $$\text{Final-P}(C_k) = \frac{(P(C_k | \text{Ảnh}))^\lambda \cdot (P(C_k | \text{Dịch tễ}))^{1-\lambda}}{\sum_j (P(C_j | \text{Ảnh}))^\lambda \cdot (P(C_j | \text{Dịch tễ}))^{1-\lambda}}$$
 
 ---
 
