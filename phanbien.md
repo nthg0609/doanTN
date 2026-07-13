@@ -50,6 +50,18 @@ Tài liệu này tổng hợp chi tiết toàn bộ các khía cạnh toán họ
   * **Residual Connections:** Giúp giải quyết hiện tượng suy giảm đạo hàm (vanishing gradient) khi huấn luyện mạng sâu.
   * **Cân bằng hiệu năng:** Đủ sâu để học các đặc trưng biên dạng phức tạp của u hắc tố, nhưng số lượng tham số vừa phải giúp suy luận nhanh trên CPU so với ResNet-101/152.
   * **Phù hợp kích thước dữ liệu:** Tránh hiện tượng quá khớp (overfitting) do tập dữ liệu phân đoạn y tế (ISIC 2018) có quy mô trung bình (2.594 mẫu).
+* **Tại sao phải sử dụng đa thang đo (Multi-scale):**
+  1. **Sự biến thiên sinh học của tổn thương da:** Các nốt u, sẩn hoặc dát sắc tố trong thực tế da liễu có kích thước cực kỳ đa dạng (từ nốt ruồi chấm nhỏ vài milimet đến các mảng ung thư tế bào đáy/melanoma lan rộng vài centimet). Nếu mô hình chỉ sử dụng một tỷ lệ thu nhận (scale) cố định, nó sẽ:
+     * Dễ bị mất dấu ngữ cảnh toàn cục (global context) khi gặp tổn thương quá lớn.
+     * Bị bỏ sót các chi tiết biên tinh tế cục bộ (local context) khi gặp tổn thương quá nhỏ.
+  2. **Giải pháp ASPP trong kiến trúc DeepLabV3+:**
+     * ASPP áp dụng các phép tích chập giãn nở (Atrous/Dilated Convolution) song song với nhiều tỉ lệ giãn nở khác nhau (dilation rates = [6, 12, 18]).
+     * Tỉ lệ nhỏ (rate=6) có trường thụ nhận hẹp giúp trích xuất các **đặc trưng cục bộ** sắc nét (rìa ngoài, đường viền bờ $B$ của ABCD).
+     * Tỉ lệ lớn (rate=18) có trường thụ nhận rộng giúp trích xuất các **đặc trưng toàn cục** (hình thái tổng thể, ranh giới giữa u và da lành xung quanh).
+     * Kết quả từ các nhánh song song này được concatenate lại để tạo ra một biểu diễn đặc trưng đa thang đo toàn diện mà không cần tăng số lượng tham số hay làm giảm độ phân giải của bản đồ đặc trưng.
+  3. **Giải pháp Multi-scale TTA (Test-Time Augmentation) đối với ảnh điện thoại:**
+     * Ảnh chụp từ điện thoại thực tế không có tiêu chuẩn khoảng cách cố định như kính soi da chuyên dụng (dermoscope).
+     * Bằng cách co giãn ảnh đầu vào ở nhiều kích thước khác nhau (thang đo $\{1.0, \; 0.75, \; 0.5\}$) lúc suy luận, sau đó chạy phân đoạn độc lập và cộng trung bình các xác suất nhị phân, mô hình đạt được **tính bất biến về tỷ lệ (Scale Invariance)**. Điều này giúp hệ thống đạt độ chính xác ổn định cao bất kể khoảng cách chụp xa hay gần của bác sĩ.
 
 ---
 
