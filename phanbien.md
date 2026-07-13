@@ -69,7 +69,26 @@ Tài liệu này tổng hợp chi tiết toàn bộ các khía cạnh toán họ
 
 ---
 
-### 5. Công thức đo đạc 4 chỉ số ABCD lâm sàng
+### 5. Phương pháp phân đoạn tương tác SAM và GrabCut hoạt động như thế nào?
+* **Mục đích:** Hỗ trợ bác sĩ điều chỉnh ranh giới phân đoạn u da một cách chủ động bằng cách nhấp chuột (click điểm) vào vùng tổn thương mong muốn, thay vì hoàn toàn phụ thuộc vào thuật toán phân đoạn tự động.
+* **Cơ chế hoạt động:**
+  1. **Nhánh 1: Segment Anything Model (SAM - MobileSAM):**
+     * Khi có file checkpoint trọng số và thư viện được nạp, mô hình sử dụng kiến trúc mạng nơ-ron học sâu ViT-T (Vision Transformer) để xử lý ảnh đầu vào và nhận điểm nhấp chuột $(x, y)$ dưới dạng điểm mồi (Foreground point prompt với nhãn `label = 1`).
+     * Mạng sinh ra các mặt nạ tương ứng kèm điểm số độ tin cậy (scores) và chọn mặt nạ có điểm số cao nhất để làm kết quả phân đoạn.
+  2. **Nhánh 2: Bộ lọc GrabCut dự phòng (Fallback):**
+     * Trong điều kiện tài nguyên CPU hạn chế trên Cloud, chương trình chạy thuật toán cắt đồ thị (Graph Cut) tối ưu hóa năng lượng dựa trên mô hình hỗn hợp Gaussian (GMM) để phân tách tiền cảnh/hậu cảnh.
+     * **Cơ chế gán nhãn và Bounding Box động:**
+       * **Giới hạn vùng tính toán (Bounding Box):** Thiết lập một khung bao quanh điểm click có kích thước bằng **60% chiều dài và rộng của ảnh** ($0.6W \times 0.6H$). Toàn bộ pixel nằm ngoài khung này (như thước đo ruler, viền ảnh đen) được gắn nhãn là **Hậu cảnh tuyệt đối (`cv2.GC_BGD = 0`)** để thuật toán bỏ qua hoàn toàn nhiễu từ bên ngoài.
+       * **Khởi tạo nhãn trong khung:** Các pixel nằm trong khung được gán nhãn mặc định là **Hậu cảnh tiềm năng (`cv2.GC_PR_BGD = 2`)**.
+       * **Gán nhãn điểm mồi:** Một vùng tròn bán kính nhỏ (bằng 8% kích thước ảnh) bao quanh điểm click chuột của bác sĩ được gán nhãn là **Tiền cảnh tiềm năng (`cv2.GC_PR_FGD = 3`)**, riêng điểm pixel click chính xác tại tâm được gán là **Tiền cảnh tuyệt đối (`cv2.GC_FGD = 1`)** để neo thuật toán.
+     * **Lặp tối ưu hóa:** Thuật toán GrabCut chạy qua 5 vòng lặp để cập nhật GMM cho tiền cảnh/hậu cảnh, sau đó dựng đồ thị dòng cực đại - cắt cực tiểu (Max-flow Min-cut) để tách vùng.
+     * **Hậu xử lý:** Sử dụng giải thuật Connected Components để lọc giữ lại thành phần liên thông lớn nhất có chứa trực tiếp tọa độ điểm click chuột ban đầu, đảm bảo mặt nạ ôm khít nốt tổn thương được chọn.
+  3. **Cơ chế Fallback an toàn y khoa:**
+     * Nếu mặt nạ tương tác sau khi tính toán quá nhỏ (diện tích $< 100$ pixel do click nhầm ra ngoài u hoặc thuật toán hội tụ lỗi), hệ thống sẽ tự động chuyển hướng sử dụng mặt nạ phân đoạn tự động của mạng **DeepLabV3+** để đảm bảo tính an toàn y khoa và luôn có dữ liệu chẩn đoán.
+
+---
+
+### 6. Công thức đo đạc 4 chỉ số ABCD lâm sàng
 Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ thống tự động tính toán các chỉ số:
 * **A — Asymmetry (Bất đối xứng):**
   1. Xác định tọa độ trọng tâm $(C_x, C_y)$ của vùng tổn thương qua các mô-men không gian bậc một:
@@ -103,7 +122,7 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
 
 ## Phần III: Phân loại & Hợp nhất Bayes đa phương thức
 
-### 6. Backbone EfficientNet-B1 & Khối Attention CBAM
+### 7. Backbone EfficientNet-B1 & Khối Attention CBAM
 * **EfficientNet-B1:** Sử dụng phương pháp Compound Scaling để cân bằng đồng thời độ sâu ($d = \alpha^\phi$), độ rộng mạng ($w = \beta^\phi$) và độ phân giải ảnh ($r = \gamma^\phi$). Mô hình có kích thước gọn nhẹ (~7.8 triệu tham số), giảm độ trễ tối đa khi suy luận trên CPU.
 * **CBAM (Convolutional Block Attention Module):** Gồm hai khối chú ý tuần tự chèn sau trích xuất đặc trưng:
   1. **Channel Attention (Chú ý kênh):** Tập trung vào việc mô hình hóa mối quan hệ giữa các kênh đặc trưng.
@@ -115,7 +134,7 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
 
 ---
 
-### 7. Hợp nhất Bayes đa phương thức (Multimodal Bayesian Fusion)
+### 8. Hợp nhất Bayes đa phương thức (Multimodal Bayesian Fusion)
 * **Nguyên lý:** Kết hợp xác suất hình ảnh y khoa thu từ mạng học sâu CNN và xác suất dịch tễ của bệnh nhân (Tuổi, Giới tính, Vị trí tổn thương) dựa trên định lý Bayes:
   $$P(C_k | \text{Ảnh}, \text{Tuổi}, \text{Giới tính}, \text{Vị trí}) \propto P(C_k | \text{Ảnh}) \times P(\text{Tuổi} | C_k) \times P(\text{Giới tính} | C_k) \times P(\text{Vị trí} | C_k)$$
 * **Cách tính toán:**
@@ -132,7 +151,7 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
 
 ## Phần IV: Trợ lý đàm thoại ngôn ngữ lớn VQA (NLP)
 
-### 8. Lựa chọn DistilGPT-2 làm Decoder & Tinh chỉnh LoRA
+### 9. Lựa chọn DistilGPT-2 làm Decoder & Tinh chỉnh LoRA
 * **Lý do chọn DistilGPT-2:** Là phiên bản chưng cất tri thức (Knowledge Distillation) từ mô hình GPT-2 gốc, giảm số tầng Transformer xuống còn 6 tầng giúp giảm kích thước tham số (~82 triệu tham số) giúp suy luận tạo sinh văn bản tư vấn cực nhanh trên CPU mà không cần GPU.
 * **Công thức tinh chỉnh LoRA (PEFT):**
   * Trong quá trình Fine-tuning, trọng số của lớp Attention gốc $W_0 \in \mathbb{R}^{d \times k}$ được đóng băng hoàn toàn. Hệ thống chỉ cập nhật ma trận biến thiên $\Delta W$ được phân tách thành tích của hai ma trận hạng thấp (low-rank) $A$ và $B$:
@@ -141,7 +160,7 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
     $$h = W_0 x + \Delta W x = W_0 x + \frac{\alpha}{r} (B \cdot A) x$$
     * **Giải thích phép nhân và chia:** Lấy kết quả đầu ra của mạng đóng băng gốc $W_0 x$ cộng thêm tích của đầu vào $x$ với ma trận LoRA hạng thấp $(B \cdot A)x$, rồi **nhân với hằng số $\alpha$ và chia cho hạng rank $r$** ($\alpha / r$ là hệ số tỉ lệ giúp cân bằng độ lớn của các cập nhật trọng số LoRA mới thích ứng so với trọng số gốc có sẵn).
 
-### 9. Kết quả đánh giá mô hình VQA (BLEU Score)
+### 10. Kết quả đánh giá mô hình VQA (BLEU Score)
 * **Kết quả mô hình ngoại tuyến (Offline Model):**
   * Đánh giá định lượng trên tập Validation (12 mẫu câu hỏi lâm sàng thực tế):
     * **Average BLEU-1:** **`0.7269`** (độ khớp từ vựng $72.69\%$)
