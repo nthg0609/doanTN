@@ -214,7 +214,9 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
          * *Công thức tính:* Gồm lớp co hẹp $1280 \times 256 = 327,680$ và lớp giãn rộng $256 \times 1280 = 327,680$, cộng thêm 1 hệ số tỉ lệ học được (`scale`).
          * *Tổng tham số:* $\text{Params-Enhancer} = 327,680 + 327,680 + 1 = 655,361$ tham số.
        * **Cầu nối chú ý chéo sâu (DeepCrossAttentionBridge):** Xếp chồng 2 lớp Cross-Attention kết hợp với cơ chế DropKey và nhiệt độ học được để thực hiện lập luận đa phương thức sâu sắc giữa Vision & Language.
-         * *Tổng tham số:* $\text{Params-Bridge} \approx 2,952,192$ tham số (ở chế độ tối giản hóa mạng FFN để tối ưu hóa CPU).
+         * *Công thức tính số tham số:* Ở chế độ tối giản hóa mạng FFN và đóng băng bớt các bias phụ trợ để tối ưu hóa suy luận CPU, số tham số của cầu nối được cấu thành từ đúng 5 ma trận phép chiếu tuyến tính kích thước $d \times d$ (với $d=768$ là chiều ẩn) và ma trận token truy vấn học được (Query Tokens có kích thước $4 \times d$):
+           $$\text{Params-Bridge} = 5 \times (d \times d) + (4 \times d)$$
+           $$\text{Params-Bridge} = 5 \times (768 \times 768) + (4 \times 768) = 5 \times 589,824 + 3,072 = 2,949,120 + 3,072 = 2,952,192 \text{ tham số}$$
        * **Bộ tiêm cấu trúc lâm sàng (ClinicalStructureInjector):** Mạng MLP siêu nhẹ mã hóa 11 biến lâm sàng (4 chỉ số ABCD + 7 lớp phân phối xác suất bệnh) thành 1 vector đặc trưng lâm sàng $768$ chiều chèn trực tiếp vào luồng token.
          * *Công thức tính:* Chiếu tuyến tính đầu vào qua lớp ẩn $11 \rightarrow 64 \rightarrow 768$. Gồm MLP1 ($11 \times 64 + 64 \text{ bias} = 768$), MLP2 ($64 \times 768 + 768 \text{ bias} = 49,920$), và chuẩn hóa LayerNorm ($768 \times 2 = 1536$).
          * *Tổng tham số:* $\text{Params-Injector} = 768 + 49,920 + 1536 = 52,224$ tham số.
