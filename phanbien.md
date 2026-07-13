@@ -250,6 +250,7 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
        Cứ mỗi khi gặp tiêu đề chương mục dạng `[BỆNH LÝ 1: ...]`, `[BỆNH LÝ 2: ...]`, hệ thống sẽ cắt ra thành một khối dữ liệu (chunk) riêng biệt chứa trọn vẹn toàn bộ hướng dẫn chẩn đoán và điều trị của một bệnh cụ thể, đảm bảo tính nguyên vẹn ngữ cảnh của y văn.
   2. **Mô hình mã hóa Vector (Embedding Model):**
      * Sử dụng mô hình mã hóa **`all-MiniLM-L6-v2`** từ thư viện `sentence-transformers`.
+     * **Độ dài đầu vào tối đa (Max Input Sequence Length):** Mô hình giới hạn độ dài đầu vào tối đa là **`256 tokens`** (tương đương với khoảng ~1000 ký tự hoặc ~200-250 từ tiếng Việt). Nếu văn bản đầu vào dài hơn 256 tokens, bộ mã hóa (tokenizer) sẽ tự động cắt bỏ phần dư thừa (truncation) để đảm bảo chiều dài cố định đầu vào.
      * **Mã hóa đối tượng nào (What is embedded):** Mã hóa **cả hai phía (câu hỏi truy vấn và tài liệu y văn)** để đưa chúng về cùng một không gian vector so sánh:
        * *Mã hóa tài liệu (Document/Chunk Embedding):* Lúc khởi tạo cơ sở dữ liệu, toàn bộ tài liệu y văn được cắt nhỏ và mã hóa trước thành các vector, lưu sẵn vào ChromaDB.
        * *Mã hóa câu hỏi (Query Embedding):* Khi bác sĩ nhập câu hỏi tự nhiên $q$, hệ thống mã hóa nó thành vector truy vấn $\mathbf{v}_q$ tại thời điểm chạy (runtime).
@@ -285,5 +286,25 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
 | **6. Hợp nhất Bayes đa phương thức** | - Vector xác suất hình ảnh $P(C_i \| \text{Ảnh})$ từ khối phân loại.<br>- Tuổi bệnh nhân (số thực).<br>- Giới tính (Nam/Nữ).<br>- Vị trí giải phẫu u (Văn bản). | - Vector xác suất cuối cùng đã hiệu chỉnh dịch tễ $P(C_i \| \text{Ảnh, Nhân khẩu})$ để đưa ra chẩn đoán chính xác nhất. |
 | **7. Truy xuất y văn (ChromaDB RAG)** | - Câu hỏi tự nhiên từ người dùng (Văn bản $q$) được mô hình `all-MiniLM-L6-v2` mã hóa thành vector 384 chiều. | - Đoạn văn bản hướng dẫn điều trị tương đồng nhất trích từ cSDL y văn của Bộ Y tế. |
 | **8. Trợ lý tư vấn VQA (DistilGPT-2 LoRA)** | - Prompt văn bản tích hợp bao gồm: *Chẩn đoán phân loại*, *Độ tin cậy*, *4 chỉ số ABCD*, *Đoạn ngữ cảnh RAG Bộ Y tế*, và *Câu hỏi của người dùng*. | - Chuỗi văn bản tư vấn lâm sàng chi tiết tiếng Việt và âm thanh nói phát ra (TTS). |
+
+---
+
+### 13. Phương pháp giải quyết mất cân bằng dữ liệu (Class Imbalance)
+Trong bài toán phân loại hình ảnh da liễu với 7 lớp bệnh của tập dữ liệu HAM10000, hiện tượng mất cân bằng dữ liệu xảy ra rất nghiêm trọng (nhóm bệnh lành tính như Nốt ruồi - NV chiếm đa số, trong khi các nhóm bệnh ác tính nguy hiểm như MEL, BCC, AKIEC chiếm số lượng rất ít). Để khắc phục triệt để và giúp mô hình học đều các lớp, chương trình áp dụng 3 kỹ thuật đồng thời:
+
+1. **Bộ lấy mẫu ngẫu nhiên có trọng số (WeightedRandomSampler):**
+   * **Nguyên lý:** Thay vì đưa dữ liệu vào huấn luyện theo thứ tự ngẫu nhiên thông thường (khiến mô hình bị ngập tràn ảnh lành tính), hệ thống gán cho mỗi ảnh một trọng số chọn mẫu tỷ lệ nghịch với số lượng mẫu của lớp tương ứng:
+     $$w_c = \frac{1}{N_c}$$
+     *(Với $N_c$ là tổng số ảnh thuộc lớp $c$ trong tập huấn luyện).*
+   * **Tác dụng:** Giúp các lớp thiểu số (ác tính) có xác suất được bốc chọn cao hơn trong mỗi mini-batch, đảm bảo mỗi batch đưa vào huấn luyện luôn phân bố tương đối đồng đều giữa các lớp bệnh da liễu.
+2. **Hàm mất mát Entropy chéo có trọng số (Weighted Cross-Entropy Loss):**
+   * **Nguyên lý:** Khi tính toán độ lỗi (loss), thay vì coi sai số của mọi lớp là như nhau, hệ thống phạt nặng hơn gấp nhiều lần khi mô hình dự đoán sai các lớp ác tính bằng cách nhân hàm loss với vector trọng số lớp:
+     $$\mathcal{L} = -\sum_{c=1}^C W_c \cdot y_c \log(\hat{y}_c)$$
+     *(Với trọng số phạt $W_c \propto \frac{\sum N_j}{N_c}$ giúp phạt rất nặng lỗi sai của các lớp thiểu số).*
+   * **Tác dụng:** Steer mô hình tập trung tối ưu hóa các lớp khó, tăng độ nhạy (Recall/Sensitivity) cho nhóm bệnh ung thư da nguy hiểm.
+3. **Tăng cường dữ liệu có chủ đích theo lớp (Class-aware Data Augmentation):**
+   * **Nguyên lý:** Áp dụng xoay, lật, cắt ngẫu nhiên, biến đổi màu sắc, độ tương phản chọn lọc với tần suất và cường độ cao hơn đối với các ảnh thuộc nhóm thiểu số.
+   * **Tác dụng:** Nhân bản nhân tạo lượng dữ liệu ảnh ác tính mà không làm ảnh hưởng hay gây loãng đặc trưng phân bố của nhóm đa số.
+
 
 
