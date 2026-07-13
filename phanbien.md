@@ -165,6 +165,15 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
 
 ### 9. Lựa chọn DistilGPT-2 làm Decoder & Tinh chỉnh LoRA
 * **Lý do chọn DistilGPT-2:** Là phiên bản chưng cất tri thức (Knowledge Distillation) từ mô hình GPT-2 gốc, giảm số tầng Transformer xuống còn 6 tầng giúp giảm kích thước tham số (~82 triệu tham số) giúp suy luận tạo sinh văn bản tư vấn cực nhanh trên CPU mà không cần GPU.
+* **Ý nghĩa của các ma trận $W_q, W_k, W_v$ với $q, k, v$ là gì?**
+  * Trong cơ chế Tự chú ý (Self-Attention) của Transformers:
+    * **$q$ (Query - Truy vấn/Câu hỏi):** Đại diện cho từ hoặc vị trí hiện tại đang xét, dùng để tìm kiếm các mối tương quan với các từ khác.
+    * **$k$ (Key - Chìa khóa/Từ khóa):** Đại diện cho tất cả các từ trong câu, dùng để so khớp độ tương quan ngữ nghĩa với Query nhằm tính toán trọng số phân bố chú ý.
+    * **$v$ (Value - Giá trị):** Chứa thông tin ngữ nghĩa thực sự của từng từ. Nó được nhân với trọng số chú ý thu được để tạo ra vector ngữ cảnh tổng hợp cuối cùng.
+  * **Các ma trận trọng số chiếu $W_q, W_k, W_v$:**
+    * Là các ma trận tuyến tính biến đổi vector nhúng đầu vào $x$ (kích thước $d=768$) thành các không gian vector Query, Key, Value tương ứng:
+      $$Q = W_q x, \quad K = W_k x, \quad V = W_v x$$
+    * Trong DistilGPT-2, 3 ma trận này được **ghép nối lại (concatenate)** theo chiều rộng thành một lớp tích duy nhất là **`c_attn`** có ma trận trọng số $W_{\text{orig}} \in \mathbb{R}^{d \times 3d}$ (với $d=768$ và $3d=2304$) để tăng tốc độ tính toán song song.
 * **Công thức tinh chỉnh LoRA (PEFT):**
   * Trong quá trình Fine-tuning, trọng số của lớp Attention gốc $W_0 \in \mathbb{R}^{d \times k}$ được đóng băng hoàn toàn. Hệ thống chỉ cập nhật ma trận biến thiên $\Delta W$ được phân tách thành tích của hai ma trận hạng thấp (low-rank) $A$ và $B$:
     $$W = W_0 + \Delta W = W_0 + B \cdot A$$
@@ -177,10 +186,15 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
      * Khi áp dụng LoRA với hạng rank **`r = 8`**, ta phân tách thành hai ma trận $A \in \mathbb{R}^{768 \times 8}$ và $B \in \mathbb{R}^{8 \times 2304}$. Số lượng tham số cần huấn luyện mới của lớp này chỉ còn:
        $$\text{Params}_{\text{LoRA}} = (768 \times 8) + (8 \times 2304) = 6,144 + 18,432 = 24,576 \text{ tham số}$$
        (Tức là đã giảm tới **$72 \text{ lần}$** số lượng tham số cho riêng lớp chiếu attention này: $\frac{24,576}{1,769,472} \approx 1.39\%$).
-     * Khi cộng tổng số tham số LoRA trên cả 6 tầng Transformer và chia cho **tổng số tham số của toàn bộ mô hình nền** (bao gồm cả các tầng embeddings, MLP, layer norms bị đóng băng hoàn toàn), ta thu được con số chính xác là **`2.13%`**.
-  2. **Lý do lựa chọn thực nghiệm (Empirical reason):**
-     * **Tránh quá khớp (Overfitting) trên tập dữ liệu y văn hẹp:** Tập dữ liệu VQA chuyên gia của hệ thống chỉ gồm 74 cặp câu hỏi-đáp y học (độ chính xác cao nhưng quy mô nhỏ). Nếu tăng rank $r$ lên cao hơn (ví dụ $r=16, 32$) hoặc nhắm thêm vào các lớp MLP, số lượng tham số huấn luyện sẽ tăng lên ($5\% - 10\%$). Điều này khiến mô hình dễ rơi vào tình trạng quá khớp — học thuộc lòng máy móc tập huấn luyện và mất đi tính tổng quát hóa khi người dùng thay đổi cách đặt câu hỏi.
-     * **Điểm tối ưu thực tế:** Qua thực nghiệm, cấu hình $r=8$ nhắm vào `c_attn` mang lại điểm đánh giá **BLEU-1/BLEU-2 cao nhất** (lần lượt là `0.7269` và `0.6812`) và đường cong hội tụ hàm mất mát (loss) mượt mà nhất. Nếu hạ rank xuống thấp hơn ($r=4$), mô hình sẽ bị thiếu khớp (underfitting) và không thể ghi nhớ chính xác các thuật ngữ y học phức tạp.
+     * Nhân với số tầng $L=6$ của DistilGPT-2, ta thu được tổng số tham số LoRA là: $24,576 \times 6 = 147,456$ tham số.
+  2. **Công thức tính toán tổng thể 2.13% trong mô hình VQA liên kết (Joint Training):**
+     * Trong mô hình VQA liên kết (`CPUMedicalVQAModel`), ngoài 147,456 tham số LoRA của DistilGPT-2, ta còn mở khóa huấn luyện hoàn toàn các khối thích ứng bổ trợ (nhánh Projection, SemanticEnhancer, DeepCrossAttentionBridge, và ClinicalStructureInjector).
+     * **Công thức tổng tham số huấn luyện:**
+       $$\text{Params}_{\text{Trainable}} = \text{Params}_{\text{LoRA}} + \text{Params}_{\text{Projection}} + \text{Params}_{\text{Enhancer}} + \text{Params}_{\text{Bridge}} + \text{Params}_{\text{Injector}} + \text{Params}_{\text{Prefix}}$$
+       $$\text{Params}_{\text{Trainable}} \approx 147,456 + 1,574,400 + 655,361 + 2,952,192 + 3,072 = 5,332,481 \text{ tham số}$$
+     * **Công thức tỉ lệ phần trăm cuối cùng:**
+       $$\text{Trainable \%} = \frac{\text{Params}_{\text{Trainable}}}{\text{Params}_{\text{Total\_VQA\_Model}}} \times 100\% = \frac{5.33 \text{ triệu}}{250.3 \text{ triệu}} \times 100\% \approx 2.13\%$$
+       (Với $\text{Params}_{\text{Total\_VQA\_Model}} \approx 250.3 \text{ triệu}$ là tổng số tham số của toàn bộ mô hình VQA bao gồm EfficientNet-B1, CBAM, các khối Projection, và DistilGPT-2 base).
 
 ---
 
