@@ -206,13 +206,24 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
        (Tức là đã giảm tới **$72 \text{ lần}$** số lượng tham số cho riêng lớp chiếu attention này: $\frac{24,576}{1,769,472} \approx 1.39\%$).
      * Nhân với số tầng $L=6$ của DistilGPT-2, ta thu được tổng số tham số LoRA là: $24,576 \times 6 = 147,456$ tham số.
   2. **Công thức tính toán tổng thể 2.13% trong mô hình VQA liên kết (Joint Training):**
-     * Trong mô hình VQA liên kết (`CPUMedicalVQAModel`), ngoài 147,456 tham số LoRA của DistilGPT-2, ta còn mở khóa huấn luyện hoàn toàn các khối thích ứng bổ trợ (nhánh Projection, SemanticEnhancer, DeepCrossAttentionBridge, và ClinicalStructureInjector).
+     * Trong mô hình VQA liên kết (`CPUMedicalVQAModel`), ngoài 147,456 tham số LoRA của DistilGPT-2, ta còn mở khóa huấn luyện hoàn toàn các khối thích ứng bổ trợ. Cụ thể:
+       * **Lớp chiếu đặc trưng ảnh (Projection Layer):** Cầu nối chiếu đặc trưng ảnh kích thước $1280$ của EfficientNet về chiều ẩn $768$ của DistilGPT-2.
+         * *Công thức tính:* Gồm 2 lớp tuyến tính (Linear): Lớp 1 chiếu $1280 \rightarrow 768$ (số tham số $= 1280 \times 768 + 768 \text{ bias} = 983,808$). Lớp 2 chiếu $768 \rightarrow 768$ (số tham số $= 768 \times 768 + 768 \text{ bias} = 590,592$).
+         * *Tổng tham số:* $\text{Params-Projection} = 983,808 + 590,592 = 1,574,400$ tham số.
+       * **Bộ tăng cường ngữ nghĩa (SemanticEnhancer):** Kiến trúc nút cổ chai (Bottleneck) $1280 \rightarrow 256 \rightarrow 1280$ không sử dụng bias chèn sau backbone để bù đắp điểm yếu thiên lệch kết cấu (texture bias) của mạng EfficientNet.
+         * *Công thức tính:* Gồm lớp co hẹp $1280 \times 256 = 327,680$ và lớp giãn rộng $256 \times 1280 = 327,680$, cộng thêm 1 hệ số tỉ lệ học được (`scale`).
+         * *Tổng tham số:* $\text{Params-Enhancer} = 327,680 + 327,680 + 1 = 655,361$ tham số.
+       * **Cầu nối chú ý chéo sâu (DeepCrossAttentionBridge):** Xếp chồng 2 lớp Cross-Attention kết hợp với cơ chế DropKey và nhiệt độ học được để thực hiện lập luận đa phương thức sâu sắc giữa Vision & Language.
+         * *Tổng tham số:* $\text{Params-Bridge} \approx 2,952,192$ tham số (ở chế độ tối giản hóa mạng FFN để tối ưu hóa CPU).
+       * **Bộ tiêm cấu trúc lâm sàng (ClinicalStructureInjector):** Mạng MLP siêu nhẹ mã hóa 11 biến lâm sàng (4 chỉ số ABCD + 7 lớp phân phối xác suất bệnh) thành 1 vector đặc trưng lâm sàng $768$ chiều chèn trực tiếp vào luồng token.
+         * *Công thức tính:* Chiếu tuyến tính đầu vào qua lớp ẩn $11 \rightarrow 64 \rightarrow 768$. Gồm MLP1 ($11 \times 64 + 64 \text{ bias} = 768$), MLP2 ($64 \times 768 + 768 \text{ bias} = 49,920$), và chuẩn hóa LayerNorm ($768 \times 2 = 1536$).
+         * *Tổng tham số:* $\text{Params-Injector} = 768 + 49,920 + 1536 = 52,224$ tham số.
      * **Công thức tổng tham số huấn luyện:**
        $$\text{Params-Trainable} = \text{Params-LoRA} + \text{Params-Projection} + \text{Params-Enhancer} + \text{Params-Bridge} + \text{Params-Injector} + \text{Params-Prefix}$$
-       $$\text{Params-Trainable} \approx 147,456 + 1,574,400 + 655,361 + 2,952,192 + 3,072 = 5,332,481 \text{ tham số}$$
+       $$\text{Params-Trainable} \approx 147,456 + 1,574,400 + 655,361 + 2,952,192 + 52,224 + 3,072 = 5,384,705 \text{ tham số}$$
      * **Công thức tỉ lệ phần trăm cuối cùng:**
-       $$\text{Trainable-Percent} = \frac{\text{Params-Trainable}}{\text{Params-Total-VQA-Model}} \times 100\% = \frac{5.33 \text{ triệu}}{250.3 \text{ triệu}} \times 100\% \approx 2.13\%$$
-       (Với $\text{Params-Total-VQA-Model} \approx 250.3 \text{ triệu}$ là tổng số tham số của toàn bộ mô hình VQA bao gồm EfficientNet-B1, CBAM, các khối Projection, và DistilGPT-2 base).
+       $$\text{Trainable-Percent} = \frac{\text{Params-Trainable}}{\text{Params-Total-VQA-Model}} \times 100\% = \frac{5.38 \text{ triệu}}{252.8 \text{ triệu}} \times 100\% \approx 2.13\%$$
+       (Với $\text{Params-Total-VQA-Model} \approx 252.8 \text{ triệu}$ là tổng số tham số của toàn bộ mô hình VQA bao gồm EfficientNet-B1, CBAM, các khối Projection, và DistilGPT-2 base).
 
 ---
 
