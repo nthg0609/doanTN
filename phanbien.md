@@ -208,11 +208,11 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
   2. **Công thức tính toán tổng thể 2.13% trong mô hình VQA liên kết (Joint Training):**
      * Trong mô hình VQA liên kết (`CPUMedicalVQAModel`), ngoài 147,456 tham số LoRA của DistilGPT-2, ta còn mở khóa huấn luyện hoàn toàn các khối thích ứng bổ trợ (nhánh Projection, SemanticEnhancer, DeepCrossAttentionBridge, và ClinicalStructureInjector).
      * **Công thức tổng tham số huấn luyện:**
-       $$\text{Params}_{\text{Trainable}} = \text{Params}_{\text{LoRA}} + \text{Params}_{\text{Projection}} + \text{Params}_{\text{Enhancer}} + \text{Params}_{\text{Bridge}} + \text{Params}_{\text{Injector}} + \text{Params}_{\text{Prefix}}$$
-       $$\text{Params}_{\text{Trainable}} \approx 147,456 + 1,574,400 + 655,361 + 2,952,192 + 3,072 = 5,332,481 \text{ tham số}$$
+       $$\text{Params-Trainable} = \text{Params-LoRA} + \text{Params-Projection} + \text{Params-Enhancer} + \text{Params-Bridge} + \text{Params-Injector} + \text{Params-Prefix}$$
+       $$\text{Params-Trainable} \approx 147,456 + 1,574,400 + 655,361 + 2,952,192 + 3,072 = 5,332,481 \text{ tham số}$$
      * **Công thức tỉ lệ phần trăm cuối cùng:**
-       $$\text{Trainable \%} = \frac{\text{Params}_{\text{Trainable}}}{\text{Params}_{\text{Total\_VQA\_Model}}} \times 100\% = \frac{5.33 \text{ triệu}}{250.3 \text{ triệu}} \times 100\% \approx 2.13\%$$
-       (Với $\text{Params}_{\text{Total\_VQA\_Model}} \approx 250.3 \text{ triệu}$ là tổng số tham số của toàn bộ mô hình VQA bao gồm EfficientNet-B1, CBAM, các khối Projection, và DistilGPT-2 base).
+       $$\text{Trainable-Percent} = \frac{\text{Params-Trainable}}{\text{Params-Total-VQA-Model}} \times 100\% = \frac{5.33 \text{ triệu}}{250.3 \text{ triệu}} \times 100\% \approx 2.13\%$$
+       (Với $\text{Params-Total-VQA-Model} \approx 250.3 \text{ triệu}$ là tổng số tham số của toàn bộ mô hình VQA bao gồm EfficientNet-B1, CBAM, các khối Projection, và DistilGPT-2 base).
 
 ---
 
@@ -232,7 +232,9 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
 * **Các thành phần cốt lõi trong hệ thống RAG của chương trình:**
   1. **Kho ngữ cảnh / Tài liệu cơ sở (Medical Corpus):**
      * Tệp tài liệu y văn chuẩn `9_VQA/medical_guidelines.txt` chứa toàn bộ hướng dẫn điều trị chi tiết bằng tiếng Việt cho 7 nhóm bệnh lý da liễu trong chương trình.
-     * Tài liệu được phân đoạn tự động theo cấu trúc định dạng thẻ phân loại: `[BỆNH LÝ X: Tên bệnh] ... Nội dung hướng dẫn chi tiết`.
+     * **Luật phân đoạn tài liệu (Chunking Rule):** Hệ thống **không** sử dụng phương pháp cắt theo số ký tự hay số từ cố định (sliding window) vì dễ làm đứt gãy ngữ cảnh y khoa giữa chừng. Thay vào đó, tài liệu được **phân đoạn logic dựa trên cấu trúc thẻ phân loại bằng biểu thức chính quy (Regex Splitter)**:
+       $$\text{Pattern Split} = \text{r"\[BỆNH LÝ \backslash d+:"}$$
+       Cứ mỗi khi gặp tiêu đề chương mục dạng `[BỆNH LÝ 1: ...]`, `[BỆNH LÝ 2: ...]`, hệ thống sẽ cắt ra thành một khối dữ liệu (chunk) riêng biệt chứa trọn vẹn toàn bộ hướng dẫn chẩn đoán và điều trị của một bệnh cụ thể, đảm bảo tính nguyên vẹn ngữ cảnh của y văn.
   2. **Mô hình mã hóa Vector (Embedding Model):**
      * Sử dụng mô hình mã hóa **`all-MiniLM-L6-v2`** từ thư viện `sentence-transformers`.
      * **Mã hóa đối tượng nào (What is embedded):** Mã hóa **cả hai phía (câu hỏi truy vấn và tài liệu y văn)** để đưa chúng về cùng một không gian vector so sánh:
