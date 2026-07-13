@@ -1,80 +1,129 @@
-# Tài liệu Phản biện Đồ án Tốt nghiệp: Hệ thống Chẩn đoán Da liễu CDSS
+# Tài liệu Hướng dẫn Phản biện Đồ án Tốt nghiệp: Hệ thống CDSS Da liễu Đa phương thức
 
-Tài liệu này tổng hợp toàn bộ câu hỏi và câu trả lời phản biện liên quan đến thuật toán Thị giác máy tính (CV), Hợp nhất dữ liệu (Bayesian Fusion) và Xử lý ngôn ngữ tự nhiên (NLP VQA) trong hệ thống.
+Tài liệu này tổng hợp chi tiết toàn bộ các khía cạnh toán học, giải thuật, cơ chế hoạt động thực tế trong mã nguồn của hệ thống hỗ trợ chẩn đoán lâm sàng da liễu CDSS. Tài liệu được thiết kế nhằm phục vụ hội đồng phản biện đồ án tốt nghiệp.
 
 ---
 
 ## Phần I: Chất lượng ảnh & Bộ lọc tiền xử lý (Safety Gate)
 
-### 1. Phương pháp Laplacian Variance đo độ mờ (Blurry) hoạt động thế nào? Ngưỡng 80.0 ý nghĩa là gì?
-* **Phương pháp:** Toán tử Laplacian là một toán tử vi phân bậc hai lấy đạo hàm của ảnh để phát hiện các vùng có sự thay đổi đột ngột về cường độ sáng (đường biên/cạnh). Trong không gian ảnh xám 8-bit rời rạc, toán tử này được xấp xỉ bằng phép tích chập ảnh với nhân (kernel) Laplacian:
+### 1. Giải thuật Laplacian Variance đo độ mờ (Blurry)
+* **Khái niệm:** Toán tử Laplacian ($\nabla^2$) là toán tử vi phân bậc hai dùng để đo độ biến thiên không gian (không gian tần số cao) của hàm cường độ sáng ảnh $I(x, y)$, định nghĩa qua ma trận Hessian $\mathbf{H}(I)$:
+  $$\nabla^2 I = \Delta I = \text{Tr}(\mathbf{H}(I)) = \frac{\partial^2 I}{\partial x^2} + \frac{\partial^2 I}{\partial y^2}$$
+* **Xấp xỉ rời rạc:** Trong không gian ảnh số rời rạc, toán tử này được xấp xỉ bằng phép tích chập ảnh xám $I_{\text{gray}}$ với nhân (kernel) Laplacian $\mathbf{K}_L$:
   $$\mathbf{K}_L = \begin{bmatrix} 0 & 1 & 0 \\ 1 & -4 & 1 \\ 0 & 1 & 0 \end{bmatrix}$$
-* **Ý nghĩa giá trị 80.0:** 
-  * Con số **80.0** ở đây **không phải là pixel** (không đo khoảng cách hay kích thước vật lý), mà là **Phương sai của ảnh Laplacian** (đơn vị là $(\text{gray level})^2$ - bình phương mức xám trong khoảng $[0, 255]$).
-  * Ảnh rõ nét có các cạnh biên rõ ràng, độ chuyển đổi mức xám đột ngột làm phương sai đạo hàm lớn. Ảnh nhòe mờ sẽ mịn hóa các biên, triệt tiêu tần số cao dẫn đến phương sai Laplacian cực nhỏ. 
-  * Ngưỡng **80.0** được chọn qua thực nghiệm y khoa: ảnh có phương sai dưới 80.0 bị coi là mờ/out-focus và bị hệ thống từ chối (`warning`).
+* **Chỉ số phương sai (Variance):** Độ sắc nét (Sharpness) được biểu diễn thông qua phương sai $\sigma^2$ của các giá trị cường độ sáng sau tích chập:
+  $$\text{blur\_score} = \sigma^2(\nabla^2 I) = \frac{1}{H \cdot W} \sum_{x=1}^W \sum_{y=1}^H \left( (\nabla^2 I)(x, y) - \mu_{\nabla^2 I} \right)^2$$
+  Trong đó $\mu_{\nabla^2 I}$ là cường độ xám trung bình của ảnh sau tích chập Laplacian.
+* **Ngưỡng so sánh (Threshold):** Mặc định trong code là **`80.0`** (đơn vị là $(\text{gray level})^2$, tức bình phương mức xám trong khoảng $[0, 255]$, phản ánh mức độ phân tán của biên).
+  * Ý nghĩa: **80.0 không phải là pixel (độ dài/khoảng cách)**.
+  * Nếu $\text{blur\_score} < 80.0$: Các cạnh biên bị làm mịn mạnh (do nhòe ảnh, triệt tiêu các tần số cao), ảnh bị đánh giá là **mờ/out-focus** và bị từ chối chẩn đoán.
 
-### 2. Fitzpatrick Scale là gì và hoạt động thế nào trong chương trình?
-* **Khái niệm:** Thang Fitzpatrick phân loại da người thành 6 nhóm từ tuýp I (da trắng sáng) đến tuýp VI (da sẫm/đen).
-* **Hoạt động giảm định kiến (Algorithmic Bias Mitigation):**
-  * Ảnh của người có tông da tối tự nhiên (tuýp V, VI) có độ sáng xám trung bình thấp và dễ bị thuật toán lọc chất lượng đánh giá nhầm là "thiếu sáng" (ngưỡng tối mặc định `DARK_THRESHOLD = 50.0`).
-  * Để khắc phục, chương trình triển khai cơ chế **thích ứng động**: Nếu ảnh có độ nét rất cao (phương sai Laplacian $\geq 100.0$) nhưng tối, hệ thống tự động nhận diện đây là da sẫm màu lành tính và **hạ ngưỡng tối thiểu xuống `30.0`** để tránh phân biệt đối xử lâm sàng, cho phép tiếp tục chẩn đoán.
+---
+
+### 2. Thang Fitzpatrick & Cơ chế thích ứng giảm định kiến chủng tộc (Bias Mitigation)
+* **Thang đo Fitzpatrick:** Phân loại da người thành 6 nhóm từ tuýp I (trắng sáng) đến tuýp VI (sẫm/đen).
+* **Đo độ sáng trung bình:** 
+  $$\text{brightness\_score} = \mu_I = \frac{1}{H \cdot W} \sum_{x=1}^W \sum_{y=1}^H I_{\text{gray}}(x, y)$$
+* **Cơ chế thích ứng động:**
+  * Ngưỡng tối an toàn mặc định là **`DARK_THRESHOLD = 50.0`**. Tuy nhiên, đối với bệnh nhân da sẫm màu tự nhiên (Fitzpatrick Type V, VI), giá trị $\mu_I$ thường tự nhiên rơi xuống dưới 50.0 dù điều kiện chụp đủ sáng.
+  * Giải pháp chống định kiến: Nếu ảnh có độ sắc nét chi tiết cao ($\text{blur\_score} \geq 100.0$), tức là ảnh lấy nét tốt và độ tối không phải do mờ hay rung ảnh mà có khả năng lớn do sắc tố da tự nhiên. Khi đó, hệ thống sẽ **hạ ngưỡng tối thiểu xuống `30.0`** để tránh từ chối sai lệch (false rejection) đối với người da màu.
 
 ---
 
 ## Phần II: Phân đoạn (Segmentation) & Đo đạc ABCD
 
-### 3. Mô hình DeepLabV3+ dùng mạng xương sống (Backbone) nào? Tại sao chọn mạng này?
-* **Backbone:** Sử dụng mạng **`ResNet-50`**.
-* **Lý do lựa chọn:**
-  * **Cân bằng tối ưu:** ResNet-50 đủ sâu để trích xuất các đặc trưng không gian đa thang đo phức tạp qua các khối tích chập tích hợp Residual Connection, nhưng không quá nặng như ResNet-101/152, đảm bảo tốc độ suy luận nhanh trên CPU.
-  * **Tránh quá khớp (Overfitting):** Tập dữ liệu phân đoạn da liễu có kích thước vừa phải (2.594 mẫu). Việc dùng các backbone tham số quá lớn rất dễ dẫn đến Overfitting trên tập dữ liệu này.
+### 3. Phân đoạn DeepLabV3+ dùng ResNet-50
+* **Kiến trúc:** DeepLabV3+ sử dụng bộ mã hóa (Encoder) **ResNet-50** kết hợp với các khối tích chập giãn nở **Atrous Spatial Pyramid Pooling (ASPP)** ở nhiều tỉ lệ giãn nở (dilation rates = [6, 12, 18]) để khai thác ngữ cảnh đa thang đo.
+* **Tại sao dùng ResNet-50:**
+  * **Residual Connections:** Giúp giải quyết hiện tượng suy giảm đạo hàm (vanishing gradient) khi huấn luyện mạng sâu.
+  * **Cân bằng hiệu năng:** Đủ sâu để học các đặc trưng biên dạng phức tạp của u hắc tố, nhưng số lượng tham số vừa phải giúp suy luận nhanh trên CPU so với ResNet-101/152.
+  * **Phù hợp kích thước dữ liệu:** Tránh hiện tượng quá khớp (overfitting) do tập dữ liệu phân đoạn y tế (ISIC 2018) có quy mô trung bình (2.594 mẫu).
 
-### 4. Thuật toán phân ngưỡng Otsu hoạt động thế nào? Dùng ngưỡng nào để phân tách?
-* **Hoạt động:** Otsu là thuật toán phân ngưỡng tự động không tham số. Nó **không sử dụng một ngưỡng cố định** (như 127) mà duyệt qua toàn bộ dải mức xám $[0, 255]$ để tìm ra một ngưỡng tối ưu $T^*$ sao cho **phương sai giữa hai lớp (intra-class variance) đạt cực đại**.
-* **Phân tách tối/sáng:** Sau khi tìm được $T^*$, chương trình áp dụng bộ lọc nhị phân nghịch đảo (`cv2.THRESH_BINARY_INV`). Các pixel có giá trị xám $< T^*$ (vùng tổn thương sắc tố tối màu) được gán thành **`255` (Trắng - Foreground)**, các pixel $> T^*$ (vùng da lành sáng màu) được gán thành **`0` (Đen - Background)**.
+---
 
-### 5. Chỉ số ABCD lâm sàng được tính toán bằng cách nào?
-* **A — Asymmetry (Bất đối xứng):** Chia mặt nạ tổn thương thành hai nửa theo trục ngang và trục dọc đi qua trọng tâm (Centroid) hình học. Lật ngược các nửa để so sánh sự chồng chéo. Chỉ số $A \in [0, 1]$: giá trị 0 là đối xứng tuyệt đối, 1 là bất đối xứng hoàn toàn.
-* **B — Border (Biên bờ):** Tính độ phức tạp bờ dựa trên chu vi ($P$) và diện tích ($A$): $\text{Border\_Complexity} = \frac{P}{\sqrt{A}}$. Viền càng lồi lõm, răng cưa thì chỉ số càng cao (ngưỡng báo động lâm sàng $>5.0$).
-* **C — Color (Màu sắc):** Tính độ lệch chuẩn (Standard Deviation) của các kênh R, G, B trên các pixel thuộc vùng tổn thương, lấy trung bình cộng 3 kênh và chuẩn hóa về dải $[0, 1]$ bằng cách chia cho độ lệch chuẩn tối đa $127.5$.
-* **D — Diameter (Đường kính):** Tính đường kính tương đương của tổn thương hình tròn có cùng diện tích: $D = 2 \times \sqrt{\frac{Area}{\pi}}$ (đơn vị pixel). Nếu là file ảnh DICOM có chứa siêu dữ liệu `PixelSpacing` ($mm/pixel$), chỉ số sẽ tự động được nhân quy đổi sang đơn vị **$mm$** thật.
+### 4. Thuật toán phân ngưỡng Otsu dự phòng y khoa
+* **Nguyên lý hoạt động:** Otsu là thuật toán phân ngưỡng tự động tìm ngưỡng tối ưu $T^*$ dựa trên kỹ thuật tối đa hóa phương sai giữa hai lớp (intra-class variance $\sigma_B^2$):
+  $$T^* = \arg\max_{0 \le T \le 255} \sigma_B^2(T)$$
+  $$\sigma_B^2(T) = \omega_0(T) \omega_1(T) \left[ \mu_0(T) - \mu_1(T) \right]^2$$
+  Trong đó $\omega_0(T), \omega_1(T)$ lần lượt là xác suất xuất hiện của lớp nền (background) và lớp đối tượng (foreground) phân tách bởi ngưỡng $T$; còn $\mu_0(T), \mu_1(T)$ là giá trị xám trung bình tương ứng của hai lớp này.
+* **Ngưỡng gán:** Thuật toán duyệt qua mọi mức xám để tính $T^*$. Sau đó gán nhãn:
+  $$\text{Pixel}(x, y) = \begin{cases} 255 & \text{nếu } I_{\text{gray}}(x, y) < T^* \text{ (Tổn thương - Tối)} \\ 0 & \text{nếu } I_{\text{gray}}(x, y) \ge T^* \text{ (Da lành - Sáng)} \end{cases}$$
+  (Sử dụng flag `cv2.THRESH_BINARY_INV` để lật ngược vì tổn thương sắc tố thường có màu tối hơn vùng da lành xung quanh).
+
+---
+
+### 5. Công thức đo đạc 4 chỉ số ABCD lâm sàng
+Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ thống tự động tính toán các chỉ số:
+* **A — Asymmetry (Bất đối xứng):**
+  1. Xác định trọng tâm $(C_x, C_y)$ của vùng tổn thương qua các mô-men không gian bậc một:
+     $$C_x = \frac{m_{10}}{m_{00}}, \quad C_y = \frac{m_{01}}{m_{00}} \quad \text{với} \quad m_{pq} = \sum_{x} \sum_{y} x^p y^q M(x, y)$$
+  2. Chia đôi mặt nạ theo trục ngang qua $C_y$, lật ngược nửa dưới chồng lên nửa trên để tính diện tích khác biệt ($Asym_H$):
+     $$Asym_H = \sum_{x} \sum_{y} |M_{\text{top}}(x, y) - M_{\text{bottom\_flipped}}(x, y)|$$
+  3. Chia đôi mặt nạ theo trục dọc qua $C_x$, lật ngược nửa phải chồng lên nửa trái để tính diện tích khác biệt ($Asym_V$):
+     $$Asym_V = \sum_{x} \sum_{y} |M_{\text{left}}(x, y) - M_{\text{right\_flipped}}(x, y)|$$
+  4. Chỉ số bất đối xứng $A \in [0, 1]$:
+     $$A = \frac{Asym_H + Asym_V}{2 \times \text{Area}(M)}$$
+* **B — Border (Biên bờ):** Tính độ phức tạp của biên bờ dựa trên tỷ lệ chu vi ($P$) và căn bậc hai diện tích ($A_{lesion}$):
+     $$\text{Border\_Complexity} = \frac{P}{\sqrt{A_{lesion}}}$$
+     Trong đó chu vi $P$ được trích xuất bằng giải thuật dò biên Moore (contour tracing). Chỉ số cao biểu thị bờ nham nhở, răng cưa.
+* **C — Color (Màu sắc):** Đo độ biến động màu sắc bằng độ lệch chuẩn trung bình của 3 kênh màu RGB trên các pixel thuộc vùng tổn thương, chuẩn hóa về dải $[0, 1]$:
+     $$C = \frac{1}{127.5} \times \left( \frac{\sigma_R + \sigma_G + \sigma_B}{3} \right)$$
+     Với $\sigma_c = \sqrt{\frac{1}{N}\sum_{i=1}^N (x_{i,c} - \mu_c)^2}$ là độ lệch chuẩn của kênh màu $c \in \{R, G, B\}$.
+* **D — Diameter (Đường kính):** Tính đường kính tương đương của tổn thương hình tròn có cùng diện tích:
+     $$D_{\text{px}} = 2 \times \sqrt{\frac{A_{lesion}}{\pi}}$$
+     Quy đổi sang mm thực tế: $D_{\text{mm}} = D_{\text{px}} \times \text{PixelSpacing}$ (nếu có thông số vật lý từ DICOM Metadata).
 
 ---
 
 ## Phần III: Phân loại & Hợp nhất Bayes đa phương thức
 
-### 6. Tại sao dùng backbone EfficientNet-B1 và cơ chế CBAM hoạt động ra sao?
-* **EfficientNet-B1:** Sử dụng phương pháp Compound Scaling để cân bằng đồng thời độ sâu, độ rộng mạng và độ phân giải ảnh. Mô hình có tham số cực kỳ gọn nhẹ (~7.8M params) nhưng độ chính xác vượt trội DenseNet/ResNet, tối ưu cho suy luận thời gian thực trên Cloud.
-* **Cơ chế CBAM (Convolutional Block Attention Module):** CBAM chèn sau backbone để tăng cường tập trung vào tổn thương:
-  * **Channel Attention:** Đi qua luồng AvgPool và MaxPool song song, thu nhỏ số kênh rồi tái tạo lại nhằm tìm ra các kênh đặc trưng bệnh lý quan trọng (ví dụ: kênh biểu diễn mạng lưới sắc tố).
-  * **Spatial Attention:** Tính toán trị trung bình và cực đại dọc theo trục kênh của tensor đặc trưng, gộp lại đưa qua lớp tích chập $7 \times 7$ để tạo bản đồ chú ý không gian, định vị chính xác vùng tổn thương da trên ảnh.
+### 6. Backbone EfficientNet-B1 & Khối Attention CBAM
+* **EfficientNet-B1:** Sử dụng phương pháp Compound Scaling để cân bằng đồng thời độ sâu ($d = \alpha^\phi$), độ rộng mạng ($w = \beta^\phi$) và độ phân giải ảnh ($r = \gamma^\phi$). Mô hình có kích thước gọn nhẹ (~7.8 triệu tham số), giảm độ trễ tối đa khi suy luận trên CPU.
+* **CBAM (Convolutional Block Attention Module):** Gồm hai khối chú ý tuần tự chèn sau trích xuất đặc trưng:
+  1. **Channel Attention (Chú ý kênh):** Tập trung vào việc mô hình hóa mối quan hệ giữa các kênh màu/kênh đặc trưng.
+     $$M_c(F) = \sigma \left( \text{MLP}(\text{AvgPool}(F)) + \text{MLP}(\text{MaxPool}(F)) \right)$$
+     Trong đó $\sigma$ là hàm kích hoạt Sigmoid, MLP chia sẻ trọng số và tỉ lệ co hẹp (reduction rate = 16).
+  2. **Spatial Attention (Chú ý không gian):** Tập trung vào vùng vị trí đặc trưng (định vị tổn thương).
+     $$M_s(F) = \sigma \left( f^{7 \times 7} \left( [ \text{AvgPool}(F); \text{MaxPool}(F) ] \right) \right)$$
+     Trong đó $f^{7 \times 7}$ là phép toán tích chập với kích thước nhân $7 \times 7$, dấu $[;]$ ký hiệu cho phép nối kênh (concatenation).
 
-### 7. Thông tin nhân khẩu học tác động đến kết quả phân loại bằng cách nào qua Bayes?
-* **Cách tác động:** Hợp nhất Bayes đa phương thức hiệu chỉnh xác suất đầu ra của bộ phân loại ảnh $P(C_i | \text{Ảnh})$ bằng xác suất tiên nghiệm của bệnh nhân (Tuổi, Giới tính, Vị trí tổn thương) thống kê từ HAM10000:
-  $$P(C_i | \text{Ảnh}, \text{Tuổi}, \text{Giới tính}, \text{Vị trí}) \propto P(C_i | \text{Ảnh}) \times P(\text{Tuổi} | C_i) \times P(\text{Giới tính} | C_i) \times P(\text{Vị trí} | C_i)$$
-* **Cách tính:**
-  1. *Tuổi:* Ước lượng xác suất qua phân phối mật độ Gaussian $N(\mu, \sigma^2)$ của từng bệnh. (Ví dụ: U ác Melanoma hay xuất hiện ở người lớn tuổi $\mu=59.6$, nốt ruồi lành tính xuất hiện ở người trẻ $\mu=38.2$).
-  2. *Giới tính & Vị trí:* Áp dụng bảng phân phối xác suất rời rạc $P(\text{Gender} | C_i)$ và $P(\text{Location} | C_i)$.
-  3. *Late Fusion:* Kết hợp theo hệ số niềm tin $\lambda$ (mặc định = 0.85): 
-     $$\text{Final\_P} = \lambda \times P(C_i | \text{Ảnh}) + (1 - \lambda) \times P(C_i | \text{Hợp nhất})$$
+---
+
+### 7. Hợp nhất Bayes đa phương thức (Multimodal Bayesian Fusion)
+* **Nguyên lý:** Kết hợp xác suất hình ảnh y khoa thu từ mạng học sâu CNN và xác suất dịch tễ của bệnh nhân (Tuổi, Giới tính, Vị trí tổn thương) dựa trên định lý Bayes:
+  $$P(C_k | \text{Ảnh}, \text{Tuổi}, \text{Giới tính}, \text{Vị trí}) \propto P(C_k | \text{Ảnh}) \times P(\text{Tuổi} | C_k) \times P(\text{Giới tính} | C_k) \times P(\text{Vị trí} | C_k)$$
+* **Cách tính toán:**
+  1. *Kỳ vọng tuổi (Gaussian Likelihood):* Xác định qua hàm mật độ xác suất phân phối chuẩn $P(\text{Age} | C_k) = \mathcal{N}(\mu_{k}, \sigma_{k}^2)$:
+     $$P(\text{Age} | C_k) = \frac{1}{\sigma_k \sqrt{2\pi}} \exp \left( -\frac{(\text{Age} - \mu_k)^2}{2\sigma_k^2} \right)$$
+     Với tham số $\mu_k, \sigma_k$ được thống kê từ bộ dữ liệu HAM10000 (Ví dụ: U hắc tố ác tính $MEL$ có $\mu=59.6, \sigma=14.8$, trong khi nốt ruồi lành $NV$ có $\mu=38.2, \sigma=17.4$).
+  2. *Xác suất giới tính & Vị trí:* Trích xuất từ phân phối tần suất rời rạc trong lịch sử bệnh án HAM10000.
+  3. *Hợp nhất muộn (Late Fusion) hiệu chỉnh bằng tham số $\lambda$ (mặc định = 0.85):*
+     $$\text{Final\_P}(C_k) = \frac{(P(C_k | \text{Ảnh}))^\lambda \cdot (P(C_k | \text{Dịch tễ}))^{1-\lambda}}{\sum_j (P(C_j | \text{Ảnh}))^\lambda \cdot (P(C_j | \text{Dịch tễ}))^{1-\lambda}}$$
 
 ---
 
 ## Phần IV: Trợ lý đàm thoại ngôn ngữ lớn VQA (NLP)
 
-### 8. Tại sao chọn DistilGPT-2 làm Decoder? Cấu hình tinh chỉnh LoRA ra sao và tại sao chọn như vậy?
-* **Lý do chọn DistilGPT-2:** Là mô hình ngôn ngữ causal nhỏ gọn (~82 triệu tham số) được thu gọn từ GPT-2 gốc bằng chưng cất tri thức, tối ưu cho suy luận tạo sinh văn bản tư vấn trực tiếp trên CPU cục bộ ngoại tuyến.
-* **Cấu hình LoRA (PEFT):**
-  * Hạng ma trận **`r = 8`**, hệ số tỉ lệ **`lora_alpha = 16`**, dropout **`0.05`**.
-  * Module nhắm mục tiêu: **`c_attn`** (gộp của ma trận $W_q, W_k, W_v$ trong khối Attention của GPT-2).
-* **Lý do chọn cấu hình:** Cấu hình rank = 8 giúp đóng băng toàn bộ tham số gốc và chỉ cập nhật ma trận thích ứng LoRA siêu nhẹ (khoảng **`2.13%`** số lượng tham số huấn luyện). Thiết lập này ngăn chặn hiện tượng quá khớp (Overfitting) trên tập dữ liệu y học chuyên sâu hẹp và ngăn chặn hiện tượng "quên lãng thảm họa" (catastrophic forgetting) của mô hình ngôn ngữ nền tảng.
+### 8. Lựa chọn DistilGPT-2 làm Decoder & Tinh chỉnh LoRA
+* **Lý do chọn DistilGPT-2:** Là phiên bản chưng cất tri thức (Knowledge Distillation) từ mô hình GPT-2 gốc, giảm số tầng Transformer xuống còn 6 tầng giúp giảm kích thước tham số (~82 triệu tham số) giúp suy luận tạo sinh văn bản tư vấn cực nhanh trên CPU mà không cần GPU.
+* **Công thức tinh chỉnh LoRA (PEFT):**
+  * Trong quá trình Fine-tuning, trọng số của lớp Attention gốc $W_0 \in \mathbb{R}^{d \times k}$ được đóng băng hoàn toàn. Hệ thống chỉ cập nhật ma trận biến thiên $\Delta W$ được phân tách thành tích của hai ma trận hạng thấp (low-rank) $A$ và $B$:
+    $$W = W_0 + \Delta W = W_0 + B \cdot A$$
+    Trong đó $B \in \mathbb{R}^{d \times r}$ và $A \in \mathbb{R}^{r \times k}$, với hạng $r \ll \min(d, k)$.
+  * Giá trị đầu ra (forward pass) của lớp tích chập attention được tính bằng:
+    $$h = W_0 x + \Delta W x = W_0 x + \frac{\alpha}{r} (B \cdot A) x$$
+    Trong đó $\alpha$ là hằng số tỉ lệ (scaling factor).
+* **Tham số cấu hình LoRA cụ thể:**
+  * **`r = 8`** (Hạng ma trận hạng thấp): Giúp số lượng tham số có thể huấn luyện chỉ chiếm khoảng **`2.13%`** toàn bộ mô hình gốc.
+  * **`lora_alpha = 16`**: Hệ số tỉ lệ ổn định cập nhật trọng số.
+  * **`target_modules = ["c_attn"]`**: Nhắm mục tiêu chính xác vào lớp chiếu Attention tích hợp của GPT-2 để tối ưu hóa khả năng hiểu câu hỏi ngữ cảnh y tế.
+  * **`lora_dropout = 0.05`**: Chống quá khớp (overfitting) trên tập dữ liệu y văn nhỏ.
 
-### 9. Kết quả đánh giá mô hình VQA (BLEU Score) cụ thể là bao nhiêu?
+### 9. Kết quả đánh giá mô hình VQA (BLEU Score)
 * **Kết quả mô hình ngoại tuyến (Offline Model):**
   * Đánh giá định lượng trên tập Validation (12 mẫu câu hỏi lâm sàng thực tế):
     * **Average BLEU-1:** **`0.7269`** (độ khớp từ vựng $72.69\%$)
     * **Average BLEU-2:** **`0.6812`** (độ khớp từ vựng $68.12\%$)
-  * **Nhận xét học thuật:** Mô hình offline đạt điểm BLEU cao do học thuộc (memorize) tốt các cấu trúc câu trả lời y văn của chuyên gia trên tập dữ liệu hẹp. Tuy nhiên, khả năng tạo sinh linh hoạt ngôn ngữ bị giới hạn khi gặp câu hỏi có từ vựng nằm ngoài tập huấn luyện.
+  * **Nhận xét học thuật:** Mô hình offline đạt điểm BLEU rất cao do học thuộc tốt các cấu trúc câu trả lời mẫu y văn của chuyên gia trên tập dữ liệu hẹp, nhưng khả năng linh hoạt ngôn ngữ bị hạn chế khi gặp câu hỏi ngoài tập huấn luyện.
 * **Mô hình trực tuyến (Online Model):**
-  * Điểm BLEU-1 đạt khoảng **`10.91%`** do câu trả lời sinh ra tự nhiên, dài, mang nhiều chi tiết y học phong phú và cách dùng từ đa dạng hơn nhiều so với câu trả lời tham chiếu ngắn (dù độ chính xác y khoa và tính ứng dụng lâm sàng thực tế tốt hơn hẳn). Điều này cho thấy chỉ số BLEU có phần hạn chế khi đánh giá các hệ thống LLM VQA Y khoa do chỉ đo sự trùng khớp từ vựng bề mặt (lexical overlap).
+  * **BLEU-1 trung bình:** **`10.91%`** (mức độ trùng khớp từ vựng thấp do mô hình trực tuyến sinh câu trả lời tự nhiên, dài, đa dạng từ ngữ và mang nhiều chi tiết y học phong phú hơn hẳn câu trả lời tham chiếu ngắn, mặc dù có độ chính xác y khoa thực tế tốt hơn).
