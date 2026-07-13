@@ -170,6 +170,24 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
     * **$q$ (Query - Truy vấn/Câu hỏi):** Đại diện cho từ hoặc vị trí hiện tại đang xét, dùng để tìm kiếm các mối tương quan với các từ khác.
     * **$k$ (Key - Chìa khóa/Từ khóa):** Đại diện cho tất cả các từ trong câu, dùng để so khớp độ tương quan ngữ nghĩa với Query nhằm tính toán trọng số phân bố chú ý.
     * **$v$ (Value - Giá trị):** Chứa thông tin ngữ nghĩa thực sự của từng từ. Nó được nhân với trọng số chú ý thu được để tạo ra vector ngữ cảnh tổng hợp cuối cùng.
+  * **Ví dụ trực quan y khoa (Clinical Example):**
+    * Giả sử chuỗi đầu vào là cụm từ: `"nốt ruồi ác tính"`. Ta xét từ hiện tại là **`"ác tính"`**:
+      * **Query ($q$) của từ `"ác tính"`** đại diện cho nhu cầu tìm kiếm: *"Tôi là tính chất 'ác tính', tôi cần tìm xem từ nào xung quanh liên quan mật thiết để bổ nghĩa cho tôi?"*
+      * **Key ($k$) của các từ xung quanh:** Từ `"nốt"` có Key chỉ thực thể tròn; từ `"ruồi"` có Key chỉ nốt ruồi hắc tố; từ `"ác tính"` có Key tự chỉ chính nó.
+      * **Tính toán Attention (So khớp):** Nhân vô hướng Query của `"ác tính"` với Key của các từ:
+        * Tích vô hướng với Key của `"nốt"` $\rightarrow$ thấp.
+        * Tích vô hướng với Key của `"ruồi"` $\rightarrow$ **rất cao** (vì tính chất ác tính liên quan mật thiết đến bệnh lý của nốt ruồi).
+        * Tích vô hướng với Key của `"ác tính"` $\rightarrow$ cao (tự chú ý).
+      * Phép tính này lọc ra trọng số chú ý (Attention Weight): ví dụ gán trọng số $0.7$ cho từ `"ruồi"`.
+      * **Value ($v$):** Lấy trọng số $0.7$ nhân với thông tin ngữ nghĩa gốc (Value) của từ `"ruồi"` và cộng tổng lại. Kết quả giúp từ `"ác tính"` tích hợp trọn vẹn ngữ cảnh và hiểu rằng nó đang mô tả cho *bệnh lý da của một nốt ruồi*.
+  * **Ví dụ giá trị số thực tế (Concrete Numerical Values):**
+    * Các vector này thực chất là các mảng số thực 768 chiều trong DistilGPT-2. Ví dụ:
+      * Vector Query của từ `"ác tính"` tại một Head Attention:
+        $$\mathbf{q}_{\text{"ác tính"}} = [0.12, \; -0.45, \; 0.89, \; \dots, \; -0.71] \in \mathbb{R}^{768}$$
+      * Vector Key của từ `"ruồi"` tại Head tương ứng:
+        $$\mathbf{k}_{\text{"ruồi"}} = [0.09, \; -0.51, \; 0.72, \; \dots, \; -0.68] \in \mathbb{R}^{768}$$
+      * Độ tương quan (Attention Score) chưa chuẩn hóa giữa hai từ được tính bằng tích vô hướng (Dot Product):
+        $$\text{Score}(\mathbf{q}_{\text{"ác tính"}}, \; \mathbf{k}_{\text{"ruồi"}}) = \mathbf{q} \cdot \mathbf{k} = (0.12 \times 0.09) + (-0.45 \times -0.51) + \dots + (-0.71 \times -0.68) = 12.85$$
   * **Các ma trận trọng số chiếu $W_q, W_k, W_v$:**
     * Là các ma trận tuyến tính biến đổi vector nhúng đầu vào $x$ (kích thước $d=768$) thành các không gian vector Query, Key, Value tương ứng:
       $$Q = W_q x, \quad K = W_k x, \quad V = W_v x$$
