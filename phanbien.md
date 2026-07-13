@@ -191,10 +191,17 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
      * Tài liệu được phân đoạn tự động theo cấu trúc định dạng thẻ phân loại: `[BỆNH LÝ X: Tên bệnh] ... Nội dung hướng dẫn chi tiết`.
   2. **Mô hình mã hóa Vector (Embedding Model):**
      * Sử dụng mô hình mã hóa **`all-MiniLM-L6-v2`** từ thư viện `sentence-transformers`.
-     * Nhiệm vụ: Chuyển đổi các chuỗi văn bản tự nhiên thành các vector đặc trưng số thực dày đặc (dense embeddings) có **384 chiều** biểu diễn chính xác ý nghĩa ngữ nghĩa của từ ngữ.
+     * **Mã hóa đối tượng nào (What is embedded):** Mã hóa **cả hai phía (câu hỏi truy vấn và tài liệu y văn)** để đưa chúng về cùng một không gian vector so sánh:
+       * *Mã hóa tài liệu (Document/Chunk Embedding):* Lúc khởi tạo cơ sở dữ liệu, toàn bộ tài liệu y văn được cắt nhỏ và mã hóa trước thành các vector, lưu sẵn vào ChromaDB.
+       * *Mã hóa câu hỏi (Query Embedding):* Khi bác sĩ nhập câu hỏi tự nhiên $q$, hệ thống mã hóa nó thành vector truy vấn $\mathbf{v}_q$ tại thời điểm chạy (runtime).
+     * **Tại sao là 384 chiều (Why 384 dimensions):**
+       * Con số **384** là kích thước đầu ra đặc trưng cố định (embedding dimension / hidden size) được thiết kế và huấn luyện sẵn của mô hình mạng nơ-ron transformer `all-MiniLM-L6-v2`.
+       * Trọng số của mô hình này được tối ưu để ánh xạ bất kỳ đoạn văn bản nào thành một vector số thực có đúng 384 chiều, đảm bảo sự cân bằng xuất sắc giữa:
+         1. *Độ nhẹ và tốc độ:* Tiết kiệm bộ nhớ RAM/ổ đĩa tối đa và tính khoảng cách Cosine cực nhanh trên CPU mà không cần GPU.
+         2. *Độ chính xác ngữ nghĩa:* Mô hình đạt điểm chất lượng cao trên các bảng xếp hạng tìm kiếm ngữ nghĩa học thuật (Sentence-Transformers Benchmarks).
   3. **Cơ sở dữ liệu Vector (Vector Database):**
      * Sử dụng **ChromaDB** chạy ở chế độ lưu trữ ngoại tuyến (`chromadb.PersistentClient`) lưu tại thư mục `5_Results/chroma_db`.
-     * Nhiệm vụ: Lưu trữ các vector nhúng của tài liệu y văn Bộ Y tế cùng metadata nhãn bệnh để phục vụ truy vấn tốc độ cao mà không cần kết nối mạng Internet.
+     * Nhiệm vụ: Lưu trữ các vector nhúng 384 chiều của tài liệu y văn Bộ Y tế cùng metadata nhãn bệnh để phục vụ truy vấn tốc độ cao mà không cần kết nối mạng Internet.
   4. **Thuật toán truy xuất (Retrieval Algorithm):**
      * Khi người dùng gửi câu hỏi y khoa $q$, mô hình `all-MiniLM-L6-v2` sẽ mã hóa câu hỏi đó thành vector $\mathbf{v}_q$.
      * Hệ thống tiến hành so sánh độ tương đồng giữa $\mathbf{v}_q$ với toàn bộ các vector tài liệu $\mathbf{v}_d$ được lưu trữ trong ChromaDB bằng công thức tính **Khoảng cách Cosine (Cosine Distance)**:
