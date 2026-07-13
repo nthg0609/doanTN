@@ -204,3 +204,20 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
   5. **Nhồi ngữ cảnh vào Prompt (Prompt Injection):**
      * Phân đoạn y văn chuẩn tìm được sẽ được tiêm trực tiếp vào trường dữ liệu `[CV_CONTEXT]` hoặc hệ thống prompt đầu vào của LLM (DistilGPT-2 LoRA hoặc Qwen chạy trên Ollama) để trói buộc phạm vi tư vấn của LLM hoàn toàn dựa trên y văn, triệt tiêu khả năng tự bịa đặt thuốc của mô hình.
 
+---
+
+### 12. Đặc tả đầu vào (Input) và đầu ra (Output) của từng thành phần trong hệ thống
+Để nắm rõ luồng truyền dữ liệu tuần tự trong Pipeline của hệ thống, dưới đây là chi tiết đầu vào và đầu ra của từng khối chức năng:
+
+| Khối chức năng / Thành phần | Đầu vào (Input) | Đầu ra (Output) |
+| :--- | :--- | :--- |
+| **1. Cổng lọc tiền xử lý (Safety Gate QA)** | - Ảnh chụp màu thô dạng RGB (JPEG/PNG/DICOM). | - Điểm số độ nét Laplacian (`blur_score`) và độ sáng trung bình (`brightness_score`).<br>- Quyết định từ chối (`warning` yêu cầu chụp lại) hoặc chấp nhận (`ok`). |
+| **2. Phân đoạn tự động (DeepLabV3+)** | - Ảnh RGB đã được chấp nhận, resize về $256 \times 256 \times 3$ và chuẩn hóa Z-score. | - Mặt nạ nhị phân tổn thương da nháp $M_{\text{raw}} \in \{0, 1\}^{256 \times 256}$. |
+| **3. Phân đoạn tương tác (SAM / GrabCut)** | - Ảnh gốc RGB.<br>- Tọa độ điểm click chuột $(x, y)$ từ bác sĩ. | - Mặt nạ nhị phân tương tác ôm khít vùng tổn thương được chọn. |
+| **4. Trích xuất chỉ số hình học ABCD** | - Mặt nạ phân đoạn nhị phân cuối cùng $M \in \{0, 1\}^{H \times W}$.<br>- Ảnh gốc RGB (dùng riêng cho tính toán kênh màu). | - Dictionary chứa 4 chỉ số thực: $A$ (Asymmetry), $B$ (Border), $C$ (Color), $D$ (Diameter - quy đổi $mm$ hoặc pixel). |
+| **5. Phân loại ảnh (EfficientNet-B1 + CBAM)** | - Ảnh ROI (Cắt ảnh gốc theo Bounding Box của mặt nạ tổn thương, đệm 10px, resize về $224 \times 224 \times 3$, chuẩn hóa ImageNet). | - Vector phân phối xác suất dự đoán của 7 nhãn bệnh da liễu $P(C_i \| \text{Ảnh})$. |
+| **6. Hợp nhất Bayes đa phương thức** | - Vector xác suất hình ảnh $P(C_i \| \text{Ảnh})$ từ khối phân loại.<br>- Tuổi bệnh nhân (số thực).<br>- Giới tính (Nam/Nữ).<br>- Vị trí giải phẫu u (Văn bản). | - Vector xác suất cuối cùng đã hiệu chỉnh dịch tễ $P(C_i \| \text{Ảnh, Nhân khẩu})$ để đưa ra chẩn đoán chính xác nhất. |
+| **7. Truy xuất y văn (ChromaDB RAG)** | - Câu hỏi tự nhiên từ người dùng (Văn bản $q$) được mô hình `all-MiniLM-L6-v2` mã hóa thành vector 384 chiều. | - Đoạn văn bản hướng dẫn điều trị tương đồng nhất trích từ cSDL y văn của Bộ Y tế. |
+| **8. Trợ lý tư vấn VQA (DistilGPT-2 LoRA)** | - Prompt văn bản tích hợp bao gồm: *Chẩn đoán phân loại*, *Độ tin cậy*, *4 chỉ số ABCD*, *Đoạn ngữ cảnh RAG Bộ Y tế*, và *Câu hỏi của người dùng*. | - Chuỗi văn bản tư vấn lâm sàng chi tiết tiếng Việt và âm thanh nói phát ra (TTS). |
+
+
