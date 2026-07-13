@@ -267,8 +267,8 @@ Từ mặt nạ nhị phân tổn thương $M \in \{0, 1\}^{H \times W}$, hệ t
        $$D_C(\mathbf{v}_q, \mathbf{v}_d) = 1 - \text{Cosine-Similarity}(\mathbf{v}_q, \mathbf{v}_d) = 1 - \frac{\mathbf{v}_q \cdot \mathbf{v}_d}{\|\mathbf{v}_q\| \|\mathbf{v}_d\|}$$
        * *Giải thích phép chia:* Lấy tích vô hướng của hai vector câu hỏi và tài liệu ($\mathbf{v}_q \cdot \mathbf{v}_d$) **chia cho tích độ dài Euclid (L2-norm) của chúng ($\|\mathbf{v}_q\| \|\mathbf{v}_d\|$)** để tính cosin góc giữa hai vector. Lấy 1 trừ đi tỉ số này để quy đổi thành khoảng cách (khoảng cách càng gần $0$ thì tài liệu càng tương đồng lớn với câu hỏi).
      * Hệ thống tự động chọn ra phân đoạn tài liệu có khoảng cách ngắn nhất để làm ngữ cảnh tin cậy.
-  5. **Nhồi ngữ cảnh vào Prompt (Prompt Injection):**
-     * Phân đoạn y văn chuẩn tìm được sẽ được tiêm trực tiếp vào trường dữ liệu `[CV_CONTEXT]` hoặc hệ thống prompt đầu vào của LLM (DistilGPT-2 LoRA hoặc Qwen chạy trên Ollama) để trói buộc phạm vi tư vấn của LLM hoàn toàn dựa trên y văn, triệt tiêu khả năng tự bịa đặt thuốc của mô hình.
+     * Phân đoạn y văn chuẩn tìm được sẽ được tiêm trực tiếp vào trường dữ liệu `[CV_CONTEXT]` hoặc hệ thống prompt đầu vào của LLM (DistilGPT-2 LoRA chạy cục bộ trong môi trường Python, hoặc Qwen2 chạy ngoại tuyến thông qua công cụ máy chủ API nội bộ **Ollama**) để trói buộc phạm vi tư vấn của LLM hoàn toàn dựa trên y văn, triệt tiêu khả năng tự bịa đặt thuốc của mô hình.
+     * *Lưu ý học thuật:* **Ollama không phải là một mô hình LLM**, mà là một **Framework/Engine mã nguồn mở** gọn nhẹ hỗ trợ triển khai và chạy trực tiếp các LLM (như Llama-3, Qwen-2, v.v.) cục bộ trên máy tính cá nhân (Local CPU/GPU) mà không cần kết nối mạng hoặc sử dụng Cloud APIs. Trong đồ án này, Ollama chạy mô hình tiếng Việt nhỏ gọn **`qwen2:0.5b`** làm máy chủ suy luận cục bộ (Local API Server).
 
 ---
 
