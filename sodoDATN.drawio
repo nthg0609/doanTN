@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Trang-1" id="yFECjL0SWr0F87SKHOQG">
-    <mxGraphModel dx="4430" dy="1606" grid="1" gridSize="16" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="3980" dy="1405" grid="1" gridSize="16" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -729,9 +729,9 @@
             <mxGeometry height="253" width="1654" x="50" y="5720" as="geometry" />
           </mxCell>
         </UserObject>
-        <UserObject label="Nhập trọng số Lambda&amp;nbsp;&lt;div&gt;λ ∈ [0,1]&lt;/div&gt;" mermaidId="n:Lambda" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&quot;Nhập trọng số Lambda (λ ∈ [0,1" id="QSvwGHtDsv96QZmnbGI3-228">
+        <UserObject label="Lambda tự động theo entropy hoặc bác sĩ nhập tay&amp;nbsp;&lt;div&gt;λ ∈ [0,1]&lt;/div&gt;" mermaidId="n:Lambda" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&quot;Nhập trọng số Lambda (λ ∈ [0,1" id="QSvwGHtDsv96QZmnbGI3-228">
           <mxCell parent="QSvwGHtDsv96QZmnbGI3-227" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Helvetica;fontSize=23;fontStyle=1" vertex="1">
-            <mxGeometry height="54" width="277" x="70" y="45" as="geometry" />
+            <mxGeometry height="83" width="330" x="44" y="16" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="Tính xác suất hậu nghiệm (Posterior Probability)" mermaidId="n:Bayes" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Tính xác suất hậu nghiệm (Posterior Probability)" id="QSvwGHtDsv96QZmnbGI3-234">

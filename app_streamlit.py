@@ -801,7 +801,14 @@ def translate_text(text: str, target_lang: str) -> str:
     try:
         from openai import OpenAI
         client = OpenAI(api_key=api_key)
-        prompt = f"Translate the following medical text into {target_lang}. Return ONLY the translated text. Do not add any conversational introduction, quotes, or explanation.\n\nText: {text}"
+        prompt = (
+            f"Translate the following medical text into {target_lang}. "
+            "The reader is a general practitioner discussing a patient, NOT the patient themselves. "
+            "Refer to the person with the condition in third person (e.g. 'bệnh nhân', 'tổn thương của bệnh nhân'); "
+            "NEVER use second-person address ('bạn', 'của bạn') for the patient. "
+            "Return ONLY the translated text. Do not add any conversational introduction, quotes, or explanation.\n\n"
+            f"Text: {text}"
+        )
         resp = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
@@ -881,6 +888,14 @@ def _build_system_prompt(cv_context: Dict[str, Any]) -> str:
 Bạn là Trợ lý Da liễu AI — hệ thống hỗ trợ sàng lọc y tế tích hợp mô hình Computer Vision và LLM.
 Tư vấn dựa HOÀN TOÀN trên dữ liệu CV được cung cấp, không được bịa đặt số liệu.
 
+[ĐỐI TƯỢNG NGƯỜI DÙNG]
+Người đang trò chuyện với bạn LÀ BÁC SĨ ĐA KHOA (không phải bệnh nhân), thường công tác tại
+trạm y tế/phòng khám tuyến cơ sở, chưa có chuyên môn sâu về da liễu. Bác sĩ đang hỏi bạn để tham
+vấn về MỘT BỆNH NHÂN mà họ đang khám, không phải hỏi về chính bản thân họ.
+QUY TẮC XƯNG HÔ BẮT BUỘC: luôn gọi người mang tổn thương là "bệnh nhân" (ngôi thứ ba), ví dụ
+"tổn thương của bệnh nhân", "triệu chứng của bệnh nhân" — TUYỆT ĐỐI KHÔNG dùng "bạn"/"của bạn"
+để chỉ người bệnh, vì như vậy sẽ khiến bác sĩ đang hỏi hiểu nhầm là chính họ mắc bệnh.
+
 [CV_CONTEXT]
 Mô hình EfficientNet-B1 + CBAM Attention:
   Nhãn dự đoán cao nhất : {pred} — {vi_name}
@@ -897,9 +912,11 @@ Chỉ số hình học ABCD (DeepLabV3+ Segmentation):
 
 [GUARDRAIL_RULES]
 ĐƯỢC PHÉP: Giải thích cơ chế bệnh sinh, mô tả triệu chứng, hướng dẫn chăm sóc da không dùng thuốc,
-  phân nhóm thuốc tổng quát, giải thích ý nghĩa chỉ số ABCD, khuyến nghị gặp bác sĩ.
+  phân nhóm thuốc tổng quát, giải thích ý nghĩa chỉ số ABCD, khuyến nghị chuyển bệnh nhân đến
+  chuyên khoa da liễu nếu cần.
 TUYỆT ĐỐI CẤM: Tên biệt dược cụ thể, liều lượng, thời gian dùng thuốc.
-ĐỊNH DẠNG: Tiếng Việt, rõ ràng, chuyên nghiệp, tối đa 400 từ, kết thúc bằng khuyến nghị gặp bác sĩ.
+ĐỊNH DẠNG: Tiếng Việt, rõ ràng, chuyên nghiệp, tối đa 400 từ, xưng hô đúng theo mục [ĐỐI TƯỢNG
+  NGƯỜI DÙNG], kết thúc bằng khuyến nghị chuyển bệnh nhân đến chuyên khoa da liễu nếu cần thiết.
 """
 
 
@@ -913,8 +930,8 @@ _GUARDRAIL_DOSAGE_PATTERNS = [
 _GUARDRAIL_RE = re.compile("|".join(_GUARDRAIL_DOSAGE_PATTERNS), re.IGNORECASE)
 
 _GUARDRAIL_FALLBACK_MESSAGE = (
-    "Hệ thống không kê đơn thuốc. Hãy tham khảo ý kiến bác sĩ chuyên khoa để được "
-    "hướng dẫn dùng thuốc phù hợp."
+    "Hệ thống không kê đơn thuốc. Khuyến nghị chuyển bệnh nhân đến bác sĩ chuyên khoa "
+    "để được hướng dẫn dùng thuốc phù hợp."
 )
 
 
@@ -936,7 +953,7 @@ def _fallback_response(question: str, result: Dict[str, Any]) -> str:
     return (
         f'Câu hỏi: "{question}". '
         f'Dự đoán: {cls.get("prediction", "N/A")} ({float(cls.get("confidence", 0.0)):.3f}). '
-        "Vui lòng tham khảo ý kiến bác sĩ da liễu."
+        "Khuyến nghị chuyển bệnh nhân đến bác sĩ chuyên khoa da liễu để được thăm khám và chẩn đoán chính xác."
     )
 
 
