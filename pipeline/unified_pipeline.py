@@ -195,6 +195,58 @@ class UnifiedDermatologyPipeline:
                 result["gradcam_image"] = gradcam_img
         return result
 
+    @staticmethod
+    def _enhance_image_quality(img_rgb: np.ndarray) -> np.ndarray:
+        """Lọc lông + tăng sáng/tương phản cục bộ — chỉ gọi khi phân đoạn trên ảnh gốc
+        thất bại (mask rỗng), KHÔNG áp dụng cho mọi ảnh, để tránh lệch phân phối
+        train/inference trên ảnh đã đủ tốt (xem kien_thuc_nen_bao_ve.md mục A7).
+
+        Lọc lông: kỹ thuật DullRazor kinh điển — Black-hat morphology làm nổi bật cấu
+        trúc mảnh/tối (sợi lông) trên nền da sáng, ngưỡng hóa thành hair_mask, rồi
+        inpainting (Telea) để "vá" lại vùng đó bằng nội suy từ pixel xung quanh.
+        Tăng sáng/tương phản: CLAHE (Contrast Limited Adaptive Histogram Equalization)
+        trên kênh L của không gian màu LAB — tăng tương phản cục bộ theo từng vùng nhỏ
+        (tile 8x8) thay vì kéo giãn histogram toàn ảnh, tránh cháy sáng vùng đã sáng sẵn.
+        """
+        gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (13, 13))
+        blackhat = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, kernel)
+        _, hair_mask = cv2.threshold(blackhat, 12, 255, cv2.THRESH_BINARY)
+        kernel_clean = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        hair_mask = cv2.morphologyEx(hair_mask, cv2.MORPH_OPEN, kernel_clean)
+
+        result = img_rgb
+        if int(np.sum(hair_mask > 0)) > 300:
+            result = cv2.inpaint(img_rgb, hair_mask, inpaintRadius=4, flags=cv2.INPAINT_TELEA)
+
+        lab = cv2.cvtColor(result, cv2.COLOR_RGB2LAB)
+        l, a, b = cv2.split(lab)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        l_clahe = clahe.apply(l)
+        lab_clahe = cv2.merge([l_clahe, a, b])
+        return cv2.cvtColor(lab_clahe, cv2.COLOR_LAB2RGB)
+
+    def _run_seg_forward(self, seg_model, img_rgb: np.ndarray, mean: np.ndarray, std: np.ndarray) -> np.ndarray:
+        """1 lượt forward model phân đoạn: resize về seg_input_size, chuẩn hóa, sigmoid,
+        rồi resize xác suất ngược lại đúng kích thước ảnh gốc (xem mục A6 — 256 chỉ là
+        độ phân giải nội bộ, không giữ lại sau bước này)."""
+        cfg = self.registry.config
+        h, w = img_rgb.shape[:2]
+        resized = cv2.resize(img_rgb, (cfg.seg_input_size, cfg.seg_input_size), interpolation=cv2.INTER_LINEAR)
+        arr = resized.astype(np.float32) / 255.0
+        arr = (arr - mean.reshape(1, 1, 3)) / std.reshape(1, 1, 3)
+        tensor = torch.from_numpy(arr).permute(2, 0, 1).unsqueeze(0).float().to(self.registry.device)
+
+        with torch.inference_mode():
+            logits = seg_model(tensor)
+            if isinstance(logits, (tuple, list)):
+                logits = logits[0]
+            prob = torch.sigmoid(logits).squeeze().cpu().numpy()
+            if prob.ndim == 3:
+                prob = prob[0]
+
+        return cv2.resize(prob, (w, h), interpolation=cv2.INTER_LINEAR)
+
     def _segment(self, img_rgb: np.ndarray, image_type: str = "dermoscopy") -> tuple[np.ndarray, Dict[str, Any]]:
         """Phân vùng tổn thương.
 
@@ -226,28 +278,37 @@ class UnifiedDermatologyPipeline:
             tta_mask = self._postprocess_mask(tta_mask)
             tta_info["method"] = "deeplab_tta"
             if tta_mask.sum() == 0:
-                fallback_mask, fb_info = self._classical_fallback_mask(img_rgb)
-                if fb_info.get("accepted", False):
-                    tta_mask = fallback_mask
-                    tta_info.update({"method": "classical_fallback_after_tta", **fb_info})
+                # Thử lọc lông + CLAHE rồi chạy lại TTA trên ảnh đã xử lý trước khi
+                # rơi xuống fallback cổ điển (OTSU/GrabCut) — xem _enhance_image_quality.
+                enhanced_rgb = self._enhance_image_quality(img_rgb)
+                tta_mask2, _prob_map2, tta_info2 = multiscale_segment_from_rgb(
+                    enhanced_rgb,
+                    model=seg_model,
+                    device=self.registry.device,
+                    scales=(1.0, 0.75, 0.5),
+                    input_size=cfg.seg_input_size,
+                    threshold=self.seg_threshold,
+                    min_area_px=self.min_area_px,
+                    mean=mean,
+                    std=std,
+                    morph_kernel=5,
+                )
+                tta_mask2 = self._postprocess_mask(tta_mask2)
+                if tta_mask2.sum() > 0:
+                    tta_mask = tta_mask2
+                    tta_info2["method"] = "deeplab_tta_enhanced_reseg"
+                    tta_info2["enhancement"] = "hair_removal+clahe"
+                    tta_info2["lesion_found"] = int(tta_mask.sum() > 0)
+                    tta_info = tta_info2
+                else:
+                    fallback_mask, fb_info = self._classical_fallback_mask(img_rgb)
+                    if fb_info.get("accepted", False):
+                        tta_mask = fallback_mask
+                        tta_info.update({"method": "classical_fallback_after_tta", **fb_info})
             return tta_mask, tta_info
 
         # ── Standard single-pass segmentation ──────────────────────────────
-        h, w = img_rgb.shape[:2]
-        resized = cv2.resize(img_rgb, (cfg.seg_input_size, cfg.seg_input_size), interpolation=cv2.INTER_LINEAR)
-        arr = resized.astype(np.float32) / 255.0
-        arr = (arr - mean.reshape(1, 1, 3)) / std.reshape(1, 1, 3)
-        tensor = torch.from_numpy(arr).permute(2, 0, 1).unsqueeze(0).float().to(self.registry.device)
-
-        with torch.inference_mode():
-            logits = seg_model(tensor)
-            if isinstance(logits, (tuple, list)):
-                logits = logits[0]
-            prob = torch.sigmoid(logits).squeeze().cpu().numpy()
-            if prob.ndim == 3:
-                prob = prob[0]
-
-        prob = cv2.resize(prob, (w, h), interpolation=cv2.INTER_LINEAR)
+        prob = self._run_seg_forward(seg_model, img_rgb, mean, std)
         mask = (prob >= self.seg_threshold).astype(np.uint8)
         mask = self._postprocess_mask(mask)
         seg_info = {
@@ -257,10 +318,24 @@ class UnifiedDermatologyPipeline:
         }
 
         if mask.sum() == 0:
-            fallback_mask, fb_info = self._classical_fallback_mask(img_rgb)
-            if fb_info.get("accepted", False):
-                mask = fallback_mask
-                seg_info.update({"method": "classical_fallback", **fb_info})
+            # Thử lọc lông + CLAHE rồi chạy lại model phân đoạn trên ảnh đã xử lý,
+            # trước khi rơi xuống fallback cổ điển (OTSU/GrabCut).
+            enhanced_rgb = self._enhance_image_quality(img_rgb)
+            prob_e = self._run_seg_forward(seg_model, enhanced_rgb, mean, std)
+            mask_e = (prob_e >= self.seg_threshold).astype(np.uint8)
+            mask_e = self._postprocess_mask(mask_e)
+            if mask_e.sum() > 0:
+                mask = mask_e
+                seg_info.update({
+                    "method": "deeplab_enhanced_reseg",
+                    "enhancement": "hair_removal+clahe",
+                    "lesion_found": int(mask.sum() > 0),
+                })
+            else:
+                fallback_mask, fb_info = self._classical_fallback_mask(img_rgb)
+                if fb_info.get("accepted", False):
+                    mask = fallback_mask
+                    seg_info.update({"method": "classical_fallback", **fb_info})
         return mask, seg_info
 
     def _classify(
