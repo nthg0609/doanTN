@@ -903,6 +903,34 @@ TUYỆT ĐỐI CẤM: Tên biệt dược cụ thể, liều lượng, thời gi
 """
 
 
+_GUARDRAIL_DOSAGE_PATTERNS = [
+    r"\b\d+\s*(mg|mcg|g|ml|iu|%)\b",                        # liều lượng: "500mg", "0.05%"...
+    r"\b(uống|dùng|bôi|sử dụng)\s+\d+\s*(viên|lần|giọt|ống)",  # tần suất dùng thuốc cụ thể
+    r"\b(paracetamol|ibuprofen|amoxicillin|clindamycin|tretinoin|isotretinoin|"
+    r"hydroquinone|corticosteroid|betamethasone|hydrocortisone|doxycycline|"
+    r"acyclovir|fluconazole|prednisone|prednisolone)\b",
+]
+_GUARDRAIL_RE = re.compile("|".join(_GUARDRAIL_DOSAGE_PATTERNS), re.IGNORECASE)
+
+_GUARDRAIL_FALLBACK_MESSAGE = (
+    "Hệ thống không kê đơn thuốc. Hãy tham khảo ý kiến bác sĩ chuyên khoa để được "
+    "hướng dẫn dùng thuốc phù hợp."
+)
+
+
+def _guardrail_check(generated_text: str) -> bool:
+    """Lớp hậu kiểm độc lập với LLM: quét câu trả lời đã sinh ra để phát hiện tên
+    biệt dược/liều lượng cụ thể trước khi hiển thị cho người dùng. Đây là lớp chặn
+    tất định (deterministic), bổ sung cho ràng buộc ở tầng system prompt — không phụ
+    thuộc việc LLM có tuân thủ chỉ dẫn hay không (chống bypass do hallucination hoặc
+    prompt injection).
+
+    Đây là danh sách mẫu ban đầu, cần bổ sung thêm hoạt chất da liễu phổ biến và
+    kiểm thử qua nhiều câu hỏi thật trước khi coi là đủ tin cậy cho production.
+    """
+    return bool(_GUARDRAIL_RE.search(generated_text))
+
+
 def _fallback_response(question: str, result: Dict[str, Any]) -> str:
     cls = result.get("classification") or {}
     return (
@@ -1035,7 +1063,11 @@ def generate_vqa_response_stream(
                 final_answer = expert_answer
             else:
                 final_answer = f"Theo mô hình VQA nội bộ kết hợp phân tích hình ảnh: {vietnamese_answer}\n\n **Tư vấn y tế bổ sung**: {expert_answer}"
-                
+
+            # Lớp guardrail hậu kiểm (output-side): quét trước khi hiển thị cho người dùng.
+            if _guardrail_check(final_answer):
+                final_answer = _GUARDRAIL_FALLBACK_MESSAGE
+
             for char in final_answer:
                 yield char
             return
@@ -1121,9 +1153,18 @@ def generate_vqa_response_stream(
         )
         for chunk in resp:
             if chunk.choices and chunk.choices[0].delta.content:
-                content = chunk.choices[0].delta.content
-                raw_parts.append(content)
-                yield content
+                raw_parts.append(chunk.choices[0].delta.content)
+
+        full_response = "".join(raw_parts)
+        guardrail_blocked = _guardrail_check(full_response)
+        # Lớp guardrail hậu kiểm (output-side): quét TOÀN BỘ câu trả lời trước khi
+        # hiển thị cho người dùng — độc lập với việc LLM có tuân thủ [GUARDRAIL_RULES]
+        # trong system prompt hay không (chống bypass do hallucination/prompt injection).
+        # Đánh đổi: mất hiệu ứng "gõ chữ" theo thời gian thực của streaming gốc, vì phải
+        # nhận đủ toàn bộ phản hồi rồi mới quét được.
+        displayed_response = _GUARDRAIL_FALLBACK_MESSAGE if guardrail_blocked else full_response
+        for char in displayed_response:
+            yield char
     except Exception as exc:
         if is_ollama:
             yield (
@@ -1143,11 +1184,12 @@ def generate_vqa_response_stream(
         st.session_state["last_vqa_references"] = retrieved_docs
 
     write_dev_log({
-        "system_prompt":    system_prompt,
-        "user_message":     question,
-        "raw_response":     "".join(raw_parts),
-        "cv_context":       cv_context,
-        "chat_history_len": len(valid_hist),
+        "system_prompt":     system_prompt,
+        "user_message":      question,
+        "raw_response":      full_response,
+        "guardrail_blocked": guardrail_blocked,
+        "cv_context":        cv_context,
+        "chat_history_len":  len(valid_hist),
     }, "LLM_VQA_EXCHANGE")
 
 
@@ -2253,8 +2295,14 @@ def main() -> None:
                               help="Ngưỡng kiểm soát chất lượng đầu vào.")
         mal_thresh= st.slider("Độ nhạy phát hiện ác tính", 0.05, 0.50, 0.15, 0.01,
                               help="Xác suất tối thiểu để hiện cảnh báo nguy cơ ác tính.")
-        lambda_w  = st.slider("Trọng số: Hình ảnh vs Dịch tễ", 0.0, 1.0, 0.80, 0.05,
-                              help="1.0 = chỉ dựa vào hình ảnh; 0.5 = kết hợp 50/50 với dữ liệu dịch tễ.")
+        auto_lambda = st.checkbox("Tự động tính λ theo độ tin cậy ảnh (khuyến nghị)", value=True,
+                                   help="λ được tính động theo entropy của phân phối xác suất phân loại: "
+                                        "ảnh càng rõ ràng (model tự tin) thì càng tin ảnh hơn, ảnh càng mơ hồ "
+                                        "thì càng tin dữ liệu dịch tễ hơn. Bỏ chọn để tự đặt λ cố định bằng tay.")
+        lambda_w  = st.slider("Trọng số: Hình ảnh vs Dịch tễ (chỉ áp dụng khi tắt tự động)", 0.0, 1.0, 0.80, 0.05,
+                              help="1.0 = chỉ dựa vào hình ảnh; 0.5 = kết hợp 50/50 với dữ liệu dịch tễ.",
+                              disabled=auto_lambda)
+        lambda_to_use = None if auto_lambda else lambda_w
 
         st.markdown("**Chế độ mô hình VQA:**")
         vqa_mode = st.radio(
@@ -2425,7 +2473,7 @@ def main() -> None:
                             age=float(p_age) if p_name.strip() else None,
                             gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
                             body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
-                            lambda_val=lambda_w,
+                            lambda_val=lambda_to_use,
                             interactive_point=st.session_state["sam_point"],
                             malignant_threshold=mal_thresh
                         )
@@ -2470,7 +2518,7 @@ def main() -> None:
                                     age=float(p_age) if p_name.strip() else None,
                                     gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
                                     body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
-                                    lambda_val=lambda_w,
+                                    lambda_val=lambda_to_use,
                                     custom_mask=st.session_state["custom_mask"],
                                     malignant_threshold=mal_thresh
                                 )
@@ -2499,7 +2547,7 @@ def main() -> None:
                             age=float(p_age) if p_name.strip() else None,
                             gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
                             body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
-                            lambda_val=lambda_w,
+                            lambda_val=lambda_to_use,
                             malignant_threshold=mal_thresh
                         )
                         if st.session_state.get("dicom_meta") and "metrics" in result_new:
@@ -2599,7 +2647,7 @@ def main() -> None:
                                                 age=float(p_age) if p_name.strip() else None,
                                                 gender=p_gender if p_gender != "--- Chọn Giới tính ---" else None,
                                                 body_location=p_location if p_location != "--- Chọn Vị trí tổn thương ---" else None,
-                                                lambda_val=lambda_w,
+                                                lambda_val=lambda_to_use,
                                                 malignant_threshold=mal_thresh
                                             )
                                             if st.session_state.get("dicom_meta") and "metrics" in result_crop:

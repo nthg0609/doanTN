@@ -73,22 +73,55 @@ class MultimodalBayesianFusion:
         exponent = -((age - mu) ** 2) / (2 * (sigma ** 2))
         return (1.0 / (sigma * math.sqrt(2 * math.pi))) * math.exp(exponent)
 
+    @staticmethod
+    def adaptive_lambda(
+        image_probs: Dict[str, float],
+        lambda_min: float = 0.5,
+        lambda_max: float = 0.95,
+    ) -> float:
+        """Tính lambda động theo độ bất định (entropy) của phân phối xác suất ảnh.
+
+        Entropy thấp (phân phối "nhọn", model tự tin) -> lambda cao (tin ảnh hơn).
+        Entropy cao (phân phối "phẳng", model phân vân giữa nhiều lớp) -> lambda thấp
+        (tin dịch tễ hơn). Đây là một dạng confidence-gated fusion đơn giản, thay thế
+        cho việc đặt lambda cố định bằng tay.
+
+        Lưu ý: entropy tính trực tiếp trên softmax chưa hiệu chỉnh (uncalibrated) nên
+        chỉ là một tín hiệu heuristic, không phải xác suất bất định đã được calibrate.
+        """
+        probs = [p for p in image_probs.values() if p > 0]
+        num_classes = len(image_probs)
+        if not probs or num_classes <= 1:
+            return (lambda_min + lambda_max) / 2.0
+        entropy = -sum(p * math.log(p) for p in probs)
+        max_entropy = math.log(num_classes)
+        normalized_entropy = min(1.0, max(0.0, entropy / max_entropy)) if max_entropy > 0 else 0.0
+        return lambda_max - (lambda_max - lambda_min) * normalized_entropy
+
     def fuse(
         self,
         image_probs: Dict[str, float],
         age: Optional[float] = None,
         gender: Optional[str] = None,
         body_location: Optional[str] = None,
-        lambda_val: float = 0.85
+        lambda_val: Optional[float] = None
     ) -> Dict[str, float]:
-        """Performs Bayesian fusion of vision probabilities and demographic priors.
+        """Performs weighted probability fusion of vision probabilities and demographic priors.
 
-        P(C_k | Image, Age, Gender, Location) proportional to:
-            P(C_k | Image) * P(Age | C_k) * P(Gender | C_k) * P(Location | C_k)
-        
-        We interpolate between fused probability and raw image probability using lambda_val:
-            Final_P = lambda * Image_P + (1 - lambda) * Fused_P
+        P(C_k | Demographic) is computed as a proper Bayesian posterior:
+            P(C_k | Age, Gender, Location) proportional to P(C_k) * P(Age|C_k) * P(Gender|C_k) * P(Location|C_k)
+
+        The final combination with the image posterior is a log-linear (weighted geometric
+        mean) pooling, NOT a strict Bayesian posterior update:
+            Final_P(C_k) proportional to [P(C_k | Image)]^lambda * [P(C_k | Demographic)]^(1 - lambda)
+
+        If lambda_val is None, lambda is computed automatically per-image via
+        adaptive_lambda() based on the entropy of image_probs, instead of using a
+        fixed manual value.
         """
+        if lambda_val is None:
+            lambda_val = self.adaptive_lambda(image_probs)
+
         # If no demographic info is provided, return image probabilities as-is
         has_age = age is not None and age >= 0
         has_gender = gender in ["male", "female", "Nam", "Nữ"]

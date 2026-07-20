@@ -82,7 +82,7 @@ class UnifiedDermatologyPipeline:
         age: Optional[float] = None,
         gender: Optional[str] = None,
         body_location: Optional[str] = None,
-        lambda_val: float = 0.85,
+        lambda_val: Optional[float] = None,
         interactive_point: Optional[tuple[int, int]] = None,
         custom_mask: Optional[np.ndarray] = None,
         malignant_threshold: Optional[float] = None,
@@ -128,6 +128,8 @@ class UnifiedDermatologyPipeline:
         if self.mode in ("classification", "both"):
             cls_result = self._classify(
                 img_rgb,
+                seg_mask=seg_mask,
+                lesion_metrics=metrics,
                 age=age,
                 gender=gender,
                 body_location=body_location,
@@ -250,21 +252,40 @@ class UnifiedDermatologyPipeline:
     def _classify(
         self,
         img_rgb: np.ndarray,
+        seg_mask: Optional[np.ndarray] = None,
+        lesion_metrics: Optional[Dict[str, Any]] = None,
         age: Optional[float] = None,
         gender: Optional[str] = None,
         body_location: Optional[str] = None,
-        lambda_val: float = 0.85,
+        lambda_val: Optional[float] = None,
     ) -> Optional[Dict[str, Any]]:
         """
-        Luồng Classification độc lập: Đồng bộ 100% với sanity_check_cls.py
+        Luồng Classification: dùng ảnh đã cắt ROI theo mask khi mask hợp lệ (khớp đúng
+        cách dữ liệu huấn luyện classifier được tạo — xem
+        2_Notebooks/05_ROI_Extraction.ipynb::extract_roi, bounding box của contour lớn
+        nhất + padding=10px). Nếu mask không hợp lệ/rỗng, fallback về ảnh gốc để giữ
+        tính độc lập/robust giữa 2 nhánh (không để lỗi segmentation làm hỏng classification).
         Tích hợp Hợp nhất Bayes Đa phương thức (Multimodal Fusion).
         """
         cls_model = self.registry.get_classification_model()
         if cls_model is None:
             return None
 
+        # 0. Chọn ảnh đầu vào: ROI-cropped nếu mask hợp lệ, ngược lại ảnh gốc.
+        classify_input = img_rgb
+        is_valid_mask = (
+            seg_mask is not None
+            and lesion_metrics is not None
+            and not lesion_metrics.get("low_confidence", True)
+            and int(lesion_metrics.get("lesion_area", 0)) >= self.min_area_px
+        )
+        if is_valid_mask:
+            cropped = self._crop_to_roi(img_rgb, seg_mask, padding=10)
+            if cropped is not None and cropped.size > 0:
+                classify_input = cropped
+
         # 1. Ép dùng PIL để Resize giống hệt sanity_check_cls.py để tránh lệch phép nội suy
-        pil_img = Image.fromarray(img_rgb)
+        pil_img = Image.fromarray(classify_input)
         pil_img = pil_img.resize((224, 224), resample=Image.Resampling.BILINEAR)
         arr = np.asarray(pil_img).astype(np.float32) / 255.0
 
@@ -303,6 +324,33 @@ class UnifiedDermatologyPipeline:
             "probabilities": fused_probs,
             "raw_probabilities": raw_probs,
         }
+
+    @staticmethod
+    def _crop_to_roi(img_rgb: np.ndarray, mask: np.ndarray, padding: int = 10) -> Optional[np.ndarray]:
+        """Cắt ảnh theo bounding box của contour lớn nhất trong mask + padding cố định.
+
+        Khớp đúng công thức đã dùng để tạo dữ liệu huấn luyện classifier
+        (xem 2_Notebooks/05_ROI_Extraction.ipynb::extract_roi, padding=10px), nhằm
+        đồng bộ phân phối đầu vào giữa huấn luyện và suy luận trực tuyến.
+        """
+        m = (np.asarray(mask) > 0).astype(np.uint8)
+        img_h, img_w = img_rgb.shape[:2]
+        if m.shape[:2] != (img_h, img_w):
+            m = cv2.resize(m, (img_w, img_h), interpolation=cv2.INTER_NEAREST)
+
+        contours, _ = cv2.findContours((m * 255).copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            return None
+        largest = max(contours, key=cv2.contourArea)
+        x, y, w, h = cv2.boundingRect(largest)
+
+        x1 = max(0, x - padding)
+        y1 = max(0, y - padding)
+        x2 = min(img_w, x + w + padding)
+        y2 = min(img_h, y + h + padding)
+        if x2 <= x1 or y2 <= y1:
+            return None
+        return img_rgb[y1:y2, x1:x2]
 
     def _postprocess_mask(self, mask: np.ndarray) -> np.ndarray:
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
