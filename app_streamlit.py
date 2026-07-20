@@ -566,7 +566,7 @@ _SEG_METHOD_CAPTIONS = {
     "classical_fallback": "⚠️ Dự phòng: phân ngưỡng OTSU (AI chính không nhận diện được tổn thương)",
     "classical_fallback_after_tta": "⚠️ Dự phòng: phân ngưỡng OTSU (AI chính không nhận diện được tổn thương)",
     "deeplab_fallback_interactive": "Điểm click không đủ tin cậy → tự động chuyển sang DeepLabV3+",
-    "mobile_sam": Phân đoạn tương tác bằng MobileSAM (theo điểm click bác sĩ)",
+    "mobile_sam": "Phân đoạn tương tác bằng MobileSAM (theo điểm click bác sĩ)",
     "grabcut_interactive_mask_init": "Phân đoạn tương tác bằng GrabCut (theo điểm click bác sĩ)",
     "floodfill_interactive_fallback": "⚠️ Dự phòng: Flood Fill từ điểm click",
     "circle_fallback": "⚠️ Dự phòng: vùng tròn quanh điểm click",
