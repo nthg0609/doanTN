@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Trang-1" id="yFECjL0SWr0F87SKHOQG">
-    <mxGraphModel dx="3980" dy="1405" grid="1" gridSize="16" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="3980" dy="2574" grid="1" gridSize="16" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -1847,6 +1847,202 @@
               <Array as="points">
                 <mxPoint x="3590.5" y="2992" />
               </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidData="{&#xa;  &quot;data&quot;: &quot;graph TD\n    %% Định nghĩa phong cách màu sắc HUST (Đỏ - Trắng - Xám)\n    classDef hustRed fill:#990000,stroke:#660000,stroke-width:2px,color:#fff;\n    classDef hustWhite fill:#fff,stroke:#990000,stroke-width:2px,color:#1e293b;\n    classDef hustGray fill:#f1f5f9,stroke:#94a3b8,stroke-width:1.5px,color:#1e293b;\n\n    Input[\&quot;Ảnh Da Đầu Vào (RGB / DICOM)\&quot;]:::hustWhite\n    \n    subgraph SG [\&quot;Bộ lọc an toàn tiền xử lý (Safety Gate)\&quot;]\n        BlurCheck[\&quot;Kiểm tra độ mờ (Laplacian Var &lt; Threshold)\&quot;]:::hustGray\n        ExposureCheck[\&quot;Kiểm tra phơi sáng (Fitzpatrick Scale)\&quot;]:::hustGray\n        BlurCheck --&gt; ExposureCheck\n    end\n    \n    Input --&gt; SG\n    \n    SG --&gt;|Đạt chất lượng| Split{Tách Nhánh Song Song}:::hustRed\n    SG --&gt;|Ảnh lỗi| Reject[\&quot;Yêu cầu chụp lại (Triage)\&quot;]:::hustRed\n\n    %% Nhánh 1: Hình học\n    subgraph SegBranch [\&quot;Nhánh 1: Phân đoạn &amp; Chỉ số ABCD\&quot;]\n        SegAlg[\&quot;Phân đoạn tổn thương (SAM / DeepLabV3+ / OTSU)\&quot;]:::hustGray\n        ABCDCalc[\&quot;Đo đạc chỉ số hình học ABCD (Asymmetry, Border, Color, Diameter)\&quot;]:::hustGray\n        SegAlg --&gt; ABCDCalc\n    end\n    \n    %% Nhánh 2: Phân loại\n    subgraph ClsBranch [\&quot;Nhánh 2: Phân loại &amp; Dịch tễ\&quot;]\n        Classifier[\&quot;Phân loại ảnh (EfficientNet-B1 + CBAM)\&quot;]:::hustGray\n        LateFusion[\&quot;Late Fusion Bayes (Hợp nhất xác suất với Tuổi, Giới tính, Vị trí)\&quot;]:::hustGray\n        Classifier --&gt; LateFusion\n    end\n    \n    Split --&gt; SegAlg\n    Split --&gt; Classifier\n    \n    %% Post-processing\n    PostSG[\&quot;Hậu kiểm lâm sàng (Safety Gate Post-check)\&quot;]:::hustWhite\n    ABCDCalc --&gt; PostSG\n    LateFusion --&gt; PostSG\n    \n    %% Output\n    PostSG --&gt;|Bệnh lý ác tính| UrgentTriage[\&quot;Cảnh báo chuyển tuyến cấp thiết (Triage)\&quot;]:::hustRed\n    PostSG --&gt;|Lành tính / Tham vấn| VQA[\&quot;Trợ lý đàm thoại VQA y văn RAG (DistilGPT-2 LoRA)\&quot;]:::hustWhite\n    \n    VQA --&gt; OutputEHR[\&quot;Lưu trữ CSDL Firestore EHR &amp; Xuất báo cáo PDF\&quot;]:::hustWhite&quot;,&#xa;  &quot;config&quot;: null&#xa;}" id="KeiwcwvMCTlgJVwNURW4-1">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=10;" vertex="1">
+            <mxGeometry as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Bộ lọc an toàn tiền xử lý (Safety Gate)" mermaidId="n:SG" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Bộ lọc an toàn tiền xử lý (Safety Gate)" id="KeiwcwvMCTlgJVwNURW4-2">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="119" width="905" x="4308" y="5" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Kiểm tra độ mờ (Laplacian Var &lt; Threshold)" mermaidId="n:BlurCheck" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Kiểm tra độ mờ (Laplacian Var &lt; Threshold)" id="KeiwcwvMCTlgJVwNURW4-3">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-2" style="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="374" x="35" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Kiểm tra phơi sáng (Fitzpatrick Scale)" mermaidId="n:ExposureCheck" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Kiểm tra phơi sáng (Fitzpatrick Scale)" id="KeiwcwvMCTlgJVwNURW4-4">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-2" style="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="331" x="539" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:BlurCheck-&gt;ExposureCheck#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.5;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-5">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-2" source="KeiwcwvMCTlgJVwNURW4-3" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.5;entryX=0;entryY=0.5;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-4">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Nhánh 1: Phân đoạn &amp; Chỉ số ABCD" mermaidId="n:SegBranch" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Nhánh 1: Phân đoạn &amp; Chỉ số ABCD" id="KeiwcwvMCTlgJVwNURW4-6">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="228" width="608" x="3994" y="495" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Phân đoạn tổn thương (SAM / DeepLabV3+ / OTSU)" mermaidId="n:SegAlg" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Phân đoạn tổn thương (SAM / DeepLabV3+ / OTSU)" id="KeiwcwvMCTlgJVwNURW4-7">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-6" style="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="428" x="90" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đo đạc chỉ số hình học ABCD (Asymmetry, Border, Color, Diameter)" mermaidId="n:ABCDCalc" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Đo đạc chỉ số hình học ABCD (Asymmetry, Border, Color, Diameter)" id="KeiwcwvMCTlgJVwNURW4-8">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-6" style="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="538" x="35" y="149" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:SegAlg-&gt;ABCDCalc#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-9">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-6" source="KeiwcwvMCTlgJVwNURW4-7" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-8">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Nhánh 2: Phân loại &amp; Dịch tễ" mermaidId="n:ClsBranch" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Nhánh 2: Phân loại &amp; Dịch tễ" id="KeiwcwvMCTlgJVwNURW4-10">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="228" width="588" x="4622" y="495" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Phân loại ảnh (EfficientNet-B1 + CBAM)" mermaidId="n:Classifier" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Phân loại ảnh (EfficientNet-B1 + CBAM)" id="KeiwcwvMCTlgJVwNURW4-11">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-10" style="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="342" x="123" y="45" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Late Fusion Bayes (Hợp nhất xác suất với Tuổi, Giới tính, Vị trí)" mermaidId="n:LateFusion" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Late Fusion Bayes (Hợp nhất xác suất với Tuổi, Giới tính, Vị trí)" id="KeiwcwvMCTlgJVwNURW4-12">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-10" style="html=1;whiteSpace=wrap;strokeWidth=1.5;fillColor=#f1f5f9;strokeColor=#94a3b8;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="518" x="35" y="149" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Classifier-&gt;LateFusion#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-13">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-10" source="KeiwcwvMCTlgJVwNURW4-11" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-12">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Ảnh Da Đầu Vào (RGB / DICOM)" mermaidId="n:Input" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=default;strokeColor=#990000;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Ảnh Da Đầu Vào (RGB / DICOM)" id="KeiwcwvMCTlgJVwNURW4-14">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=default;strokeColor=#990000;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="285" x="4618" y="-99" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Tách Nhánh Song Song" mermaidId="n:Split" mermaidBaseStyle="rhombus;html=1;strokeWidth=2;whiteSpace=wrap;fillColor=#990000;strokeColor=#660000;fontColor=#fff;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Tách Nhánh Song Song" id="KeiwcwvMCTlgJVwNURW4-15">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="rhombus;html=1;strokeWidth=2;whiteSpace=wrap;fillColor=#990000;strokeColor=#660000;fontColor=#fff;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="272" width="272" x="4471" y="193" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Yêu cầu chụp lại (Triage)" mermaidId="n:Reject" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#990000;strokeColor=#660000;fontColor=#fff;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Yêu cầu chụp lại (Triage)" id="KeiwcwvMCTlgJVwNURW4-16">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#990000;strokeColor=#660000;fontColor=#fff;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="242" x="4793" y="302" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Hậu kiểm lâm sàng (Safety Gate Post-check)" mermaidId="n:PostSG" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=default;strokeColor=#990000;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Hậu kiểm lâm sàng (Safety Gate Post-check)" id="KeiwcwvMCTlgJVwNURW4-17">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=default;strokeColor=#990000;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="379" x="4418" y="773" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Cảnh báo chuyển tuyến cấp thiết (Triage)" mermaidId="n:UrgentTriage" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#990000;strokeColor=#660000;fontColor=#fff;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Cảnh báo chuyển tuyến cấp thiết (Triage)" id="KeiwcwvMCTlgJVwNURW4-18">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=#990000;strokeColor=#660000;fontColor=#fff;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="362" x="4204" y="896" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Trợ lý đàm thoại VQA y văn RAG (DistilGPT-2 LoRA)" mermaidId="n:VQA" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=default;strokeColor=#990000;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Trợ lý đàm thoại VQA y văn RAG (DistilGPT-2 LoRA)" id="KeiwcwvMCTlgJVwNURW4-19">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=default;strokeColor=#990000;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="425" x="4616" y="896" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="Lưu trữ CSDL Firestore EHR &amp; Xuất báo cáo PDF" mermaidId="n:OutputEHR" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=default;strokeColor=#990000;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="Lưu trữ CSDL Firestore EHR &amp; Xuất báo cáo PDF" id="KeiwcwvMCTlgJVwNURW4-20">
+          <mxCell parent="KeiwcwvMCTlgJVwNURW4-1" style="html=1;whiteSpace=wrap;strokeWidth=2;fillColor=default;strokeColor=#990000;fontColor=#1e293b;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
+            <mxGeometry height="54" width="404" x="4627" y="1000" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Input-&gt;SG#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;curved=1;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-21">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-14" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-2">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Đạt chất lượng" mermaidId="e:SG-&gt;Split#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;curved=1;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.39;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="Đạt chất lượng" id="KeiwcwvMCTlgJVwNURW4-22">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-2" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.39;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-15">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4607" y="159" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Ảnh lỗi" mermaidId="e:SG-&gt;Reject#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;curved=1;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.61;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="Ảnh lỗi" id="KeiwcwvMCTlgJVwNURW4-23">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-2" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.61;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-16">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4914" y="159" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Split-&gt;SegAlg#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0;exitY=0.76;entryX=0.5;entryY=0;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-24">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-15" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0;exitY=0.76;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-7">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4298" y="490" />
+                <mxPoint x="4298" y="515" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:Split-&gt;Classifier#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.76;entryX=0.5;entryY=0;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-25">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-15" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=1;exitY=0.76;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-11">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4916" y="490" />
+                <mxPoint x="4916" y="515" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:ABCDCalc-&gt;PostSG#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.08;entryY=0;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-26">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-8" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.08;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-17">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4298" y="723" />
+                <mxPoint x="4298" y="748" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:LateFusion-&gt;PostSG#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.92;entryY=0;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-27">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-12" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.92;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-17">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4916" y="723" />
+                <mxPoint x="4916" y="748" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Bệnh lý ác tính" mermaidId="e:PostSG-&gt;UrgentTriage#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.24;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="Bệnh lý ác tính" id="KeiwcwvMCTlgJVwNURW4-28">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-17" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.24;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-18">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4385" y="862" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="Lành tính / Tham vấn" mermaidId="e:PostSG-&gt;VQA#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.75;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="Lành tính / Tham vấn" id="KeiwcwvMCTlgJVwNURW4-29">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-17" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#E8E8E88D,#2a2a2a8D);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.75;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-19">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="4829" y="862" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="" mermaidId="e:VQA-&gt;OutputEHR#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;" mermaidBaseValue="" id="KeiwcwvMCTlgJVwNURW4-30">
+          <mxCell edge="1" parent="KeiwcwvMCTlgJVwNURW4-1" source="KeiwcwvMCTlgJVwNURW4-19" style="curved=1;startArrow=none;endArrow=block;endSize=7;strokeColor=light-dark(#333333,#cccccc);exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;" target="KeiwcwvMCTlgJVwNURW4-20">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points" />
             </mxGeometry>
           </mxCell>
         </UserObject>

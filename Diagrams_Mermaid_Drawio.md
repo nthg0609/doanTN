@@ -143,51 +143,48 @@ graph TD
 ## 4. Biểu đồ lớp UML (Class Diagram) cấu trúc Phần mềm (Slide 15)
 Biểu đồ lớp UML thể hiện thiết kế hướng đối tượng hoàn chỉnh của pipeline xử lý y tế.
 
+**Đã sửa để khớp đúng code thật (bản trước có nhiều tên hàm/class bịa — đã đối chiếu trực tiếp từng file `pipeline/*.py`):**
+- Bỏ hẳn `class EHRManager` — lớp này **không tồn tại**, EHR trong hệ thống chỉ là các hàm rời (`app_streamlit.py`), không phải thiết kế OOP. Nếu cần thể hiện EHR trên slide, nên vẽ như 1 khối chức năng riêng, không phải 1 class trong UML này.
+- `SafetyGate` chỉ thật sự có `evaluate()` — việc kiểm tra mờ/độ sáng nằm ở hàm rời `check_image_quality()` trong `pipeline/image_qa.py` (khác module), không phải phương thức riêng của `SafetyGate`.
+- `InteractiveSegmenter` chỉ có `segment_by_point()` — GrabCut chạy lồng bên trong hàm này, không phải phương thức tách riêng; OTSU dự phòng thật ra thuộc về `UnifiedDermatologyPipeline._classical_fallback_mask`.
+- `MultimodalBayesianFusion` không lưu state instance (`demographics_prior` không tồn tại là attribute) — 3 bảng prior (tuổi/giới/vị trí) là hằng số cấp module, các phương thức thật là `fuse()`, `adaptive_lambda()` (λ tự động theo entropy, xem `kien_thuc_nen_bao_ve.md` mục D3), `get_age_likelihood()`.
+- Bổ sung `_enhance_image_quality()` (lọc lông + CLAHE, mục A7) và `_classical_fallback_mask()` vào `UnifiedDermatologyPipeline` — 2 phương thức thật vừa được thêm/đã có sẵn nhưng thiếu trong sơ đồ cũ.
+
 ```mermaid
 classDiagram
     class UnifiedDermatologyPipeline {
-        +SafetyGate safety_gate
-        +InteractiveSegmenter segmenter
         +ModelRegistry registry
-        +run(image_path, age, gender, lambda_val) InferenceResult
-        -_safe_load_rgb(image_path) ndarray
-        -_segment(image, type) ndarray
-        -_classify(image, age, gender, lambda) dict
+        +SafetyGate safety_gate
+        +run(image_path, age, gender, body_location, lambda_val, interactive_point) dict
+        -_segment(img_rgb, image_type) tuple
+        -_classify(img_rgb, seg_mask, lesion_metrics, lambda_val) dict
+        -_crop_to_roi(img_rgb, mask, padding) ndarray
+        -_get_interactive_segmenter() InteractiveSegmenter
+        -_enhance_image_quality(img_rgb) ndarray
+        -_classical_fallback_mask(img_rgb) tuple
     }
 
     class SafetyGate {
         +SafetyGateConfig config
-        +evaluate(metrics, cls_confidence, image_type) GateResult
-        -_check_blur(image) bool
-        -_check_exposure(image) bool
+        +evaluate(metrics, cls_confidence, image_type, malignant_threshold) SafetyGateResult
     }
 
     class InteractiveSegmenter {
-        +DeepLabV3Model model
-        +segment_by_point(image, pt_x, pt_y) ndarray
-        -_apply_grabcut_refinement(image, mask) ndarray
-        -_run_otsu_fallback(image) ndarray
+        +bool sam_available
+        +SamPredictor predictor
+        +segment_by_point(img_rgb, pt_x, pt_y) tuple
     }
 
     class MultimodalBayesianFusion {
-        +EfficientNetB1 classifier
-        +dict demographics_prior
-        +fuse(img_probs, patient_data, lambda_val) dict
-        -_calculate_posterior(prior, likelihood) ndarray
-    }
-
-    class EHRManager {
-        +FirestoreClient db
-        +encrypt_patient_data(dict_data) dict
-        +sync_record(patient_id, record_data) bool
-        +generate_report_pdf(record_data) str
+        +fuse(image_probs, age, gender, body_location, lambda_val) dict
+        +adaptive_lambda(image_probs, lambda_min, lambda_max) float
+        +get_age_likelihood(age, mu, sigma) float
     }
 
     %% Mối quan hệ
-    UnifiedDermatologyPipeline --> SafetyGate : sử dụng để tiền kiểm/hậu kiểm
-    UnifiedDermatologyPipeline --> InteractiveSegmenter : gọi phân đoạn ảnh
-    UnifiedDermatologyPipeline --> MultimodalBayesianFusion : gọi phân loại & fusion
-    UnifiedDermatologyPipeline --> EHRManager : gọi để mã hóa & lưu CSDL
+    UnifiedDermatologyPipeline --> SafetyGate : hậu kiểm sau khi có kết quả phân đoạn + phân loại
+    UnifiedDermatologyPipeline --> InteractiveSegmenter : gọi khi bác sĩ click điểm mồi (SAM/GrabCut)
+    UnifiedDermatologyPipeline --> MultimodalBayesianFusion : gọi trong _classify để hợp nhất Bayes
 ```
 
 ---
@@ -278,7 +275,7 @@ graph TD
 ---
 
 ## 7. Giải thuật Phân đoạn tương tác SAM + GrabCut & Dự phòng OTSU (Slide 9)
-Sơ đồ giải thuật phân vùng tổn thương nâng cao giúp đo đạc chỉ số ABCD ổn định ngay cả khi mô hình Deep Learning gặp ảnh lỗi.
+Sơ đồ giải thuật phân vùng tổn thương nâng cao giúp đo đạc chỉ số ABCD ổn định ngay cả khi mô hình Deep Learning gặp ảnh lỗi. **Đã cập nhật:** thêm lớp cứu cánh thích ứng (lọc lông + CLAHE) giữa DeepLabV3+ và OTSU — khớp đúng code thật trong `unified_pipeline.py::_segment` (xem `kien_thuc_nen_bao_ve.md` mục A7).
 
 ```mermaid
 graph TD
@@ -301,15 +298,26 @@ graph TD
     InitPoint -->|Không nhấp| DeepLab["Chạy tự động DeepLabV3+ (Multi-scale TTA)"]:::hustGray
     
     GrabCut --> CheckSize{"Kiểm tra kích thước mặt nạ (Sum < 100 pixels)?"}:::hustRed
-    DeepLab --> CheckSize
-    
-    subgraph Fallback ["Giải pháp dự phòng y khoa"]
+    CheckSize -->|Có (Mặt nạ quá nhỏ/lỗi)| DeepLab
+
+    DeepLab --> CheckEmpty{"Mặt nạ rỗng (Sum = 0)?"}:::hustRed
+    CheckEmpty -->|Không, đạt chuẩn| Output["Mặt nạ phân đoạn tối ưu (Lesion Mask)"]:::hustWhite
+
+    subgraph Rescue ["Lớp cứu cánh thích ứng (chỉ chạy khi mặt nạ rỗng)"]
+        Enhance["Lọc lông DullRazor (Black-hat + Inpainting Telea) + Tăng tương phản CLAHE (kênh L/LAB)"]:::hustGray
+        Reseg["Chạy lại DeepLabV3+ trên ảnh đã xử lý"]:::hustGray
+        Enhance --> Reseg
+    end
+
+    CheckEmpty -->|Có, mặt nạ rỗng| Enhance
+    Reseg --> CheckEmpty2{"Vẫn rỗng?"}:::hustRed
+    CheckEmpty2 -->|Không, đạt chuẩn| Output
+
+    subgraph Fallback ["Giải pháp dự phòng y khoa cuối cùng"]
         OTSU["Thuật toán phân ngưỡng OTSU nghịch đảo (cv2.THRESH_BINARY_INV)"]:::hustGray
     end
     
-    CheckSize -->|Có (Mặt nạ quá nhỏ/lỗi)| OTSU
-    CheckSize -->|Không (Đạt chuẩn)| Output["Mặt nạ phân đoạn tối ưu (Lesion Mask)"]:::hustWhite
-    
+    CheckEmpty2 -->|Có, vẫn rỗng| OTSU
     OTSU --> Output
     
     Output --> ABCD["Tính toán chỉ số ABCD y văn & trích xuất DICOM PixelSpacing"]:::hustWhite

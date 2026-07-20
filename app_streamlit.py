@@ -558,6 +558,32 @@ def _mask_to_image(mask: Optional[np.ndarray], target_shape) -> Optional[np.ndar
     return (mask > 0).astype(np.uint8) * 255
 
 
+_SEG_METHOD_CAPTIONS = {
+    "deeplab": "Phân đoạn tự động (DeepLabV3+)",
+    "deeplab_tta": "Phân đoạn tự động (DeepLabV3+, đa tỷ lệ TTA cho ảnh phone)",
+    "deeplab_enhanced_reseg": "Đã tự động lọc lông + tăng sáng (CLAHE) rồi phân đoạn lại — ảnh gốc khó nhận diện",
+    "deeplab_tta_enhanced_reseg": "Đã tự động lọc lông + tăng sáng (CLAHE, có TTA) rồi phân đoạn lại — ảnh gốc khó nhận diện",
+    "classical_fallback": "⚠️ Dự phòng: phân ngưỡng OTSU (AI chính không nhận diện được tổn thương)",
+    "classical_fallback_after_tta": "⚠️ Dự phòng: phân ngưỡng OTSU (AI chính không nhận diện được tổn thương)",
+    "deeplab_fallback_interactive": "Điểm click không đủ tin cậy → tự động chuyển sang DeepLabV3+",
+    "mobile_sam": Phân đoạn tương tác bằng MobileSAM (theo điểm click bác sĩ)",
+    "grabcut_interactive_mask_init": "Phân đoạn tương tác bằng GrabCut (theo điểm click bác sĩ)",
+    "floodfill_interactive_fallback": "⚠️ Dự phòng: Flood Fill từ điểm click",
+    "circle_fallback": "⚠️ Dự phòng: vùng tròn quanh điểm click",
+    "custom_drawn_canvas": "Mặt nạ do bác sĩ tự vẽ tay",
+}
+
+
+def _seg_method_caption(seg_info: Optional[Dict[str, Any]]) -> Optional[str]:
+    """Diễn giải seg_info['method'] thành 1 dòng dễ hiểu cho bác sĩ — đặc biệt để lộ rõ
+    khi lớp cứu cánh lọc lông+CLAHE (mục A7, kien_thuc_nen_bao_ve.md) đã được kích hoạt,
+    thay vì ẩn hoàn toàn trong log kỹ thuật."""
+    if not seg_info:
+        return None
+    method = seg_info.get("method")
+    return _SEG_METHOD_CAPTIONS.get(method, f"Phương pháp phân đoạn: {method}" if method else None)
+
+
 # ==============================================================================
 # MODULE ĐA TỔN THƯƠNG
 # ==============================================================================
@@ -2626,6 +2652,9 @@ def main() -> None:
                 if mask_img_arr is not None:
                     st.image(mask_img_arr, caption="Mặt nạ tổn thương (AI Segmentation)",
                              clamp=True, channels="L", use_container_width=True)
+                    seg_caption = _seg_method_caption(result.get("segmentation") if result else None)
+                    if seg_caption:
+                        st.caption(seg_caption)
                 else:
                     st.info("Chưa thực hiện phân đoạn.")
             with col_img3:
