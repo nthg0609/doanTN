@@ -2163,6 +2163,35 @@ def download_weights_if_missing() -> None:
         except Exception:
             pass
 
+def download_sam_checkpoint_if_missing() -> None:
+    """Tải checkpoint MobileSAM (~40MB) từ GitHub nếu chưa có — không cần cơ chế
+    confirm-token của Google Drive như các checkpoint lớn khác, vì đây là file raw
+    trên GitHub nên tải trực tiếp một bước là đủ."""
+    import requests
+    from pathlib import Path
+
+    dest_path = Path("4_Models/sam/mobile_sam.pt")
+    if dest_path.exists() and dest_path.stat().st_size > 30 * 1024 * 1024:
+        return
+
+    url = "https://github.com/ChaoningZhang/MobileSAM/raw/master/weights/mobile_sam.pt"
+    with st.spinner("Đang tải checkpoint MobileSAM (~40MB, chỉ tải một lần)..."):
+        try:
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            resp = requests.get(url, stream=True, timeout=60)
+            resp.raise_for_status()
+            tmp_path = dest_path.with_suffix(".tmp")
+            with open(tmp_path, "wb") as f:
+                for chunk in resp.iter_content(32768):
+                    if chunk:
+                        f.write(chunk)
+            tmp_path.replace(dest_path)
+        except Exception as e:
+            st.warning(f"Không tải được checkpoint MobileSAM ({e}) — hệ thống sẽ tự dùng GrabCut dự phòng.")
+            if dest_path.with_suffix(".tmp").exists():
+                dest_path.with_suffix(".tmp").unlink()
+
+
 def main() -> None:
     st.set_page_config(
         page_title="Dermatology EHR — AI Assistant",
@@ -2171,6 +2200,7 @@ def main() -> None:
         initial_sidebar_state="expanded",
     )
     download_weights_if_missing()
+    download_sam_checkpoint_if_missing()
     _inject_custom_css()
 
     st.markdown(

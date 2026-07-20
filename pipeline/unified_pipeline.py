@@ -71,8 +71,22 @@ class UnifiedDermatologyPipeline:
         self.min_area_px = int(min_area_px)
         self.mode = mode
         self.use_tta = use_tta and _TTA_AVAILABLE  # P1-2: TTA chỉ hoạt động khi module có sẵn
+        self._interactive_segmenter: Optional[InteractiveSegmenter] = None  # lazy singleton, tránh nạp lại SAM mỗi lần click
         if load_models:
             self.registry.load_all()
+
+    def _get_interactive_segmenter(self) -> InteractiveSegmenter:
+        """Tạo (hoặc tái sử dụng) InteractiveSegmenter, nạp checkpoint MobileSAM nếu có sẵn.
+
+        Nếu checkpoint không tồn tại (hoặc thư viện mobile_sam/segment_anything chưa cài),
+        InteractiveSegmenter tự động fallback về GrabCut — hành vi cũ không đổi.
+        """
+        if self._interactive_segmenter is None:
+            sam_checkpoint = self.registry.base_dir / "4_Models" / "sam" / "mobile_sam.pt"
+            self._interactive_segmenter = InteractiveSegmenter(
+                checkpoint_path=str(sam_checkpoint) if sam_checkpoint.exists() else None
+            )
+        return self._interactive_segmenter
 
     def run(
         self,
@@ -105,7 +119,7 @@ class UnifiedDermatologyPipeline:
         # Nếu có điểm nhấp tương tác (SAM/GrabCut), chạy phân đoạn tương tác.
         elif interactive_point is not None:
             pt_x, pt_y = interactive_point
-            segmenter = InteractiveSegmenter()
+            segmenter = self._get_interactive_segmenter()
             seg_mask, seg_info = segmenter.segment_by_point(img_rgb, pt_x, pt_y)
             # Nếu mặt nạ tương tác quá nhỏ (do lỗi phân đoạn hoặc click nhầm vùng da lành), dùng phân đoạn tự động
             if int(seg_mask.sum()) < 100:

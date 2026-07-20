@@ -22,3 +22,4 @@ peft
 fpdf2
 pydicom
 streamlit-drawable-canvas
+mobile_sam @ git+https://github.com/ChaoningZhang/MobileSAM.git
